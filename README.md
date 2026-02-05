@@ -222,11 +222,11 @@ These provide layer mappings and cross-domain coupling patterns for implementing
 Elastic License 2.0 — See [LICENSE](LICENSE) for full text.
 
 **tl;dr:**
-- ✅ Free to use, modify, distribute for internal applications
-- ✅ Can use in production for your own organization
-- ❌ **Cannot** offer as a hosted/managed service (SaaS)
-- ❌ **Cannot** embed in commercial products without commercial license
-- ❌ **Cannot** remove license protections
+- Free to use, modify, distribute for internal applications
+- Can use in production for your own organization
+- **Cannot** offer as a hosted/managed service (SaaS)
+- **Cannot** embed in commercial products without commercial license
+- **Cannot** remove license protections
 
 ### Commercial License
 
