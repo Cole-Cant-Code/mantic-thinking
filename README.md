@@ -1,7 +1,7 @@
 # Mantic Early Warning System
 
-Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis. 
-Compatible with Claude, Kimi, Gemini, Codex, and GPT-4o.
+Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis.
+Compatible with Claude, Kimi, Gemini, OpenAI, and Ollama.
 
 **14 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection)
 
