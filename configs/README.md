@@ -9,6 +9,7 @@ This directory contains domain-specific configurations and framework documentati
 | `mantic_tech_spec.md` | Technical specification - core formula, mathematical properties, implementation details |
 | `mantic_explicit_framework.md` | Explicit framework mode - technical operating protocol with columnar architecture |
 | `mantic_reasoning_guidelines.md` | Reasoning assistant guidelines - internal thinking scaffold |
+| `mantic_boundary_weaver.md` | Cross-silo navigation pattern - translating complexity between boundaries |
 | `mantic_early_warning_tools.md` | Friction tools descriptions (7 divergence detection tools) |
 | `mantic_value_emergence_tools.md` | Emergence tools descriptions (7 confluence detection tools) |
 
