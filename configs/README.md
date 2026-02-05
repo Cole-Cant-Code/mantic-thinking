@@ -13,6 +13,15 @@ This directory contains domain-specific configurations and framework documentati
 | `mantic_early_warning_tools.md` | Friction tools descriptions (7 divergence detection tools) |
 | `mantic_value_emergence_tools.md` | Emergence tools descriptions (7 confluence detection tools) |
 
+## Ollama Compatibility
+
+All Mantic tools work with Ollama's OpenAI-compatible endpoint:
+```python
+client = openai.OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+```
+
+Tested with: MiniMax M2.1, GPT-OSS, GLM-4, Llama 3.1/3.2, Qwen 2.5, and other tool-capable models.
+
 ## Domain-Specific Configurations
 
 | File | Domain | Description |

@@ -574,6 +574,32 @@ result = execute_tool("cyber_attribution_resolver", {...})  # Friction
 result = execute_tool("cyber_adversary_overreach", {...})   # Emergence
 ```
 
+### For Ollama (Local/Cloud Models)
+```python
+# Import via adapters/openai_adapter.py (Ollama is OpenAI-compatible)
+from adapters.openai_adapter import get_openai_tools, execute_tool
+import openai
+
+# Point at Ollama's OpenAI-compatible endpoint
+client = openai.OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama"  # required but ignored
+)
+
+tools = get_openai_tools()
+
+# Works with any Ollama model that supports tools:
+# - minimax-m2.1:cloud
+# - gpt-oss:20b-cloud  
+# - glm-4.7:cloud
+# - llama3.1, qwen2.5, etc.
+
+result = execute_tool("social_catalytic_alignment", {
+    "individual_readiness": 0.82, "network_bridges": 0.85,
+    "policy_window": 0.80, "paradigm_momentum": 0.88
+})
+```
+
 ---
 
 ## Input Validation Rules

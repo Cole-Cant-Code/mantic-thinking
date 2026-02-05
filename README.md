@@ -115,6 +115,22 @@ result = execute_tool("climate_resilience_multiplier", {
 })
 ```
 
+### For Ollama (MiniMax, GPT-OSS, GLM, etc.)
+
+```python
+from adapters.openai_adapter import get_openai_tools, execute_tool
+import openai
+
+# Ollama's OpenAI-compatible endpoint
+client = openai.OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama"
+)
+
+tools = get_openai_tools()
+# Works with: minimax-m2.1:cloud, gpt-oss:20b-cloud, glm-4.7:cloud, etc.
+```
+
 ### For Codex / OpenAI
 
 ```python
