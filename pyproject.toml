@@ -9,7 +9,7 @@ description = "Cross-domain anomaly and opportunity detection using 4-layer hier
 readme = "README.md"
 license = {text = "Elastic License 2.0"}
 authors = [
-    {name = "Mantic Framework", email = "contact@mantic-framework.com"},
+    {name = "Mantic Framework", email = "contact@manticthink.com"},
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
