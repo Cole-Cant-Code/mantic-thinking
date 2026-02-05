@@ -38,6 +38,8 @@ from tools import (
     legal_precedent_seeding,
     military_strategic_initiative,
     social_catalytic_alignment,
+    codebase_layer_conflict,
+    codebase_alignment_window,
 )
 
 
@@ -298,6 +300,87 @@ class TestSocialTool:
         assert result["alert"] is not None
 
 
+class TestCodebaseFriction:
+    """Test codebase layer conflict detector."""
+
+    def test_aligned(self):
+        """Test well-aligned codebase (no conflict)."""
+        result = codebase_layer_conflict.detect(
+            architecture=0.75, implementation=0.72, testing=0.70, documentation=0.68
+        )
+        assert result["conflict_type"] == "aligned"
+        assert result["alert"] is None
+        assert "m_score" in result
+
+    def test_confidence_debt(self):
+        """Test confidence debt detection (high impl, low testing)."""
+        result = codebase_layer_conflict.detect(
+            architecture=0.85, implementation=0.80, testing=0.40, documentation=0.75
+        )
+        assert result["conflict_type"] == "confidence_debt"
+        assert result["alert"] is not None
+        assert "CONFIDENCE DEBT" in result["alert"]
+        assert result["bottleneck"] == "testing"
+
+    def test_specification_drift(self):
+        """Test specification drift (docs exceed implementation)."""
+        result = codebase_layer_conflict.detect(
+            architecture=0.70, implementation=0.45, testing=0.50, documentation=0.85
+        )
+        assert result["conflict_type"] == "specification_drift"
+        assert result["alert"] is not None
+        assert "SPECIFICATION DRIFT" in result["alert"]
+
+    def test_clamping(self):
+        """Test input clamping."""
+        result = codebase_layer_conflict.detect(
+            architecture=1.5, implementation=-0.2, testing=0.5, documentation=0.7
+        )
+        assert "m_score" in result
+        assert result["layer_values"]["architecture"] == 1.0
+        assert result["layer_values"]["implementation"] == 0.0
+
+
+class TestCodebaseEmergence:
+    """Test codebase alignment window detector."""
+
+    def test_optimal_window(self):
+        """Test optimal alignment (all > 0.8)."""
+        result = codebase_alignment_window.detect(
+            architecture=0.85, implementation=0.82, testing=0.88, documentation=0.80
+        )
+        assert result["window_detected"] is True
+        assert "FAVORABLE" in result["window_type"]
+        assert result["limiting_factor"] is not None
+        assert result["confidence"] > 0
+
+    def test_not_aligned(self):
+        """Test not aligned (testing below threshold)."""
+        result = codebase_alignment_window.detect(
+            architecture=0.80, implementation=0.75, testing=0.45, documentation=0.70
+        )
+        assert result["window_detected"] is False
+        assert "testing" in result["improvement_needed"]
+        assert result["alignment_floor"] < 0.65
+
+    def test_fully_optimal(self):
+        """Test fully optimal window (all > 0.8)."""
+        result = codebase_alignment_window.detect(
+            architecture=0.90, implementation=0.85, testing=0.82, documentation=0.88
+        )
+        assert result["window_detected"] is True
+        assert "OPTIMAL" in result["window_type"]
+        assert result["confidence"] == 0.95
+
+    def test_clamping(self):
+        """Test input clamping."""
+        result = codebase_alignment_window.detect(
+            architecture=1.5, implementation=0.9, testing=0.85, documentation=0.88
+        )
+        assert result["window_detected"] is True
+        assert "m_score" in result
+
+
 # =============================================================================
 # Emergence Tool Tests
 # =============================================================================
@@ -496,7 +579,7 @@ class TestOpenAIAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_openai_tools()
-        assert len(tools) == 14
+        assert len(tools) == 16
     
     def test_tool_schema(self):
         """Test tool schema format."""
@@ -584,9 +667,15 @@ class TestOpenAIAdapter:
                 "network_bridges": 0.85,
                 "policy_window": 0.80,
                 "paradigm_momentum": 0.88
+            },
+            "codebase_layer_conflict": {
+                "architecture": 0.75, "implementation": 0.70, "testing": 0.60, "documentation": 0.65
+            },
+            "codebase_alignment_window": {
+                "architecture": 0.80, "implementation": 0.75, "testing": 0.70, "documentation": 0.72
             }
         }
-        
+
         for tool_name, params in test_inputs.items():
             result = execute_openai(tool_name, params)
             assert "m_score" in result
@@ -599,7 +688,7 @@ class TestKimiAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_kimi_tools()
-        assert len(tools) == 14
+        assert len(tools) == 16
     
     def test_kimi_meta(self):
         """Test Kimi-specific metadata."""
@@ -632,7 +721,7 @@ class TestClaudeAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_claude_tools()
-        assert len(tools) == 14
+        assert len(tools) == 16
     
     def test_claude_meta(self):
         """Test Claude-specific metadata."""
