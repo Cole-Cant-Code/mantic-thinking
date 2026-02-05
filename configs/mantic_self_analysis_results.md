@@ -149,7 +149,7 @@ Dominant: L3
 
 [Column: Testing] (Score: 0.52)
 L1: Reasonable per-tool test cases (friction suite)
-L2: Emergence tools lack dedicated tests (half-blind)
+L2: Minimal smoke tests added for internal codebase tools; emergence tools still lack dedicated per-domain test classes (half-blind)
 L3: Cross-model consistency test is strong
 L4: No property-based testing, no CI/CD
 Dominant: L3
@@ -189,7 +189,7 @@ Resolution: Create tool registry/template system
 
 | Priority | Action | Rationale |
 |:---:|--------|-----------|
-| **HIGH** | Add emergence tool test classes | Testing-Meso is 0.50. Half the tool suite lacks dedicated validation. |
+| **HIGH** | Add emergence tool test classes | Testing-Meso is 0.50. Minimal smoke tests exist for internal tools only; per-domain emergence tests still needed. |
 | **HIGH** | Standardize WEIGHTS format (dict everywhere) | Implementation-Meso inconsistency between friction (dict) and emergence (list). |
 | MEDIUM | Add CI/CD pipeline | Testing-Macro is 0.55. Cross-model test exists but isn't automated. |
 | MEDIUM | Create proper Python packaging (pyproject.toml) | Implementation-Meta is 0.55. sys.path.insert is fragile. |
