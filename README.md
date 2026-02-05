@@ -178,13 +178,13 @@ mantic-tools/
 
 ```bash
 # Quick sanity check
-python -c "from adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools ready')"
+python3 -c "from adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools ready')"
 
 # Run all tests
-python -m pytest tests/test_cross_model.py -v
+python3 -m pytest tests/test_cross_model.py -v
 
 # Test individual tool
-python tools/emergence/healthcare_precision_therapeutic.py
+python3 tools/emergence/healthcare_precision_therapeutic.py
 ```
 
 ## Key Principle: Same M-Score, Opposite Meaning

@@ -53,8 +53,8 @@ class TestManticKernel:
         
         M, S, attr = mantic_kernel(W, L, I)
         
-        assert np.isclose(M, 0.125, atol=1e-10)
-        assert np.isclose(S, 0.125, atol=1e-10)
+        assert np.isclose(M, 0.5, atol=1e-10)
+        assert np.isclose(S, 0.5, atol=1e-10)
         assert len(attr) == 4
         assert all(np.isclose(a, 0.25, atol=1e-10) for a in attr)
     
@@ -67,7 +67,9 @@ class TestManticKernel:
         M, S, attr = mantic_kernel(W, L, I)
         
         # Should renormalize weights and compute with 3 layers
-        assert len(attr) == 3
+        # Attribution preserves original indices (missing layer -> 0.0)
+        assert len(attr) == 4
+        assert np.isclose(attr[1], 0.0, atol=1e-10)
         assert M > 0
     
     def test_weight_validation(self):

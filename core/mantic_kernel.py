@@ -37,6 +37,7 @@ def mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):
             M: final mantic score (float)
             S: spatial component = sum(W*L*I) (float)
             attribution: layer contribution percentages (list of 4 floats)
+                If a layer is missing (NaN), its attribution is 0.0.
     
     Raises:
         ValueError: If weights don't sum to ~1 after NaN handling
@@ -90,7 +91,13 @@ def mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):
         attribution = (W * L * I) / S
     else:
         attribution = np.zeros_like(W)
-    
+
+    # Preserve original indices when data was missing
+    if not np.all(available):
+        full_attr = np.zeros(len(available), dtype=float)
+        full_attr[available] = attribution
+        attribution = full_attr
+
     return float(M), float(S), attribution.tolist()
 
 
