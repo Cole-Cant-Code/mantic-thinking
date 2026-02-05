@@ -4,6 +4,7 @@ Mantic Early Warning System - Cross-Model Adapters
 Provides model-specific interfaces for:
 - Claude (Computer Use format)
 - Kimi (Native tool format)
+- Gemini (FunctionDeclaration format)
 - OpenAI/Codex (Function calling format)
 
 All adapters support 14 tools:
@@ -32,6 +33,14 @@ from .claude_adapter import (
     get_claude_prompt_addon,
     get_summary_by_type
 )
+from .gemini_adapter import (
+    get_gemini_tools,
+    get_gemini_tools_flat,
+    execute_tool as execute_gemini,
+    format_for_gemini,
+    get_gemini_prompt_addon,
+    get_tool_by_name
+)
 
 __all__ = [
     # OpenAI/Codex
@@ -52,4 +61,11 @@ __all__ = [
     "format_for_claude",
     "get_claude_prompt_addon",
     "get_summary_by_type",
+    # Gemini
+    "get_gemini_tools",
+    "get_gemini_tools_flat",
+    "execute_gemini",
+    "format_for_gemini",
+    "get_gemini_prompt_addon",
+    "get_tool_by_name",
 ]

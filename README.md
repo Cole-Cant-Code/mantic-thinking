@@ -1,7 +1,7 @@
 # Mantic Early Warning System
 
 Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis. 
-Compatible with Claude, Kimi, Codex, and GPT-4o.
+Compatible with Claude, Kimi, Gemini, Codex, and GPT-4o.
 
 **14 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection)
 
@@ -97,6 +97,24 @@ result = execute_tool("finance_confluence_alpha", {
 print(format_for_claude(result, "finance_confluence_alpha"))
 ```
 
+### For Gemini
+
+```python
+from adapters.gemini_adapter import get_gemini_tools, execute_tool
+
+# Get tools in Gemini FunctionDeclaration format
+tools = get_gemini_tools()
+
+# Or get flat list for simpler SDK usage
+from adapters.gemini_adapter import get_gemini_tools_flat
+declarations = get_gemini_tools_flat()
+
+result = execute_tool("climate_resilience_multiplier", {
+    "atmospheric_benefit": 0.75, "ecological_benefit": 0.80,
+    "infrastructure_benefit": 0.78, "policy_alignment": 0.82
+})
+```
+
 ### For Codex / OpenAI
 
 ```python
@@ -130,7 +148,7 @@ mantic-tools/
 ├── tools/
 │   ├── friction/              # 7 divergence detection tools
 │   └── emergence/             # 7 confluence detection tools
-├── adapters/                  # Model-specific adapters (Claude/Kimi/OpenAI)
+├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
 ├── configs/                   # Domain configurations & framework docs
 │   ├── mantic_tech_spec.md    # Technical specification
 │   ├── mantic_explicit_framework.md  # Framework protocol

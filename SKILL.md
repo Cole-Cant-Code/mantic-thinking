@@ -5,7 +5,7 @@
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** MIT  
-**models:** [claude, kimi, codex, gpt-4o]
+**models:** [claude, kimi, gemini, codex, gpt-4o]
 
 ---
 
@@ -537,6 +537,25 @@ comparison = compare_friction_emergence(
                      "phenotypic_timing": 0.88, "psychosocial_engagement": 0.90}
 )
 # High M in friction = risk. High M in emergence = opportunity.
+```
+
+### For Gemini (Function Declaration)
+```python
+# Import via adapters/gemini_adapter.py
+from adapters.gemini_adapter import get_gemini_tools, execute_tool
+
+# Get tools in Gemini FunctionDeclaration format
+tools = get_gemini_tools()  # Returns [{"function_declarations": [...]}]
+
+# Or get flat list
+from adapters.gemini_adapter import get_gemini_tools_flat
+declarations = get_gemini_tools_flat()
+
+# Execute tool
+result = execute_tool("climate_resilience_multiplier", {
+    "atmospheric_benefit": 0.75, "ecological_benefit": 0.80,
+    "infrastructure_benefit": 0.78, "policy_alignment": 0.82
+})
 ```
 
 ### For Codex/OpenAI (Function Calling)
