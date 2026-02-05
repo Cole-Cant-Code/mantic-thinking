@@ -15,3 +15,7 @@ __pycache__/
 
 # Local config/secrets
 .env
+
+# Local development utilities (not part of release)
+demo.py
+visualization/__init__.py

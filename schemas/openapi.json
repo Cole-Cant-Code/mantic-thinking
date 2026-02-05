@@ -1,39 +1,69 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.0",
   "info": {
-    "title": "Mantic Early Warning System API",
-    "description": "Cross-domain anomaly detection using 4-layer hierarchical analysis. Compatible with Claude, Kimi, Codex, and GPT-4o.",
+    "title": "Mantic Tools API",
     "version": "1.0.0",
-    "contact": {
-      "name": "Mantic Framework"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "description": "Mantic Early Warning System - 14 tools (7 friction + 7 emergence)"
   },
   "paths": {
-    "/detect/healthcare": {
+    "/detect/healthcare_phenotype_genotype": {
       "post": {
-        "summary": "Healthcare: Phenotype-Genotype Mismatch Detector",
-        "description": "Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience.",
-        "operationId": "healthcare_phenotype_genotype",
+        "summary": "FRICTION: Detects when genomic risk doesn't match phenotypic presentation, indic",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/HealthcareRequest"
+                "type": "object",
+                "properties": {
+                  "phenotypic": {
+                    "type": "number",
+                    "description": "Current symptoms/vitals (0-1)"
+                  },
+                  "genomic": {
+                    "type": "number",
+                    "description": "Genetic risk score (0-1)"
+                  },
+                  "environmental": {
+                    "type": "number",
+                    "description": "Exposure load (0-1)"
+                  },
+                  "psychosocial": {
+                    "type": "number",
+                    "description": "Stress/resilience (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "phenotypic",
+                  "genomic",
+                  "environmental",
+                  "psychosocial"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -41,28 +71,64 @@
         }
       }
     },
-    "/detect/finance": {
+    "/detect/finance_regime_conflict": {
       "post": {
-        "summary": "Finance: Regime Conflict Monitor",
-        "description": "Spots when technical price action contradicts fundamentals, flow, or risk signals.",
-        "operationId": "finance_regime_conflict",
+        "summary": "FRICTION: Spots when technical price action contradicts fundamentals, flow, or r",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FinanceRequest"
+                "type": "object",
+                "properties": {
+                  "technical": {
+                    "type": "number",
+                    "description": "Price action signals (0-1)"
+                  },
+                  "macro": {
+                    "type": "number",
+                    "description": "Fundamental indicators (0-1)"
+                  },
+                  "flow": {
+                    "type": "number",
+                    "description": "Capital flow direction (-1 to 1)"
+                  },
+                  "risk": {
+                    "type": "number",
+                    "description": "Risk appetite metrics (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "technical",
+                  "macro",
+                  "flow",
+                  "risk"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -70,28 +136,64 @@
         }
       }
     },
-    "/detect/cyber": {
+    "/detect/cyber_attribution_resolver": {
       "post": {
-        "summary": "Cybersecurity: Attribution Uncertainty Resolver",
-        "description": "Scores confidence when technical sophistication doesn't align with geopolitical context.",
-        "operationId": "cyber_attribution_resolver",
+        "summary": "FRICTION: Scores confidence when technical sophistication doesn't align with geo",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CyberRequest"
+                "type": "object",
+                "properties": {
+                  "technical": {
+                    "type": "number",
+                    "description": "Technical sophistication (0-1)"
+                  },
+                  "threat_intel": {
+                    "type": "number",
+                    "description": "Threat intel confidence (0-1)"
+                  },
+                  "operational_impact": {
+                    "type": "number",
+                    "description": "Operational impact severity (0-1)"
+                  },
+                  "geopolitical": {
+                    "type": "number",
+                    "description": "Geopolitical context alignment (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "technical",
+                  "threat_intel",
+                  "operational_impact",
+                  "geopolitical"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -99,28 +201,64 @@
         }
       }
     },
-    "/detect/climate": {
+    "/detect/climate_maladaptation": {
       "post": {
-        "summary": "Climate: Maladaptation Preventer",
-        "description": "Blocks solutions that solve immediate micro problems but create macro/meta harms.",
-        "operationId": "climate_maladaptation",
+        "summary": "FRICTION: Blocks solutions that solve immediate micro problems but create macro/",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClimateRequest"
+                "type": "object",
+                "properties": {
+                  "atmospheric": {
+                    "type": "number",
+                    "description": "Atmospheric metrics (0-1)"
+                  },
+                  "ecological": {
+                    "type": "number",
+                    "description": "Ecosystem health (0-1)"
+                  },
+                  "infrastructure": {
+                    "type": "number",
+                    "description": "Infrastructure resilience (0-1)"
+                  },
+                  "policy": {
+                    "type": "number",
+                    "description": "Policy coherence (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "atmospheric",
+                  "ecological",
+                  "infrastructure",
+                  "policy"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -128,28 +266,64 @@
         }
       }
     },
-    "/detect/legal": {
+    "/detect/legal_precedent_drift": {
       "post": {
-        "summary": "Legal: Precedent Drift Alert",
-        "description": "Warns when judicial philosophy shifts threaten current precedent-based strategies.",
-        "operationId": "legal_precedent_drift",
+        "summary": "FRICTION: Warns when judicial philosophy shifts threaten current precedent-based",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LegalRequest"
+                "type": "object",
+                "properties": {
+                  "black_letter": {
+                    "type": "number",
+                    "description": "Statutory text alignment (0-1)"
+                  },
+                  "precedent": {
+                    "type": "number",
+                    "description": "Precedent consistency (0-1)"
+                  },
+                  "operational": {
+                    "type": "number",
+                    "description": "Implementation feasibility (0-1)"
+                  },
+                  "socio_political": {
+                    "type": "number",
+                    "description": "Social/political context (-1 to 1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "black_letter",
+                  "precedent",
+                  "operational",
+                  "socio_political"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -157,28 +331,64 @@
         }
       }
     },
-    "/detect/military": {
+    "/detect/military_friction_forecast": {
       "post": {
-        "summary": "Military: Friction Forecast Engine",
-        "description": "Identifies where tactical plans hit logistics or political constraints.",
-        "operationId": "military_friction_forecast",
+        "summary": "FRICTION: Identifies where tactical plans hit logistics or political constraints",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MilitaryRequest"
+                "type": "object",
+                "properties": {
+                  "maneuver": {
+                    "type": "number",
+                    "description": "Tactical maneuver feasibility (0-1)"
+                  },
+                  "intelligence": {
+                    "type": "number",
+                    "description": "Intelligence confidence (0-1)"
+                  },
+                  "sustainment": {
+                    "type": "number",
+                    "description": "Logistics sustainability (0-1)"
+                  },
+                  "political": {
+                    "type": "number",
+                    "description": "Political authorization (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "maneuver",
+                  "intelligence",
+                  "sustainment",
+                  "political"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -186,28 +396,519 @@
         }
       }
     },
-    "/detect/social": {
+    "/detect/social_narrative_rupture": {
       "post": {
-        "summary": "Social/Cultural: Narrative Rupture Detector",
-        "description": "Catches virality that outpaces institutional sense-making capacity.",
-        "operationId": "social_narrative_rupture",
+        "summary": "FRICTION: Catches virality that outpaces institutional sense-making capacity.",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SocialRequest"
+                "type": "object",
+                "properties": {
+                  "individual": {
+                    "type": "number",
+                    "description": "Sentiment velocity (0-1)"
+                  },
+                  "network": {
+                    "type": "number",
+                    "description": "Propagation speed (0-1)"
+                  },
+                  "institutional": {
+                    "type": "number",
+                    "description": "Response lag (0-1)"
+                  },
+                  "cultural": {
+                    "type": "number",
+                    "description": "Archetype alignment (-1 to 1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "individual",
+                  "network",
+                  "institutional",
+                  "cultural"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Detection result",
+            "description": "Mantic analysis result",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionResult"
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/healthcare_precision_therapeutic": {
+      "post": {
+        "summary": "CONFLUENCE: Identifies rare alignment of genomic predisposition, environmental r",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "genomic_predisposition": {
+                    "type": "number",
+                    "description": "Genetic readiness for treatment (0-1)"
+                  },
+                  "environmental_readiness": {
+                    "type": "number",
+                    "description": "Exposure/toxin levels favorable (0-1)"
+                  },
+                  "phenotypic_timing": {
+                    "type": "number",
+                    "description": "Disease progression stage optimal (0-1)"
+                  },
+                  "psychosocial_engagement": {
+                    "type": "number",
+                    "description": "Patient motivation/support high (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "genomic_predisposition",
+                  "environmental_readiness",
+                  "phenotypic_timing",
+                  "psychosocial_engagement"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/finance_confluence_alpha": {
+      "post": {
+        "summary": "CONFLUENCE: Detects asymmetric opportunity when technical setup, macro tailwind,",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "technical_setup": {
+                    "type": "number",
+                    "description": "Technical indicators favorable (0-1)"
+                  },
+                  "macro_tailwind": {
+                    "type": "number",
+                    "description": "Fundamental/macro support (0-1)"
+                  },
+                  "flow_positioning": {
+                    "type": "number",
+                    "description": "Crowd positioning (-1 to 1, extreme = contrarian signal)"
+                  },
+                  "risk_compression": {
+                    "type": "number",
+                    "description": "Risk appetite favorable (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "technical_setup",
+                  "macro_tailwind",
+                  "flow_positioning",
+                  "risk_compression"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/cyber_adversary_overreach": {
+      "post": {
+        "summary": "CONFLUENCE: Identifies defensive advantage windows when attacker TTPs are stretc",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "threat_intel_stretch": {
+                    "type": "number",
+                    "description": "Attacker TTPs overextended/visible (0-1)"
+                  },
+                  "geopolitical_pressure": {
+                    "type": "number",
+                    "description": "External pressure on attacker (0-1)"
+                  },
+                  "operational_hardening": {
+                    "type": "number",
+                    "description": "Defender readiness/hardening (0-1)"
+                  },
+                  "tool_reuse_fatigue": {
+                    "type": "number",
+                    "description": "Attacker tool reuse/indicators (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "threat_intel_stretch",
+                  "geopolitical_pressure",
+                  "operational_hardening",
+                  "tool_reuse_fatigue"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/climate_resilience_multiplier": {
+      "post": {
+        "summary": "CONFLUENCE: Surfaces interventions with positive cross-domain coupling solving m",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "atmospheric_benefit": {
+                    "type": "number",
+                    "description": "Atmospheric/climate benefit (0-1)"
+                  },
+                  "ecological_benefit": {
+                    "type": "number",
+                    "description": "Ecosystem benefit (0-1)"
+                  },
+                  "infrastructure_benefit": {
+                    "type": "number",
+                    "description": "Infrastructure resilience benefit (0-1)"
+                  },
+                  "policy_alignment": {
+                    "type": "number",
+                    "description": "Policy coherence/support (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "atmospheric_benefit",
+                  "ecological_benefit",
+                  "infrastructure_benefit",
+                  "policy_alignment"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/legal_precedent_seeding": {
+      "post": {
+        "summary": "CONFLUENCE: Spots windows when socio-political climate, institutional capacity, ",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "socio_political_climate": {
+                    "type": "number",
+                    "description": "Receptiveness to legal change (0-1)"
+                  },
+                  "institutional_capacity": {
+                    "type": "number",
+                    "description": "Courts/resources to handle case (0-1)"
+                  },
+                  "statutory_ambiguity": {
+                    "type": "number",
+                    "description": "Statutory text ambiguity/openness (0-1)"
+                  },
+                  "circuit_split": {
+                    "type": "number",
+                    "description": "Degree of circuit split (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "socio_political_climate",
+                  "institutional_capacity",
+                  "statutory_ambiguity",
+                  "circuit_split"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/military_strategic_initiative": {
+      "post": {
+        "summary": "CONFLUENCE: Identifies decisive action opportunities when intelligence ambiguity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enemy_ambiguity": {
+                    "type": "number",
+                    "description": "Intelligence gaps favoring surprise (0-1)"
+                  },
+                  "positional_advantage": {
+                    "type": "number",
+                    "description": "Geographical/tactical position (0-1)"
+                  },
+                  "logistic_readiness": {
+                    "type": "number",
+                    "description": "Sustainment capability ready (0-1)"
+                  },
+                  "authorization_clarity": {
+                    "type": "number",
+                    "description": "Political authority clear (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "enemy_ambiguity",
+                  "positional_advantage",
+                  "logistic_readiness",
+                  "authorization_clarity"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/social_catalytic_alignment": {
+      "post": {
+        "summary": "CONFLUENCE: Spots transformative potential when individual readiness, network br",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "individual_readiness": {
+                    "type": "number",
+                    "description": "Population psychological readiness (0-1)"
+                  },
+                  "network_bridges": {
+                    "type": "number",
+                    "description": "Cross-cutting network connections (0-1)"
+                  },
+                  "policy_window": {
+                    "type": "number",
+                    "description": "Policy opportunity open (0-1)"
+                  },
+                  "paradigm_momentum": {
+                    "type": "number",
+                    "description": "Cultural paradigm shift underway (0-1)"
+                  },
+                  "f_time": {
+                    "type": "number",
+                    "default": 1.0
+                  }
+                },
+                "required": [
+                  "individual_readiness",
+                  "network_bridges",
+                  "policy_window",
+                  "paradigm_momentum"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mantic analysis result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "m_score": {
+                      "type": "number"
+                    },
+                    "alert": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -217,277 +918,6 @@
     }
   },
   "components": {
-    "schemas": {
-      "HealthcareRequest": {
-        "type": "object",
-        "required": ["phenotypic", "genomic", "environmental", "psychosocial"],
-        "properties": {
-          "phenotypic": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Current symptoms/vitals (0-1, where 0 = no symptoms, 1 = severe symptoms)"
-          },
-          "genomic": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Genetic risk score (0-1, where 0 = low risk, 1 = high risk)"
-          },
-          "environmental": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Exposure load (0-1, where 0 = no exposure, 1 = heavy exposure)"
-          },
-          "psychosocial": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Stress/resilience factors (0-1, where 0 = high stress, 1 = high resilience)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "FinanceRequest": {
-        "type": "object",
-        "required": ["technical", "macro", "flow", "risk"],
-        "properties": {
-          "technical": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Price action signals (0-1, where 0 = bearish, 1 = bullish)"
-          },
-          "macro": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Fundamental indicators (0-1, where 0 = weak fundamentals, 1 = strong fundamentals)"
-          },
-          "flow": {
-            "type": "number",
-            "minimum": -1,
-            "maximum": 1,
-            "description": "Capital flow direction (-1 = heavy outflows, 1 = heavy inflows)"
-          },
-          "risk": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Risk appetite metrics (0-1, where 0 = risk-off, 1 = risk-on)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "CyberRequest": {
-        "type": "object",
-        "required": ["technical", "threat_intel", "operational_impact", "geopolitical"],
-        "properties": {
-          "technical": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Technical sophistication indicators (0-1, where 0 = rudimentary, 1 = nation-state level)"
-          },
-          "threat_intel": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Threat intelligence confidence (0-1, where 0 = no intel, 1 = confirmed attribution)"
-          },
-          "operational_impact": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Severity of operational impact (0-1, where 0 = minimal, 1 = critical)"
-          },
-          "geopolitical": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Geopolitical context alignment (0-1, where 0 = no context, 1 = clear motive/context)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "ClimateRequest": {
-        "type": "object",
-        "required": ["atmospheric", "ecological", "infrastructure", "policy"],
-        "properties": {
-          "atmospheric": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Atmospheric condition metrics"
-          },
-          "ecological": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Ecosystem health indicators (0-1, where 0 = degraded, 1 = healthy)"
-          },
-          "infrastructure": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Infrastructure resilience (0-1, where 0 = vulnerable, 1 = resilient)"
-          },
-          "policy": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Policy coherence score (0-1, where 0 = fragmented, 1 = coherent)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "LegalRequest": {
-        "type": "object",
-        "required": ["black_letter", "precedent", "operational", "socio_political"],
-        "properties": {
-          "black_letter": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Statutory text alignment (0-1, where 0 = ambiguous, 1 = clear)"
-          },
-          "precedent": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Precedent consistency (0-1, where 0 = overturned/questioned, 1 = solid)"
-          },
-          "operational": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Practical implementation feasibility"
-          },
-          "socio_political": {
-            "type": "number",
-            "minimum": -1,
-            "maximum": 1,
-            "description": "Social/political context (-1 = leftward shift, 1 = rightward shift)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "MilitaryRequest": {
-        "type": "object",
-        "required": ["maneuver", "intelligence", "sustainment", "political"],
-        "properties": {
-          "maneuver": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Tactical maneuver feasibility (0-1, where 0 = constrained, 1 = open)"
-          },
-          "intelligence": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Intelligence confidence (0-1, where 0 = unknowns, 1 = complete picture)"
-          },
-          "sustainment": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Logistics sustainability (0-1, where 0 = unsustainable, 1 = assured)"
-          },
-          "political": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Political authorization level (0-1, where 0 = constrained, 1 = full authority)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "SocialRequest": {
-        "type": "object",
-        "required": ["individual", "network", "institutional", "cultural"],
-        "properties": {
-          "individual": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Individual sentiment velocity (0-1, where 0 = stable, 1 = rapidly shifting)"
-          },
-          "network": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Network propagation speed (0-1, where 0 = contained, 1 = viral)"
-          },
-          "institutional": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Institutional response lag (0-1, where 0 = rapid response, 1 = significant lag)"
-          },
-          "cultural": {
-            "type": "number",
-            "minimum": -1,
-            "maximum": 1,
-            "description": "Cultural archetype alignment (-1 = counter-narrative, 1 = aligned)"
-          },
-          "f_time": {
-            "type": "number",
-            "default": 1.0,
-            "description": "Temporal kernel multiplier"
-          }
-        }
-      },
-      "DetectionResult": {
-        "type": "object",
-        "required": ["m_score", "spatial_component", "layer_attribution"],
-        "properties": {
-          "m_score": {
-            "type": "number",
-            "description": "Final mantic anomaly score (0-1)"
-          },
-          "spatial_component": {
-            "type": "number",
-            "description": "Raw spatial component (S) from kernel calculation"
-          },
-          "layer_attribution": {
-            "type": "object",
-            "description": "Percentage contribution per layer",
-            "additionalProperties": {
-              "type": "number"
-            }
-          },
-          "alert": {
-            "type": "string",
-            "description": "Human-readable detection message (null if no anomaly)"
-          }
-        }
-      }
-    }
+    "schemas": {}
   }
 }
