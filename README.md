@@ -191,9 +191,9 @@ python3 tools/emergence/healthcare_precision_therapeutic.py
 
 | M-Score | Friction (Risk) | Emergence (Opportunity) |
 |---------|-----------------|------------------------|
-| 0.1-0.3 | Low risk ✓ | Low opportunity (wait) |
-| 0.4-0.6 | Moderate friction ⚠️ | Favorable window |
-| 0.7-0.9 | High risk 🚨 | Optimal window 🎯 |
+| 0.1-0.3 | Low risk | Low opportunity (wait) |
+| 0.4-0.6 | Moderate friction | Favorable window |
+| 0.7-0.9 | High risk | Optimal window |
 
 The M-score measures **intensity**. Friction tools interpret high intensity as danger. Emergence tools interpret high intensity as opportunity.
 
