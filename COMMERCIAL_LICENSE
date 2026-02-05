@@ -1,0 +1,134 @@
+Mantic Framework Commercial License
+
+This file outlines the commercial licensing terms for the Mantic Early Warning
+System. For non-commercial or internal use, see the LICENSE file (Elastic
+License 2.0).
+
+------------------------------------------------------------------------------
+LICENSE TIERS
+------------------------------------------------------------------------------
+
+TIER 1: STARTUP / SMALL BUSINESS
+- Annual revenue < $1M USD
+- Up to 10 employees
+- Internal use only (no redistribution)
+
+  Price: $500/year or $1,500 one-time
+
+TIER 2: GROWTH / ENTERPRISE INTERNAL
+- Annual revenue < $50M USD
+- Unlimited internal users
+- Internal use only (no redistribution)
+
+  Price: $5,000/year or $15,000 one-time
+
+TIER 3: ENTERPRISE UNLIMITED
+- Annual revenue ≥ $50M USD
+- Unlimited internal users
+- Includes 20 hours consulting/support
+
+  Price: $25,000/year or $75,000 one-time
+
+TIER 4: OEM / REDISTRIBUTION / SAAS
+- Embed in commercial product
+- Offer as managed service (SaaS)
+- White-label rights
+- Includes source code modification rights
+- Priority support
+
+  Price: Custom (starting at $50,000/year)
+  Contact: licensing@manticthink.com
+
+------------------------------------------------------------------------------
+WHAT EACH TIER INCLUDES
+------------------------------------------------------------------------------
+
+All tiers include:
+- Right to use all 14 tools (Friction + Emergence)
+- All 7 domain configurations (Healthcare, Finance, Cyber, Climate, Legal,
+  Military, Social)
+- All adapters (OpenAI, Claude, Kimi, Gemini, Ollama)
+- Updates for license duration
+
+OEM/SaaS tier additionally includes:
+- Right to modify and redistribute
+- Right to remove attribution
+- Right to offer as hosted service
+- Dedicated support channel
+- Custom domain configurations
+
+------------------------------------------------------------------------------
+RESTRICTIONS
+------------------------------------------------------------------------------
+
+Unless you have purchased an OEM/SaaS license:
+
+1. You may NOT offer Mantic tools as a hosted or managed service where users
+   access the functionality via API, web interface, or cloud platform.
+
+2. You may NOT embed Mantic tools in a product sold to end users without
+   additional OEM licensing.
+
+3. You may NOT remove or alter copyright notices, license references, or
+   attribution in the source code.
+
+4. You may NOT sublicense, sell, or transfer your license to third parties
+   without written permission.
+
+------------------------------------------------------------------------------
+HOW TO PURCHASE
+------------------------------------------------------------------------------
+
+Contact: licensing@manticthink.com
+
+Include in your inquiry:
+- Company name and size
+- Intended use case (internal, product embedding, SaaS)
+- Estimated number of users/deployments
+- Any customization requirements
+
+Standard licenses are issued within 48 hours of payment.
+Custom/OEM licenses require 1-2 weeks for terms negotiation.
+
+------------------------------------------------------------------------------
+REFUND POLICY
+------------------------------------------------------------------------------
+
+Full refund within 14 days if:
+- License has not been used in production
+- Written request provided with business justification
+
+No refunds after:
+- 14-day period expires
+- Code has been deployed to production
+- Custom terms have been negotiated
+
+------------------------------------------------------------------------------
+SUPPORT & UPDATES
+------------------------------------------------------------------------------
+
+All paid licenses include:
+- Access to updates for the license term
+- Email support (48-hour response)
+- Bug fix priority
+
+OEM/SaaS licenses additionally include:
+- Phone/Slack support (business hours)
+- Quarterly roadmap reviews
+- Custom feature development (additional cost)
+
+------------------------------------------------------------------------------
+QUESTIONS?
+------------------------------------------------------------------------------
+
+For licensing inquiries: licensing@manticthink.com
+
+For technical questions: support@mantic-framework.com
+
+For legal questions: Include "Legal Inquiry" in subject line
+
+------------------------------------------------------------------------------
+VERSION HISTORY
+------------------------------------------------------------------------------
+
+v1.0 (2025-02-05): Initial commercial terms

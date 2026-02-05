@@ -4,7 +4,7 @@
 **version:** 1.0.0  
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
-**license:** MIT  
+**license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
 **models:** [claude, kimi, gemini, codex, gpt-4o]
 
 ---

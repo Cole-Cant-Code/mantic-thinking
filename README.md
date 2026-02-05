@@ -217,7 +217,33 @@ These provide layer mappings and cross-domain coupling patterns for implementing
 
 ## License
 
-MIT License
+### Source-Available License (Default)
+
+Elastic License 2.0 — See [LICENSE](LICENSE) for full text.
+
+**tl;dr:**
+- ✅ Free to use, modify, distribute for internal applications
+- ✅ Can use in production for your own organization
+- ❌ **Cannot** offer as a hosted/managed service (SaaS)
+- ❌ **Cannot** embed in commercial products without commercial license
+- ❌ **Cannot** remove license protections
+
+### Commercial License
+
+Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
+
+**Purchase a commercial license** — See [COMMERCIAL_LICENSE](COMMERCIAL_LICENSE) for pricing and terms.
+
+| Tier | Best For | From |
+|------|----------|------|
+| Startup | <$1M revenue, internal use | $500/year |
+| Growth | <$50M revenue, internal use | $5,000/year |
+| Enterprise | Unlimited internal, large orgs | $25,000/year |
+| OEM/SaaS | Embed, resell, offer as service | Custom (from $50k) |
+
+**Contact:** licensing@manticthink.com
+
+*All licenses include updates and email support. OEM includes custom development options.*
 
 ## Version
 
