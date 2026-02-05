@@ -16,6 +16,9 @@ import json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.mantic_kernel import mantic_kernel, compute_temporal_kernel, verify_kernel_integrity
+
+# Import codebase tools directly (internal use only, not in public API)
+# These are intentionally NOT exported in tools/__init__.py to keep them internal
 from tools.friction.codebase_layer_conflict import detect as detect_conflict
 from tools.emergence.codebase_alignment_window import detect as detect_alignment
 from tools.friction.cyber_attribution_resolver import detect as detect_cyber

@@ -917,3 +917,58 @@ if __name__ == "__main__":
     print("All tests passed! ✓")
     print("\nMantic Early Warning System is ready for cross-model use.")
     print("Compatible with: Claude, Kimi, Codex, GPT-4o")
+
+
+# =============================================================================
+# Internal Tool Smoke Tests (Not Part of Public API)
+# =============================================================================
+
+class TestInternalCodebaseTools:
+    """
+    Smoke tests for internal codebase analysis tools.
+    
+    These tools are intentionally NOT exported in tools/__init__.py
+    and NOT wired into adapters. They exist for self-analysis only.
+    """
+
+    def test_codebase_layer_conflict_imports(self):
+        """Verify internal friction tool can be imported directly."""
+        from tools.friction.codebase_layer_conflict import detect, WEIGHTS, LAYER_NAMES
+        assert callable(detect)
+        assert 'architecture' in WEIGHTS
+        assert len(LAYER_NAMES) == 4
+
+    def test_codebase_alignment_window_imports(self):
+        """Verify internal emergence tool can be imported directly."""
+        from tools.emergence.codebase_alignment_window import detect, WEIGHTS, LAYER_NAMES
+        assert callable(detect)
+        assert len(WEIGHTS) == 4  # List of 4 equal weights
+        assert len(LAYER_NAMES) == 4
+
+    def test_codebase_friction_basic(self):
+        """Basic smoke test for layer conflict detection."""
+        from tools.friction.codebase_layer_conflict import detect
+        result = detect(
+            architecture=0.8, implementation=0.7, testing=0.6, documentation=0.75
+        )
+        assert 'm_score' in result
+        assert 'conflict_type' in result
+        assert result['m_score'] >= 0
+
+    def test_codebase_emergence_basic(self):
+        """Basic smoke test for alignment window detection."""
+        from tools.emergence.codebase_alignment_window import detect
+        result = detect(
+            architecture=0.8, implementation=0.75, testing=0.7, documentation=0.72
+        )
+        assert 'm_score' in result
+        assert 'window_detected' in result
+        assert result['m_score'] >= 0
+
+    def test_internal_tools_not_in_public_api(self):
+        """Verify internal tools are NOT exported in tools.__init__."""
+        import tools
+        assert not hasattr(tools, 'codebase_layer_conflict')
+        assert not hasattr(tools, 'codebase_alignment_window')
+        assert 'codebase_layer_conflict' not in dir(tools)
+        assert 'codebase_alignment_window' not in dir(tools)
