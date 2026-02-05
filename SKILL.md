@@ -27,6 +27,54 @@ Where:
 
 ---
 
+## Temporal Kernels
+
+Models can pre-compute `f_time` using `compute_temporal_kernel()` before calling any `detect()` tool.
+This allows time-aware scoring — signals decay, grow, saturate, or oscillate depending on the mode.
+
+### Usage
+
+```python
+from core.mantic_kernel import compute_temporal_kernel
+
+# Compute temporal modifier, then pass to any tool
+f_time = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="exponential")
+result = detect(..., f_time=f_time)
+```
+
+### Parameters
+
+- **t**: Time delta (0 = now, positive = future, negative = past)
+- **n**: Novelty — how unusual the pattern is (>0 amplifies, <0 attenuates)
+- **alpha**: Sensitivity — how reactive to novelty over time
+- **kernel_type**: Which temporal model to use
+
+### Available Modes
+
+| Mode | When to Use | Example Domain |
+|------|-------------|----------------|
+| `exponential` | Viral spread, cascade growth/decay | Social narrative rupture |
+| `logistic` | Saturation, carrying capacity | Legal precedent drift |
+| `s_curve` | Adoption curves, learning onset | Healthcare therapeutic windows |
+| `power_law` | Heavy-tailed, long-memory dynamics | Climate maladaptation |
+| `oscillatory` | Seasonal, cyclical patterns | Finance regime conflicts |
+| `memory` | Decaying influence of past events | Military strategic initiative |
+| `linear` | Simple linear decay | General purpose |
+
+### Mode-Specific Parameters
+
+- **s_curve**: `t0` — inflection point (default 0.0)
+- **power_law**: `exponent` — power coefficient (default 1.0)
+- **oscillatory**: `frequency` — oscillation frequency (default 1.0)
+- **memory**: `memory_strength` — initial memory weight (default 1.0)
+
+> **Warning:** The `exponential` mode with positive `n` and `alpha` produces **growth**, not decay.
+> Use `n=-1` for decay behavior (matching old `decay_rate` parameter).
+
+> **Note:** `power_law` requires `t >= -1`. Values below this are clamped.
+
+---
+
 ## Tool Suites
 
 The Mantic Framework provides **14 tools** across 7 domains, with two complementary detection modes:

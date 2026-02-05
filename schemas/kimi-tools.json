@@ -4,7 +4,7 @@
   "tools": [
     {
       "name": "healthcare_phenotype_genotype",
-      "description": "FRICTION: Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience",
+      "description": "Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience",
       "parameters": {
         "type": "object",
         "properties": {
@@ -18,14 +18,13 @@
       },
       "meta": {
         "domain": "healthcare",
-        "tool_type": "friction",
         "threshold": 0.4,
         "deterministic": true
       }
     },
     {
       "name": "finance_regime_conflict",
-      "description": "FRICTION: Spots when technical price action contradicts fundamentals, flow, or risk signals",
+      "description": "Spots when technical price action contradicts fundamentals, flow, or risk signals",
       "parameters": {
         "type": "object",
         "properties": {
@@ -39,14 +38,13 @@
       },
       "meta": {
         "domain": "finance",
-        "tool_type": "friction",
         "threshold": 0.4,
         "deterministic": true
       }
     },
     {
       "name": "cyber_attribution_resolver",
-      "description": "FRICTION: Scores confidence when technical sophistication doesn't align with geopolitical context",
+      "description": "Scores confidence when technical sophistication doesn't align with geopolitical context",
       "parameters": {
         "type": "object",
         "properties": {
@@ -60,14 +58,13 @@
       },
       "meta": {
         "domain": "cybersecurity",
-        "tool_type": "friction",
         "threshold": 0.35,
         "deterministic": true
       }
     },
     {
       "name": "climate_maladaptation",
-      "description": "FRICTION: Blocks solutions that solve immediate micro problems but create macro/meta harms",
+      "description": "Blocks solutions that solve immediate micro problems but create macro/meta harms",
       "parameters": {
         "type": "object",
         "properties": {
@@ -81,14 +78,13 @@
       },
       "meta": {
         "domain": "climate",
-        "tool_type": "friction",
         "thresholds": {"caution": 0.4, "block": 0.6},
         "deterministic": true
       }
     },
     {
       "name": "legal_precedent_drift",
-      "description": "FRICTION: Warns when judicial philosophy shifts threaten current precedent-based strategies",
+      "description": "Warns when judicial philosophy shifts threaten current precedent-based strategies",
       "parameters": {
         "type": "object",
         "properties": {
@@ -102,14 +98,13 @@
       },
       "meta": {
         "domain": "legal",
-        "tool_type": "friction",
         "threshold": 0.4,
         "deterministic": true
       }
     },
     {
       "name": "military_friction_forecast",
-      "description": "FRICTION: Identifies where tactical plans hit logistics or political constraints",
+      "description": "Identifies where tactical plans hit logistics or political constraints",
       "parameters": {
         "type": "object",
         "properties": {
@@ -123,14 +118,13 @@
       },
       "meta": {
         "domain": "military",
-        "tool_type": "friction",
         "threshold": 0.4,
         "deterministic": true
       }
     },
     {
       "name": "social_narrative_rupture",
-      "description": "FRICTION: Catches virality that outpaces institutional sense-making capacity",
+      "description": "Catches virality that outpaces institutional sense-making capacity",
       "parameters": {
         "type": "object",
         "properties": {
@@ -144,155 +138,7 @@
       },
       "meta": {
         "domain": "social",
-        "tool_type": "friction",
         "threshold": 0.5,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "healthcare_precision_therapeutic",
-      "description": "CONFLUENCE: Identifies rare alignment of genomic predisposition, environmental readiness, phenotypic timing, and psychosocial engagement for maximum treatment efficacy",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "genomic_predisposition": {"type": "number", "min": 0, "max": 1},
-          "environmental_readiness": {"type": "number", "min": 0, "max": 1},
-          "phenotypic_timing": {"type": "number", "min": 0, "max": 1},
-          "psychosocial_engagement": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["genomic_predisposition", "environmental_readiness", "phenotypic_timing", "psychosocial_engagement"]
-      },
-      "meta": {
-        "domain": "healthcare",
-        "tool_type": "emergence",
-        "threshold": 0.65,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "finance_confluence_alpha",
-      "description": "CONFLUENCE: Detects asymmetric opportunity when technical setup, macro tailwind, flow positioning, and risk compression achieve directional harmony",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "technical_setup": {"type": "number", "min": 0, "max": 1},
-          "macro_tailwind": {"type": "number", "min": 0, "max": 1},
-          "flow_positioning": {"type": "number", "min": -1, "max": 1},
-          "risk_compression": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["technical_setup", "macro_tailwind", "flow_positioning", "risk_compression"]
-      },
-      "meta": {
-        "domain": "finance",
-        "tool_type": "emergence",
-        "threshold": 0.60,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "cyber_adversary_overreach",
-      "description": "CONFLUENCE: Identifies defensive advantage windows when attacker TTPs are stretched, geopolitically pressured, and operationally fatigued",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "threat_intel_stretch": {"type": "number", "min": 0, "max": 1},
-          "geopolitical_pressure": {"type": "number", "min": 0, "max": 1},
-          "operational_hardening": {"type": "number", "min": 0, "max": 1},
-          "tool_reuse_fatigue": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["threat_intel_stretch", "geopolitical_pressure", "operational_hardening", "tool_reuse_fatigue"]
-      },
-      "meta": {
-        "domain": "cybersecurity",
-        "tool_type": "emergence",
-        "threshold": 0.70,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "climate_resilience_multiplier",
-      "description": "CONFLUENCE: Surfaces interventions with positive cross-domain coupling solving multiple layer problems simultaneously",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "atmospheric_benefit": {"type": "number", "min": 0, "max": 1},
-          "ecological_benefit": {"type": "number", "min": 0, "max": 1},
-          "infrastructure_benefit": {"type": "number", "min": 0, "max": 1},
-          "policy_alignment": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["atmospheric_benefit", "ecological_benefit", "infrastructure_benefit", "policy_alignment"]
-      },
-      "meta": {
-        "domain": "climate",
-        "tool_type": "emergence",
-        "threshold": 0.50,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "legal_precedent_seeding",
-      "description": "CONFLUENCE: Spots windows when socio-political climate, institutional capacity, statutory ambiguity, and circuit splits align for favorable case law establishment",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "socio_political_climate": {"type": "number", "min": 0, "max": 1},
-          "institutional_capacity": {"type": "number", "min": 0, "max": 1},
-          "statutory_ambiguity": {"type": "number", "min": 0, "max": 1},
-          "circuit_split": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["socio_political_climate", "institutional_capacity", "statutory_ambiguity", "circuit_split"]
-      },
-      "meta": {
-        "domain": "legal",
-        "tool_type": "emergence",
-        "threshold": 0.60,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "military_strategic_initiative",
-      "description": "CONFLUENCE: Identifies decisive action opportunities when intelligence ambiguity, positional advantage, logistic readiness, and political authorization synchronize",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "enemy_ambiguity": {"type": "number", "min": 0, "max": 1},
-          "positional_advantage": {"type": "number", "min": 0, "max": 1},
-          "logistic_readiness": {"type": "number", "min": 0, "max": 1},
-          "authorization_clarity": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["enemy_ambiguity", "positional_advantage", "logistic_readiness", "authorization_clarity"]
-      },
-      "meta": {
-        "domain": "military",
-        "tool_type": "emergence",
-        "threshold": 0.70,
-        "deterministic": true
-      }
-    },
-    {
-      "name": "social_catalytic_alignment",
-      "description": "CONFLUENCE: Spots transformative potential when individual readiness, network bridges, policy windows, and paradigm momentum converge",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "individual_readiness": {"type": "number", "min": 0, "max": 1},
-          "network_bridges": {"type": "number", "min": 0, "max": 1},
-          "policy_window": {"type": "number", "min": 0, "max": 1},
-          "paradigm_momentum": {"type": "number", "min": 0, "max": 1},
-          "f_time": {"type": "number", "default": 1.0}
-        },
-        "required": ["individual_readiness", "network_bridges", "policy_window", "paradigm_momentum"]
-      },
-      "meta": {
-        "domain": "social",
-        "tool_type": "emergence",
-        "threshold": 0.65,
         "deterministic": true
       }
     }

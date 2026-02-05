@@ -94,28 +94,68 @@ def mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):
     return float(M), float(S), attribution.tolist()
 
 
-def compute_temporal_kernel(t, decay_rate=0.1, kernel_type="exponential"):
+def compute_temporal_kernel(t, n=1.0, alpha=0.1, kernel_type="exponential",
+                            decay_rate=None, **kwargs):
     """
     Compute temporal kernel value f(t) for time-based adjustments.
-    
+
     Args:
         t: time delta (0 = current, positive = future, negative = past)
-        decay_rate: rate of temporal decay (default 0.1)
-        kernel_type: "exponential" or "linear" (default "exponential")
-    
+        n: novelty parameter (>0 amplifies, <0 attenuates, default 1.0)
+        alpha: sensitivity/amplification coefficient (default 0.1)
+        kernel_type: temporal mode (default "exponential")
+            - "exponential": exp(n * alpha * t) — viral/cascade growth or decay
+            - "linear": max(0, 1 - alpha * |t|) — simple linear decay
+            - "logistic": 1 / (1 + exp(-n * alpha * t)) — saturation/carrying capacity
+            - "s_curve": 1 / (1 + exp(-alpha * (t - t0))) — adoption/learning onset
+            - "power_law": (1 + t)^(n * alpha * exponent) — heavy-tailed dynamics
+            - "oscillatory": exp(n*alpha*t) * 0.5*(1 + 0.5*sin(f*t)) — seasonal
+            - "memory": 1 + memory_strength * exp(-t) — decaying influence
+        decay_rate: DEPRECATED, use alpha instead. If provided, maps to alpha.
+        **kwargs: mode-specific parameters:
+            - t0: inflection point for s_curve (default 0.0)
+            - exponent: power for power_law (default 1.0)
+            - frequency: oscillation frequency for oscillatory (default 1.0)
+            - memory_strength: initial memory weight for memory (default 1.0)
+
     Returns:
-        float: temporal kernel multiplier
-    
+        float: temporal kernel multiplier (always > 0)
+
     Note:
         This is a utility function - the core mantic_kernel expects
         f_time to be pre-computed. Use this to generate f_time values.
+
+        The exponential mode with positive n and alpha produces GROWTH,
+        not decay. Use n=-1 for decay behavior (matching old decay_rate).
     """
+    # Backward compatibility: decay_rate maps to alpha
+    if decay_rate is not None:
+        alpha = decay_rate
+
     if kernel_type == "exponential":
-        return np.exp(-decay_rate * abs(t))
+        result = np.exp(n * alpha * t)
     elif kernel_type == "linear":
-        return max(0, 1 - decay_rate * abs(t))
+        result = max(0.0, 1.0 - alpha * abs(t))
+    elif kernel_type == "logistic":
+        result = 1.0 / (1.0 + np.exp(-n * alpha * t))
+    elif kernel_type == "s_curve":
+        t0 = kwargs.get("t0", 0.0)
+        result = 1.0 / (1.0 + np.exp(-alpha * (t - t0)))
+    elif kernel_type == "power_law":
+        exponent = kwargs.get("exponent", 1.0)
+        base = max(1e-10, 1.0 + t)  # Clamp for t < -1
+        result = base ** (n * alpha * exponent)
+    elif kernel_type == "oscillatory":
+        frequency = kwargs.get("frequency", 1.0)
+        result = np.exp(n * alpha * t) * 0.5 * (1.0 + 0.5 * np.sin(frequency * t))
+    elif kernel_type == "memory":
+        memory_strength = kwargs.get("memory_strength", 1.0)
+        result = 1.0 + memory_strength * np.exp(-t)
     else:
         raise ValueError(f"Unknown kernel type: {kernel_type}")
+
+    # Ensure positivity (per spec: f_time(t) > 0 for all t)
+    return float(max(result, 1e-10))
 
 
 # Version marker for cross-model compatibility verification

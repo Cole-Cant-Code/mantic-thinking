@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.mantic_kernel import mantic_kernel, verify_kernel_integrity
+from core.mantic_kernel import mantic_kernel, verify_kernel_integrity, compute_temporal_kernel
 from core.validators import clamp_input, normalize_weights, validate_layers
 from adapters.openai_adapter import get_openai_tools, execute_tool as execute_openai
 from adapters.kimi_adapter import get_kimi_tools, execute as execute_kimi
@@ -399,6 +399,129 @@ class TestClaudeAdapter:
         })
         assert "m_score" in result
         assert "_claude_meta" in result
+
+
+# =============================================================================
+# Temporal Kernel Tests
+# =============================================================================
+
+class TestTemporalKernels:
+    """Test all 7 temporal kernel modes."""
+
+    def test_exponential(self):
+        """Verify exponential: exp(n * alpha * t)."""
+        result = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="exponential")
+        expected = np.exp(1.0 * 0.1 * 5)
+        assert np.isclose(result, expected, atol=1e-10)
+
+    def test_exponential_decay(self):
+        """Verify exponential decay with negative n."""
+        result = compute_temporal_kernel(t=5, n=-1.0, alpha=0.1, kernel_type="exponential")
+        expected = np.exp(-1.0 * 0.1 * 5)
+        assert np.isclose(result, expected, atol=1e-10)
+        assert result < 1.0  # Decay
+
+    def test_linear(self):
+        """Verify linear decay clamps to 0."""
+        result = compute_temporal_kernel(t=5, alpha=0.1, kernel_type="linear")
+        expected = max(0, 1 - 0.1 * 5)
+        assert np.isclose(result, expected, atol=1e-10)
+        # Should clamp at 0 for large t
+        result_far = compute_temporal_kernel(t=20, alpha=0.1, kernel_type="linear")
+        assert result_far >= 0
+
+    def test_logistic(self):
+        """Verify logistic: 1 / (1 + exp(-n*alpha*t)), output in (0, 1)."""
+        result = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="logistic")
+        expected = 1.0 / (1.0 + np.exp(-1.0 * 0.1 * 5))
+        assert np.isclose(result, expected, atol=1e-10)
+        assert 0 < result < 1
+
+    def test_s_curve(self):
+        """Verify s_curve inflection at t0."""
+        # At t=t0, output should be 0.5
+        result_at_t0 = compute_temporal_kernel(t=5, alpha=0.1, kernel_type="s_curve", t0=5.0)
+        assert np.isclose(result_at_t0, 0.5, atol=1e-10)
+        # Before t0, output < 0.5
+        result_before = compute_temporal_kernel(t=0, alpha=0.1, kernel_type="s_curve", t0=5.0)
+        assert result_before < 0.5
+        # After t0, output > 0.5
+        result_after = compute_temporal_kernel(t=10, alpha=0.1, kernel_type="s_curve", t0=5.0)
+        assert result_after > 0.5
+
+    def test_power_law(self):
+        """Verify power_law: (1+t)^(n*alpha*exponent)."""
+        result = compute_temporal_kernel(t=10, n=1.0, alpha=0.1, kernel_type="power_law", exponent=1.0)
+        expected = (1.0 + 10) ** (1.0 * 0.1 * 1.0)
+        assert np.isclose(result, expected, atol=1e-10)
+
+    def test_power_law_domain_guard(self):
+        """Verify power_law clamps (1+t) for t < -1 — no NaN."""
+        result = compute_temporal_kernel(t=-2, kernel_type="power_law")
+        assert not np.isnan(result)
+        assert result > 0
+
+    def test_oscillatory(self):
+        """Verify oscillatory has periodic component."""
+        result = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="oscillatory", frequency=1.0)
+        expected = np.exp(1.0 * 0.1 * 5) * 0.5 * (1.0 + 0.5 * np.sin(1.0 * 5))
+        assert np.isclose(result, expected, atol=1e-10)
+
+    def test_memory(self):
+        """Verify memory: 1 + strength*exp(-t), decays toward 1."""
+        result_t0 = compute_temporal_kernel(t=0, kernel_type="memory", memory_strength=1.0)
+        assert np.isclose(result_t0, 2.0, atol=1e-10)  # 1 + 1*exp(0) = 2
+        result_far = compute_temporal_kernel(t=100, kernel_type="memory", memory_strength=1.0)
+        assert np.isclose(result_far, 1.0, atol=1e-6)  # Decays to 1
+
+    def test_positivity_all_modes(self):
+        """All modes must return f_time > 0 for reasonable inputs."""
+        modes = [
+            ("exponential", {}),
+            ("linear", {}),
+            ("logistic", {}),
+            ("s_curve", {"t0": 0.0}),
+            ("power_law", {"exponent": 1.0}),
+            ("oscillatory", {"frequency": 1.0}),
+            ("memory", {"memory_strength": 1.0}),
+        ]
+        for mode, kw in modes:
+            for t in [-10, -5, -1, 0, 1, 5, 10]:
+                result = compute_temporal_kernel(t, n=1.0, alpha=0.1, kernel_type=mode, **kw)
+                assert result > 0, f"{mode} at t={t} returned {result}"
+
+    def test_backward_compat_decay_rate(self):
+        """Old decay_rate parameter should map to alpha."""
+        result = compute_temporal_kernel(t=5, decay_rate=0.2, kernel_type="exponential")
+        expected = compute_temporal_kernel(t=5, n=1.0, alpha=0.2, kernel_type="exponential")
+        assert np.isclose(result, expected, atol=1e-10)
+
+    def test_kernel_integrity_unchanged(self):
+        """Core mantic_kernel must still pass integrity check after temporal changes."""
+        assert verify_kernel_integrity()
+
+    def test_tool_with_temporal(self):
+        """A detect() tool with pre-computed f_time scales M correctly."""
+        # Get baseline M-score with f_time=1.0
+        result_base = finance_regime_conflict.detect(
+            technical=0.7, macro=0.6, flow=0.5, risk=0.6
+        )
+        # Get f_time from temporal kernel
+        f_time = compute_temporal_kernel(t=5, n=-1, alpha=0.1, kernel_type="exponential")
+        result_temporal = finance_regime_conflict.detect(
+            technical=0.7, macro=0.6, flow=0.5, risk=0.6, f_time=f_time
+        )
+        # M should scale: M_temporal = M_base * f_time
+        assert np.isclose(
+            result_temporal["m_score"],
+            result_base["m_score"] * f_time,
+            atol=1e-10
+        )
+
+    def test_unknown_kernel_type(self):
+        """Unknown kernel type should raise ValueError."""
+        with pytest.raises(ValueError):
+            compute_temporal_kernel(t=5, kernel_type="invalid_mode")
 
 
 # =============================================================================
