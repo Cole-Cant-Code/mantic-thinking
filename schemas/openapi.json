@@ -1,0 +1,493 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mantic Early Warning System API",
+    "description": "Cross-domain anomaly detection using 4-layer hierarchical analysis. Compatible with Claude, Kimi, Codex, and GPT-4o.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Mantic Framework"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "paths": {
+    "/detect/healthcare": {
+      "post": {
+        "summary": "Healthcare: Phenotype-Genotype Mismatch Detector",
+        "description": "Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience.",
+        "operationId": "healthcare_phenotype_genotype",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HealthcareRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/finance": {
+      "post": {
+        "summary": "Finance: Regime Conflict Monitor",
+        "description": "Spots when technical price action contradicts fundamentals, flow, or risk signals.",
+        "operationId": "finance_regime_conflict",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinanceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/cyber": {
+      "post": {
+        "summary": "Cybersecurity: Attribution Uncertainty Resolver",
+        "description": "Scores confidence when technical sophistication doesn't align with geopolitical context.",
+        "operationId": "cyber_attribution_resolver",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CyberRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/climate": {
+      "post": {
+        "summary": "Climate: Maladaptation Preventer",
+        "description": "Blocks solutions that solve immediate micro problems but create macro/meta harms.",
+        "operationId": "climate_maladaptation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClimateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/legal": {
+      "post": {
+        "summary": "Legal: Precedent Drift Alert",
+        "description": "Warns when judicial philosophy shifts threaten current precedent-based strategies.",
+        "operationId": "legal_precedent_drift",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LegalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/military": {
+      "post": {
+        "summary": "Military: Friction Forecast Engine",
+        "description": "Identifies where tactical plans hit logistics or political constraints.",
+        "operationId": "military_friction_forecast",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilitaryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect/social": {
+      "post": {
+        "summary": "Social/Cultural: Narrative Rupture Detector",
+        "description": "Catches virality that outpaces institutional sense-making capacity.",
+        "operationId": "social_narrative_rupture",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthcareRequest": {
+        "type": "object",
+        "required": ["phenotypic", "genomic", "environmental", "psychosocial"],
+        "properties": {
+          "phenotypic": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Current symptoms/vitals (0-1, where 0 = no symptoms, 1 = severe symptoms)"
+          },
+          "genomic": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Genetic risk score (0-1, where 0 = low risk, 1 = high risk)"
+          },
+          "environmental": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Exposure load (0-1, where 0 = no exposure, 1 = heavy exposure)"
+          },
+          "psychosocial": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Stress/resilience factors (0-1, where 0 = high stress, 1 = high resilience)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "FinanceRequest": {
+        "type": "object",
+        "required": ["technical", "macro", "flow", "risk"],
+        "properties": {
+          "technical": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Price action signals (0-1, where 0 = bearish, 1 = bullish)"
+          },
+          "macro": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Fundamental indicators (0-1, where 0 = weak fundamentals, 1 = strong fundamentals)"
+          },
+          "flow": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1,
+            "description": "Capital flow direction (-1 = heavy outflows, 1 = heavy inflows)"
+          },
+          "risk": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Risk appetite metrics (0-1, where 0 = risk-off, 1 = risk-on)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "CyberRequest": {
+        "type": "object",
+        "required": ["technical", "threat_intel", "operational_impact", "geopolitical"],
+        "properties": {
+          "technical": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Technical sophistication indicators (0-1, where 0 = rudimentary, 1 = nation-state level)"
+          },
+          "threat_intel": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Threat intelligence confidence (0-1, where 0 = no intel, 1 = confirmed attribution)"
+          },
+          "operational_impact": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Severity of operational impact (0-1, where 0 = minimal, 1 = critical)"
+          },
+          "geopolitical": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Geopolitical context alignment (0-1, where 0 = no context, 1 = clear motive/context)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "ClimateRequest": {
+        "type": "object",
+        "required": ["atmospheric", "ecological", "infrastructure", "policy"],
+        "properties": {
+          "atmospheric": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Atmospheric condition metrics"
+          },
+          "ecological": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Ecosystem health indicators (0-1, where 0 = degraded, 1 = healthy)"
+          },
+          "infrastructure": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Infrastructure resilience (0-1, where 0 = vulnerable, 1 = resilient)"
+          },
+          "policy": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Policy coherence score (0-1, where 0 = fragmented, 1 = coherent)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "LegalRequest": {
+        "type": "object",
+        "required": ["black_letter", "precedent", "operational", "socio_political"],
+        "properties": {
+          "black_letter": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Statutory text alignment (0-1, where 0 = ambiguous, 1 = clear)"
+          },
+          "precedent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Precedent consistency (0-1, where 0 = overturned/questioned, 1 = solid)"
+          },
+          "operational": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Practical implementation feasibility"
+          },
+          "socio_political": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1,
+            "description": "Social/political context (-1 = leftward shift, 1 = rightward shift)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "MilitaryRequest": {
+        "type": "object",
+        "required": ["maneuver", "intelligence", "sustainment", "political"],
+        "properties": {
+          "maneuver": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Tactical maneuver feasibility (0-1, where 0 = constrained, 1 = open)"
+          },
+          "intelligence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Intelligence confidence (0-1, where 0 = unknowns, 1 = complete picture)"
+          },
+          "sustainment": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Logistics sustainability (0-1, where 0 = unsustainable, 1 = assured)"
+          },
+          "political": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Political authorization level (0-1, where 0 = constrained, 1 = full authority)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "SocialRequest": {
+        "type": "object",
+        "required": ["individual", "network", "institutional", "cultural"],
+        "properties": {
+          "individual": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Individual sentiment velocity (0-1, where 0 = stable, 1 = rapidly shifting)"
+          },
+          "network": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Network propagation speed (0-1, where 0 = contained, 1 = viral)"
+          },
+          "institutional": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Institutional response lag (0-1, where 0 = rapid response, 1 = significant lag)"
+          },
+          "cultural": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1,
+            "description": "Cultural archetype alignment (-1 = counter-narrative, 1 = aligned)"
+          },
+          "f_time": {
+            "type": "number",
+            "default": 1.0,
+            "description": "Temporal kernel multiplier"
+          }
+        }
+      },
+      "DetectionResult": {
+        "type": "object",
+        "required": ["m_score", "spatial_component", "layer_attribution"],
+        "properties": {
+          "m_score": {
+            "type": "number",
+            "description": "Final mantic anomaly score (0-1)"
+          },
+          "spatial_component": {
+            "type": "number",
+            "description": "Raw spatial component (S) from kernel calculation"
+          },
+          "layer_attribution": {
+            "type": "object",
+            "description": "Percentage contribution per layer",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "alert": {
+            "type": "string",
+            "description": "Human-readable detection message (null if no anomaly)"
+          }
+        }
+      }
+    }
+  }
+}

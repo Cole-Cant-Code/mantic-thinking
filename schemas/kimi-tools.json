@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0.0",
+  "tool_format": "kimi-native",
+  "tools": [
+    {
+      "name": "healthcare_phenotype_genotype",
+      "description": "Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "phenotypic": {"type": "number", "min": 0, "max": 1},
+          "genomic": {"type": "number", "min": 0, "max": 1},
+          "environmental": {"type": "number", "min": 0, "max": 1},
+          "psychosocial": {"type": "number", "min": 0, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["phenotypic", "genomic", "environmental", "psychosocial"]
+      },
+      "meta": {
+        "domain": "healthcare",
+        "threshold": 0.4,
+        "deterministic": true
+      }
+    },
+    {
+      "name": "finance_regime_conflict",
+      "description": "Spots when technical price action contradicts fundamentals, flow, or risk signals",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "technical": {"type": "number", "min": 0, "max": 1},
+          "macro": {"type": "number", "min": 0, "max": 1},
+          "flow": {"type": "number", "min": -1, "max": 1},
+          "risk": {"type": "number", "min": 0, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["technical", "macro", "flow", "risk"]
+      },
+      "meta": {
+        "domain": "finance",
+        "threshold": 0.4,
+        "deterministic": true
+      }
+    },
+    {
+      "name": "cyber_attribution_resolver",
+      "description": "Scores confidence when technical sophistication doesn't align with geopolitical context",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "technical": {"type": "number", "min": 0, "max": 1},
+          "threat_intel": {"type": "number", "min": 0, "max": 1},
+          "operational_impact": {"type": "number", "min": 0, "max": 1},
+          "geopolitical": {"type": "number", "min": 0, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["technical", "threat_intel", "operational_impact", "geopolitical"]
+      },
+      "meta": {
+        "domain": "cybersecurity",
+        "threshold": 0.35,
+        "deterministic": true
+      }
+    },
+    {
+      "name": "climate_maladaptation",
+      "description": "Blocks solutions that solve immediate micro problems but create macro/meta harms",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "atmospheric": {"type": "number", "min": 0, "max": 1},
+          "ecological": {"type": "number", "min": 0, "max": 1},
+          "infrastructure": {"type": "number", "min": 0, "max": 1},
+          "policy": {"type": "number", "min": 0, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["atmospheric", "ecological", "infrastructure", "policy"]
+      },
+      "meta": {
+        "domain": "climate",
+        "thresholds": {"caution": 0.4, "block": 0.6},
+        "deterministic": true
+      }
+    },
+    {
+      "name": "legal_precedent_drift",
+      "description": "Warns when judicial philosophy shifts threaten current precedent-based strategies",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "black_letter": {"type": "number", "min": 0, "max": 1},
+          "precedent": {"type": "number", "min": 0, "max": 1},
+          "operational": {"type": "number", "min": 0, "max": 1},
+          "socio_political": {"type": "number", "min": -1, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["black_letter", "precedent", "operational", "socio_political"]
+      },
+      "meta": {
+        "domain": "legal",
+        "threshold": 0.4,
+        "deterministic": true
+      }
+    },
+    {
+      "name": "military_friction_forecast",
+      "description": "Identifies where tactical plans hit logistics or political constraints",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "maneuver": {"type": "number", "min": 0, "max": 1},
+          "intelligence": {"type": "number", "min": 0, "max": 1},
+          "sustainment": {"type": "number", "min": 0, "max": 1},
+          "political": {"type": "number", "min": 0, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["maneuver", "intelligence", "sustainment", "political"]
+      },
+      "meta": {
+        "domain": "military",
+        "threshold": 0.4,
+        "deterministic": true
+      }
+    },
+    {
+      "name": "social_narrative_rupture",
+      "description": "Catches virality that outpaces institutional sense-making capacity",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "individual": {"type": "number", "min": 0, "max": 1},
+          "network": {"type": "number", "min": 0, "max": 1},
+          "institutional": {"type": "number", "min": 0, "max": 1},
+          "cultural": {"type": "number", "min": -1, "max": 1},
+          "f_time": {"type": "number", "default": 1.0}
+        },
+        "required": ["individual", "network", "institutional", "cultural"]
+      },
+      "meta": {
+        "domain": "social",
+        "threshold": 0.5,
+        "deterministic": true
+      }
+    }
+  ],
+  "core_formula": {
+    "math": "M = (sum(W * L * I)) * f(t) / k_n",
+    "immutable": true,
+    "version": "1.0.0"
+  },
+  "model_compatibility": ["kimi", "claude", "codex", "gpt-4o"]
+}

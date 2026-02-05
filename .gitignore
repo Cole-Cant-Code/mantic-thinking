@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+
+# Virtual env
+.venv/
+
+# OS
+.DS_Store
+
+# Local config/secrets
+.env
