@@ -120,6 +120,7 @@ result = execute_tool("cyber_adversary_overreach", {
 ```
 mantic-tools/
 ├── SKILL.md                    # Universal manifest
+├── README.md                   # This file
 ├── schemas/
 │   ├── openapi.json           # OpenAPI spec
 │   └── kimi-tools.json        # Kimi native format
@@ -129,7 +130,13 @@ mantic-tools/
 ├── tools/
 │   ├── friction/              # 7 divergence detection tools
 │   └── emergence/             # 7 confluence detection tools
-├── adapters/                  # Model-specific adapters
+├── adapters/                  # Model-specific adapters (Claude/Kimi/OpenAI)
+├── configs/                   # Domain configurations & framework docs
+│   ├── mantic_tech_spec.md    # Technical specification
+│   ├── mantic_explicit_framework.md  # Framework protocol
+│   ├── mantic_health.md       # Healthcare domain config
+│   ├── mantic_finance.md      # Finance domain config
+│   └── ...                    # (8 domain configs total)
 └── tests/                     # Cross-model validation
 ```
 
@@ -155,6 +162,15 @@ python tools/emergence/healthcare_precision_therapeutic.py
 | 0.7-0.9 | High risk 🚨 | Optimal window 🎯 |
 
 The M-score measures **intensity**. Friction tools interpret high intensity as danger. Emergence tools interpret high intensity as opportunity.
+
+## Configuration Files
+
+The `configs/` directory contains framework documentation and domain-specific configurations:
+
+- **Framework docs**: Technical specification, explicit framework mode, reasoning guidelines
+- **Domain configs**: Healthcare, Finance, Cybersecurity, Climate, Legal, Social, Command, Current Affairs
+
+These provide layer mappings and cross-domain coupling patterns for implementing domain-specific tools.
 
 ## Design Principles
 
