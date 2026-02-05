@@ -4,7 +4,7 @@ OpenAI/Codex Adapter for Mantic Tools
 Converts Mantic tools to OpenAI function calling format.
 Compatible with GPT-4, GPT-4o, and Codex.
 
-Includes both Friction tools (7) and Emergence tools (7) = 14 total.
+Includes both Friction tools (8) and Emergence tools (8) = 16 total.
 """
 
 import sys
@@ -20,6 +20,7 @@ from tools import (
     legal_precedent_drift,
     military_friction_forecast,
     social_narrative_rupture,
+    codebase_layer_conflict,
 )
 
 # Emergence tools (confluence detection)
@@ -31,10 +32,11 @@ from tools import (
     legal_precedent_seeding,
     military_strategic_initiative,
     social_catalytic_alignment,
+    codebase_alignment_window,
 )
 
 
-# Map tool IDs to detection functions (14 tools total)
+# Map tool IDs to detection functions (16 tools total)
 TOOL_MAP = {
     # Friction tools (7)
     "healthcare_phenotype_genotype": healthcare_phenotype_genotype.detect,
@@ -44,7 +46,8 @@ TOOL_MAP = {
     "legal_precedent_drift": legal_precedent_drift.detect,
     "military_friction_forecast": military_friction_forecast.detect,
     "social_narrative_rupture": social_narrative_rupture.detect,
-    # Emergence tools (7)
+    "codebase_layer_conflict": codebase_layer_conflict.detect,
+    # Emergence tools (8)
     "healthcare_precision_therapeutic": healthcare_precision_therapeutic.detect,
     "finance_confluence_alpha": finance_confluence_alpha.detect,
     "cyber_adversary_overreach": cyber_adversary_overreach.detect,
@@ -52,15 +55,16 @@ TOOL_MAP = {
     "legal_precedent_seeding": legal_precedent_seeding.detect,
     "military_strategic_initiative": military_strategic_initiative.detect,
     "social_catalytic_alignment": social_catalytic_alignment.detect,
+    "codebase_alignment_window": codebase_alignment_window.detect,
 }
 
 
 def get_openai_tools():
     """
     Return OpenAI function calling schema for all Mantic tools.
-    
+
     Returns:
-        list: OpenAI function definitions (14 tools)
+        list: OpenAI function definitions (16 tools)
     """
     friction_tools = [
         {
@@ -188,9 +192,27 @@ def get_openai_tools():
                     "required": ["individual", "network", "institutional", "cultural"]
                 }
             }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "codebase_layer_conflict",
+                "description": "FRICTION: Detects when codebase engineering dimensions diverge — architecture vs implementation vs testing vs documentation misalignment.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "architecture": {"type": "number", "description": "Structural soundness (0-1)"},
+                        "implementation": {"type": "number", "description": "Code quality and correctness (0-1)"},
+                        "testing": {"type": "number", "description": "Validation coverage and rigor (0-1)"},
+                        "documentation": {"type": "number", "description": "Specification completeness (0-1)"},
+                        "f_time": {"type": "number", "default": 1.0}
+                    },
+                    "required": ["architecture", "implementation", "testing", "documentation"]
+                }
+            }
         }
     ]
-    
+
     emergence_tools = [
         {
             "type": "function",
@@ -317,9 +339,27 @@ def get_openai_tools():
                     "required": ["individual_readiness", "network_bridges", "policy_window", "paradigm_momentum"]
                 }
             }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "codebase_alignment_window",
+                "description": "CONFLUENCE: Identifies alignment windows when architecture, implementation, testing, and documentation all achieve favorable levels for optimal action timing.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "architecture": {"type": "number", "description": "Structural soundness (0-1)"},
+                        "implementation": {"type": "number", "description": "Code quality and correctness (0-1)"},
+                        "testing": {"type": "number", "description": "Validation coverage and rigor (0-1)"},
+                        "documentation": {"type": "number", "description": "Specification completeness (0-1)"},
+                        "f_time": {"type": "number", "default": 1.0}
+                    },
+                    "required": ["architecture", "implementation", "testing", "documentation"]
+                }
+            }
         }
     ]
-    
+
     return friction_tools + emergence_tools
 
 
