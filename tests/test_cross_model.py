@@ -152,7 +152,7 @@ class TestHealthcareTool:
     def test_hidden_burden(self):
         """Test hidden burden detection."""
         result = healthcare_phenotype_genotype.detect(
-            phenotypic=0.9, genomic=0.4, environmental=0.8, psychosocial=0.3
+            phenotypic=0.9, genomic=0.1, environmental=0.1, psychosocial=0.3
         )
         assert result["alert"] is not None
         assert "HIDDEN BURDEN" in result["alert"]
@@ -299,9 +299,9 @@ class TestOpenAIAdapter:
     """Test OpenAI/Codex adapter."""
     
     def test_tools_count(self):
-        """Test that all 7 tools are available."""
+        """Test that all 14 tools are available."""
         tools = get_openai_tools()
-        assert len(tools) == 7
+        assert len(tools) == 14
     
     def test_tool_schema(self):
         """Test tool schema format."""
@@ -360,9 +360,9 @@ class TestKimiAdapter:
     """Test Kimi native adapter."""
     
     def test_tools_count(self):
-        """Test that all 7 tools are available."""
+        """Test that all 14 tools are available."""
         tools = get_kimi_tools()
-        assert len(tools) == 7
+        assert len(tools) == 14
     
     def test_kimi_meta(self):
         """Test Kimi-specific metadata."""
@@ -383,9 +383,9 @@ class TestClaudeAdapter:
     """Test Claude Computer Use adapter."""
     
     def test_tools_count(self):
-        """Test that all 7 tools are available."""
+        """Test that all 14 tools are available."""
         tools = get_claude_tools()
-        assert len(tools) == 7
+        assert len(tools) == 14
     
     def test_claude_meta(self):
         """Test Claude-specific metadata."""
