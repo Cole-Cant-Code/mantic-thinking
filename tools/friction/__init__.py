@@ -14,7 +14,6 @@ from . import climate_maladaptation
 from . import legal_precedent_drift
 from . import military_friction_forecast
 from . import social_narrative_rupture
-from . import codebase_layer_conflict
 
 __all__ = [
     "healthcare_phenotype_genotype",
@@ -24,5 +23,4 @@ __all__ = [
     "legal_precedent_drift",
     "military_friction_forecast",
     "social_narrative_rupture",
-    "codebase_layer_conflict",
 ]

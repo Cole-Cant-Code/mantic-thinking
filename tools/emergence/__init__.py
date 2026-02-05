@@ -14,7 +14,6 @@ from . import climate_resilience_multiplier
 from . import legal_precedent_seeding
 from . import military_strategic_initiative
 from . import social_catalytic_alignment
-from . import codebase_alignment_window
 
 __all__ = [
     "healthcare_precision_therapeutic",
@@ -24,5 +23,4 @@ __all__ = [
     "legal_precedent_seeding",
     "military_strategic_initiative",
     "social_catalytic_alignment",
-    "codebase_alignment_window",
 ]
