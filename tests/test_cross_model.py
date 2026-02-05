@@ -31,6 +31,13 @@ from tools import (
     legal_precedent_drift,
     military_friction_forecast,
     social_narrative_rupture,
+    healthcare_precision_therapeutic,
+    finance_confluence_alpha,
+    cyber_adversary_overreach,
+    climate_resilience_multiplier,
+    legal_precedent_seeding,
+    military_strategic_initiative,
+    social_catalytic_alignment,
 )
 
 
@@ -292,6 +299,194 @@ class TestSocialTool:
 
 
 # =============================================================================
+# Emergence Tool Tests
+# =============================================================================
+
+class TestHealthcareEmergence:
+    """Test healthcare precision therapeutic window."""
+
+    def test_optimal_alignment(self):
+        """Test optimal alignment case."""
+        result = healthcare_precision_therapeutic.detect(
+            genomic_predisposition=0.85,
+            environmental_readiness=0.82,
+            phenotypic_timing=0.88,
+            psychosocial_engagement=0.90,
+        )
+        assert result["window_detected"] is True
+        assert "OPTIMAL" in result["window_type"]
+        assert result["limiting_factor"] in ["genomic", "environmental", "phenotypic", "psychosocial"]
+
+    def test_not_aligned(self):
+        """Test not aligned case."""
+        result = healthcare_precision_therapeutic.detect(
+            genomic_predisposition=0.75,
+            environmental_readiness=0.80,
+            phenotypic_timing=0.70,
+            psychosocial_engagement=0.45,
+        )
+        assert result["window_detected"] is False
+        assert "psychosocial" in result["improvement_needed"]
+
+
+class TestFinanceEmergence:
+    """Test finance confluence alpha engine."""
+
+    def test_high_conviction(self):
+        """Test high conviction window."""
+        result = finance_confluence_alpha.detect(
+            technical_setup=0.85,
+            macro_tailwind=0.80,
+            flow_positioning=0.75,
+            risk_compression=0.70,
+        )
+        assert result["window_detected"] is True
+        assert result["setup_quality"] in {"HIGH_CONVICTION", "MODERATE_CONVICTION"}
+
+    def test_no_confluence(self):
+        """Test no confluence due to flow."""
+        result = finance_confluence_alpha.detect(
+            technical_setup=0.75,
+            macro_tailwind=0.70,
+            flow_positioning=-0.20,
+            risk_compression=0.65,
+        )
+        assert result["window_detected"] is False
+        assert result["reason"]
+
+
+class TestCyberEmergence:
+    """Test cyber adversary overreach detector."""
+
+    def test_critical_overreach(self):
+        """Test critical overreach window."""
+        result = cyber_adversary_overreach.detect(
+            threat_intel_stretch=0.90,
+            geopolitical_pressure=0.85,
+            operational_hardening=0.80,
+            tool_reuse_fatigue=0.88,
+        )
+        assert result["window_detected"] is True
+        assert result["defender_advantage"] in {"CRITICAL", "HIGH", "MODERATE"}
+
+    def test_defender_not_ready(self):
+        """Test window closed when defender not hardened."""
+        result = cyber_adversary_overreach.detect(
+            threat_intel_stretch=0.85,
+            geopolitical_pressure=0.80,
+            operational_hardening=0.45,
+            tool_reuse_fatigue=0.75,
+        )
+        assert result["window_detected"] is False
+        assert result["limiting_factor"] == "Defender not sufficiently hardened"
+
+
+class TestClimateEmergence:
+    """Test climate resilience multiplier."""
+
+    def test_high_multiplier(self):
+        """Test high multiplier window."""
+        result = climate_resilience_multiplier.detect(
+            atmospheric_benefit=0.75,
+            ecological_benefit=0.80,
+            infrastructure_benefit=0.78,
+            policy_alignment=0.82,
+        )
+        assert result["window_detected"] is True
+        assert result["intervention_type"] in {"HIGH_MULTIPLIER", "MULTIPLIER", "MODERATE_MULTIPLIER"}
+
+    def test_no_multiplier(self):
+        """Test no multiplier window."""
+        result = climate_resilience_multiplier.detect(
+            atmospheric_benefit=0.30,
+            ecological_benefit=0.25,
+            infrastructure_benefit=0.85,
+            policy_alignment=0.40,
+        )
+        assert result["window_detected"] is False
+        assert result["limiting_factors"]
+
+
+class TestLegalEmergence:
+    """Test legal precedent seeding optimizer."""
+
+    def test_exceptional_opportunity(self):
+        """Test exceptional opportunity window."""
+        result = legal_precedent_seeding.detect(
+            socio_political_climate=0.85,
+            institutional_capacity=0.80,
+            statutory_ambiguity=0.88,
+            circuit_split=0.82,
+        )
+        assert result["window_detected"] is True
+        assert result["precedent_opportunity"] in {"EXCEPTIONAL", "HIGH", "MODERATE"}
+        assert result["circuit_split_exploitable"] is True
+
+    def test_no_split(self):
+        """Test no circuit split."""
+        result = legal_precedent_seeding.detect(
+            socio_political_climate=0.80,
+            institutional_capacity=0.75,
+            statutory_ambiguity=0.82,
+            circuit_split=0.30,
+        )
+        assert result["window_detected"] is False
+        assert result["limiting_factor"] == "No exploitable circuit split"
+
+
+class TestMilitaryEmergence:
+    """Test military strategic initiative window."""
+
+    def test_decisive_action(self):
+        """Test decisive action window."""
+        result = military_strategic_initiative.detect(
+            enemy_ambiguity=0.85,
+            positional_advantage=0.88,
+            logistic_readiness=0.82,
+            authorization_clarity=0.90,
+        )
+        assert result["window_detected"] is True
+        assert result["maneuver_type"] in {"DECISIVE_ACTION", "OFFENSIVE_OPERATION", "TACTICAL_INITIATIVE"}
+
+    def test_logistics_not_ready(self):
+        """Test no initiative window due to logistics."""
+        result = military_strategic_initiative.detect(
+            enemy_ambiguity=0.80,
+            positional_advantage=0.75,
+            logistic_readiness=0.45,
+            authorization_clarity=0.85,
+        )
+        assert result["window_detected"] is False
+        assert "logistics not ready" in result["limiting_factors"]
+
+
+class TestSocialEmergence:
+    """Test social catalytic alignment detector."""
+
+    def test_transformative_potential(self):
+        """Test transformative alignment window."""
+        result = social_catalytic_alignment.detect(
+            individual_readiness=0.82,
+            network_bridges=0.85,
+            policy_window=0.80,
+            paradigm_momentum=0.88,
+        )
+        assert result["window_detected"] is True
+        assert result["movement_potential"] in {"TRANSFORMATIVE", "HIGH", "MODERATE"}
+
+    def test_policy_window_closed(self):
+        """Test no alignment due to closed policy window."""
+        result = social_catalytic_alignment.detect(
+            individual_readiness=0.80,
+            network_bridges=0.75,
+            policy_window=0.40,
+            paradigm_momentum=0.70,
+        )
+        assert result["window_detected"] is False
+        assert "policy_window" in result["limiting_factors"]
+
+
+# =============================================================================
 # Adapter Tests
 # =============================================================================
 
@@ -347,6 +542,48 @@ class TestOpenAIAdapter:
             },
             "social_narrative_rupture": {
                 "individual": 0.5, "network": 0.6, "institutional": 0.4, "cultural": 0.3
+            },
+            "healthcare_precision_therapeutic": {
+                "genomic_predisposition": 0.85,
+                "environmental_readiness": 0.82,
+                "phenotypic_timing": 0.88,
+                "psychosocial_engagement": 0.90
+            },
+            "finance_confluence_alpha": {
+                "technical_setup": 0.85,
+                "macro_tailwind": 0.80,
+                "flow_positioning": 0.75,
+                "risk_compression": 0.70
+            },
+            "cyber_adversary_overreach": {
+                "threat_intel_stretch": 0.90,
+                "geopolitical_pressure": 0.85,
+                "operational_hardening": 0.80,
+                "tool_reuse_fatigue": 0.88
+            },
+            "climate_resilience_multiplier": {
+                "atmospheric_benefit": 0.75,
+                "ecological_benefit": 0.80,
+                "infrastructure_benefit": 0.78,
+                "policy_alignment": 0.82
+            },
+            "legal_precedent_seeding": {
+                "socio_political_climate": 0.85,
+                "institutional_capacity": 0.80,
+                "statutory_ambiguity": 0.88,
+                "circuit_split": 0.82
+            },
+            "military_strategic_initiative": {
+                "enemy_ambiguity": 0.85,
+                "positional_advantage": 0.88,
+                "logistic_readiness": 0.82,
+                "authorization_clarity": 0.90
+            },
+            "social_catalytic_alignment": {
+                "individual_readiness": 0.82,
+                "network_bridges": 0.85,
+                "policy_window": 0.80,
+                "paradigm_momentum": 0.88
             }
         }
         
@@ -378,6 +615,16 @@ class TestKimiAdapter:
         })
         assert "m_score" in result
 
+    def test_execute_emergence(self):
+        """Test emergence tool execution."""
+        result = execute_kimi("healthcare_precision_therapeutic", {
+            "genomic_predisposition": 0.85,
+            "environmental_readiness": 0.82,
+            "phenotypic_timing": 0.88,
+            "psychosocial_engagement": 0.90
+        })
+        assert "window_detected" in result
+
 
 class TestClaudeAdapter:
     """Test Claude Computer Use adapter."""
@@ -401,6 +648,16 @@ class TestClaudeAdapter:
         })
         assert "m_score" in result
         assert "_claude_meta" in result
+
+    def test_execute_emergence(self):
+        """Test emergence tool execution."""
+        result = execute_claude("social_catalytic_alignment", {
+            "individual_readiness": 0.82,
+            "network_bridges": 0.85,
+            "policy_window": 0.80,
+            "paradigm_momentum": 0.88
+        })
+        assert "window_detected" in result
 
 
 # =============================================================================
@@ -552,6 +809,22 @@ class TestCrossModelConsistency:
         # Core alert should be the same
         assert openai_result["alert"] == kimi_result["alert"] == claude_result["alert"]
 
+    def test_emergence_same_outputs(self):
+        """Test emergence tool consistency across adapters."""
+        params = {
+            "genomic_predisposition": 0.85,
+            "environmental_readiness": 0.82,
+            "phenotypic_timing": 0.88,
+            "psychosocial_engagement": 0.90
+        }
+
+        openai_result = execute_openai("healthcare_precision_therapeutic", params)
+        kimi_result = execute_kimi("healthcare_precision_therapeutic", params)
+        claude_result = execute_claude("healthcare_precision_therapeutic", params)
+
+        assert openai_result["m_score"] == kimi_result["m_score"] == claude_result["m_score"]
+        assert openai_result["window_detected"] == kimi_result["window_detected"] == claude_result["window_detected"]
+
 
 # =============================================================================
 # Main entry point for standalone testing
@@ -566,7 +839,7 @@ if __name__ == "__main__":
     assert verify_kernel_integrity()
     print("   ✓ Kernel integrity verified")
     
-    print("\n2. Testing all 7 tools...")
+    print("\n2. Testing all 14 tools...")
     tools = [
         ("healthcare", healthcare_phenotype_genotype.detect, 
          {"phenotypic": 0.5, "genomic": 0.6, "environmental": 0.4, "psychosocial": 0.5}),
@@ -582,6 +855,27 @@ if __name__ == "__main__":
          {"maneuver": 0.7, "intelligence": 0.8, "sustainment": 0.6, "political": 0.7}),
         ("social", social_narrative_rupture.detect,
          {"individual": 0.5, "network": 0.6, "institutional": 0.4, "cultural": 0.3}),
+        ("healthcare_emergence", healthcare_precision_therapeutic.detect,
+         {"genomic_predisposition": 0.85, "environmental_readiness": 0.82,
+          "phenotypic_timing": 0.88, "psychosocial_engagement": 0.90}),
+        ("finance_emergence", finance_confluence_alpha.detect,
+         {"technical_setup": 0.85, "macro_tailwind": 0.80,
+          "flow_positioning": 0.75, "risk_compression": 0.70}),
+        ("cyber_emergence", cyber_adversary_overreach.detect,
+         {"threat_intel_stretch": 0.90, "geopolitical_pressure": 0.85,
+          "operational_hardening": 0.80, "tool_reuse_fatigue": 0.88}),
+        ("climate_emergence", climate_resilience_multiplier.detect,
+         {"atmospheric_benefit": 0.75, "ecological_benefit": 0.80,
+          "infrastructure_benefit": 0.78, "policy_alignment": 0.82}),
+        ("legal_emergence", legal_precedent_seeding.detect,
+         {"socio_political_climate": 0.85, "institutional_capacity": 0.80,
+          "statutory_ambiguity": 0.88, "circuit_split": 0.82}),
+        ("military_emergence", military_strategic_initiative.detect,
+         {"enemy_ambiguity": 0.85, "positional_advantage": 0.88,
+          "logistic_readiness": 0.82, "authorization_clarity": 0.90}),
+        ("social_emergence", social_catalytic_alignment.detect,
+         {"individual_readiness": 0.82, "network_bridges": 0.85,
+          "policy_window": 0.80, "paradigm_momentum": 0.88}),
     ]
     
     for name, func, params in tools:
@@ -604,6 +898,20 @@ if __name__ == "__main__":
     
     assert openai_r["m_score"] == kimi_r["m_score"] == claude_r["m_score"]
     print(f"   ✓ All adapters produce M-score = {openai_r['m_score']:.3f}")
+
+    emergence_params = {
+        "genomic_predisposition": 0.85,
+        "environmental_readiness": 0.82,
+        "phenotypic_timing": 0.88,
+        "psychosocial_engagement": 0.90
+    }
+    openai_e = execute_openai("healthcare_precision_therapeutic", emergence_params)
+    kimi_e = execute_kimi("healthcare_precision_therapeutic", emergence_params)
+    claude_e = execute_claude("healthcare_precision_therapeutic", emergence_params)
+
+    assert openai_e["m_score"] == kimi_e["m_score"] == claude_e["m_score"]
+    assert openai_e["window_detected"] == kimi_e["window_detected"] == claude_e["window_detected"]
+    print(f"   ✓ Emergence M-score = {openai_e['m_score']:.3f} (window_detected={openai_e['window_detected']})")
     
     print("\n" + "=" * 60)
     print("All tests passed! ✓")
