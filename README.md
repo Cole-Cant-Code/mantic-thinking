@@ -1,4 +1,4 @@
-# Mantic Early Warning System
+# Mantic Early Warning & Emergence Detection System
 
 Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis.
 Compatible with Claude, Kimi, Gemini, OpenAI, and Ollama.
