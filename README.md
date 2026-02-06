@@ -252,4 +252,4 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
-1.0.0 - Complete suite with 14 cross-model compatible tools
+1.1.0 - Bounded overrides + internal planning tool

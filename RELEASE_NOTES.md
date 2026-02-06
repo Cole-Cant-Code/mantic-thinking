@@ -24,6 +24,10 @@ reasoning scaffold. The immutable core kernel remains unchanged.
 - **Domain kernel allowlist updated**
   - Added `planning` to `DOMAIN_KERNEL_ALLOWLIST`.
 
+- **Public schemas/adapters updated**
+  - `temporal_config` and `threshold_override` are now exposed as optional
+    parameters in OpenAI/Claude/Kimi/Gemini schemas.
+
 ## Compatibility
 
 - Core formula (`core/mantic_kernel.py`) unchanged.
@@ -48,5 +52,4 @@ reasoning scaffold. The immutable core kernel remains unchanged.
 ## Notes
 
 - The planning tool is internal-only and not exposed via adapters or schemas.
-- Adapters and schemas were not modified in this release.
-
+- Adapters and schemas now include optional override parameters.

@@ -33,6 +33,29 @@ from tools import (
     social_catalytic_alignment,
 )
 
+# Optional override inputs (bounded internally by tools)
+OVERRIDE_PROPERTIES = {
+    "threshold_override": {
+        "type": "object",
+        "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+        "additionalProperties": {"type": "number"}
+    },
+    "temporal_config": {
+        "type": "object",
+        "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+        "properties": {
+            "kernel_type": {"type": "string", "description": "Temporal kernel type (domain-allowed)"},
+            "alpha": {"type": "number", "description": "Sensitivity (bounded)"},
+            "n": {"type": "number", "description": "Novelty (bounded)"},
+            "t": {"type": "number", "description": "Time delta"},
+            "t0": {"type": "number", "description": "S-curve inflection point"},
+            "exponent": {"type": "number", "description": "Power-law exponent"},
+            "frequency": {"type": "number", "description": "Oscillation frequency"},
+            "memory_strength": {"type": "number", "description": "Memory strength"}
+        }
+    }
+}
+
 
 # Map tool IDs to detection functions (14 tools total)
 TOOL_MAP = {
@@ -319,6 +342,10 @@ def get_openai_tools():
             }
         }
     ]
+
+    # Add bounded override params to all tools (optional)
+    for tool in friction_tools + emergence_tools:
+        tool["function"]["parameters"]["properties"].update(OVERRIDE_PROPERTIES)
 
     return friction_tools + emergence_tools
 
