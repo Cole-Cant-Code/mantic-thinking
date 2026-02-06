@@ -1,19 +1,16 @@
-# Release Notes — 2026-02-06 (v1.1.3)
+# Release Notes — 2026-02-06 (v1.1.4)
 
 ## Summary
 
-This release tightens input validation across all tools, rejects non-finite
-override values, and allows contrarian flow to qualify in the finance confluence
-engine. The immutable core kernel remains unchanged.
+This release removes import-time `sys.path` mutation from adapters and limits
+path adjustments to direct script execution. The immutable core kernel remains
+unchanged.
 
 ## Highlights
 
-- **Strict input validation**
-  - All tool entrypoints now require finite inputs (no None/NaN/inf).
-- **Override safety**
-  - NaN/inf threshold and temporal overrides are rejected and fall back to defaults.
-- **Finance confluence refinement**
-  - Contrarian flow can qualify for a window when other layers are favorable.
+- **Adapter import hygiene**
+  - Adapters no longer mutate `sys.path` on import; path adjustments only occur
+    for direct script execution.
 
 ## Compatibility
 
@@ -25,10 +22,10 @@ engine. The immutable core kernel remains unchanged.
 
 ## Files Changed (High-Level)
 
-- `core/validators.py` — finite input/override validation
-- `tools/**` — enforce finite required inputs; finance confluence gate update
-- `tests/test_cross_model.py` — missing input, contrarian flow, NaN override tests
+- `adapters/*.py` — guard `sys.path` modification behind `__main__`
+- `README.md` — version line updated
+- `pyproject.toml` — version bump
 
 ## Notes
 
-- No changes to domain weights or kernel implementation.
+- No functional changes to tool behavior or kernel math.

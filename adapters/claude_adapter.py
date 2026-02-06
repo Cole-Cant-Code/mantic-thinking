@@ -9,7 +9,12 @@ Includes both Friction tools (7) and Emergence tools (7) = 14 total.
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Avoid mutating sys.path on import; only adjust for direct script execution.
+if __name__ == "__main__":
+    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
 from adapters.openai_adapter import TOOL_MAP, get_openai_tools, get_tools_by_type
 
