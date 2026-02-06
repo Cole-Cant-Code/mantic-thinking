@@ -42,7 +42,7 @@ Detects when layers align: `if min(L) > 0.6: window_detected()`
 ## Installation
 
 ```bash
-cd mantic-tools
+cd mantic-thinking
 pip install -r requirements.txt
 ```
 
@@ -152,7 +152,7 @@ result = execute_tool("cyber_adversary_overreach", {
 ## Architecture
 
 ```
-mantic-tools/
+mantic-thinking/
 ├── SKILL.md                    # Universal manifest
 ├── README.md                   # This file
 ├── schemas/

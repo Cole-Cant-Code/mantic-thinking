@@ -664,7 +664,7 @@ All tools return a standardized response:
 
 Run cross-model validation:
 ```bash
-cd mantic-tools
+cd mantic-thinking
 python -m pytest tests/test_cross_model.py -v
 ```
 

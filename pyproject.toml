@@ -49,10 +49,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Cole-Cant-Code/mantic-tools"
-Documentation = "https://github.com/Cole-Cant-Code/mantic-tools#readme"
-Repository = "https://github.com/Cole-Cant-Code/mantic-tools.git"
-Issues = "https://github.com/Cole-Cant-Code/mantic-tools/issues"
+Homepage = "https://github.com/Cole-Cant-Code/mantic-thinking"
+Documentation = "https://github.com/Cole-Cant-Code/mantic-thinking#readme"
+Repository = "https://github.com/Cole-Cant-Code/mantic-thinking.git"
+Issues = "https://github.com/Cole-Cant-Code/mantic-thinking/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
