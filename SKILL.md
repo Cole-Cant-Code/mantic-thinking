@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.1.1  
+**version:** 1.1.2  
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  

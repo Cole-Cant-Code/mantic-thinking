@@ -42,8 +42,7 @@ Detects when layers align: `if min(L) > 0.6: window_detected()`
 ## Installation
 
 ```bash
-cd mantic-thinking
-pip install -r requirements.txt
+pip install mantic-thinking
 ```
 
 ## Quick Start
@@ -252,4 +251,4 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
-1.1.1 - Public override params in schemas/adapters
+1.1.2 - PyPI install instructions updated
