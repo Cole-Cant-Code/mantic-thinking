@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 import numpy as np
 from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
 from core.validators import (
-    clamp_input, format_attribution,
+    clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
@@ -77,6 +77,14 @@ def detect(technical, macro, flow, risk, f_time=1.0,
         Includes 'overrides_applied' audit block showing any tuning.
     """
     # =======================================================================
+    # INPUT VALIDATION
+    require_finite_inputs({
+        "technical": technical,
+        "macro": macro,
+        "flow": flow,
+        "risk": risk,
+    })
+
     # OVERRIDES PROCESSING (Bounded and Audited)
     # =======================================================================
     

@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 import numpy as np
 from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
 from core.validators import (
-    clamp_input, format_attribution,
+    clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
@@ -55,6 +55,14 @@ def detect(individual, network, institutional, cultural, f_time=1.0,
            threshold_override=None, temporal_config=None):
     """Detect narrative ruptures in social/cultural systems."""
     
+    # INPUT VALIDATION
+    require_finite_inputs({
+        "individual": individual,
+        "network": network,
+        "institutional": institutional,
+        "cultural": cultural,
+    })
+
     # OVERRIDES PROCESSING
     threshold_info = {}
     active_thresholds = DEFAULT_THRESHOLDS.copy()

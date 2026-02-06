@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 import numpy as np
 from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.validators import clamp_input, require_finite_inputs, format_attribution
 
 
 # Equal weight for alignment detection
@@ -50,6 +50,14 @@ def detect(architecture, implementation, testing, documentation, f_time=1.0):
         >>> print(result['window_detected'])
         True
     """
+    # INPUT VALIDATION
+    require_finite_inputs({
+        "architecture": architecture,
+        "implementation": implementation,
+        "testing": testing,
+        "documentation": documentation,
+    })
+
     # Clamp inputs
     L = [
         clamp_input(architecture, name="architecture"),

@@ -251,4 +251,5 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.1.3 - Input validation and confluence logic refinement
 1.1.2 - PyPI install instructions updated

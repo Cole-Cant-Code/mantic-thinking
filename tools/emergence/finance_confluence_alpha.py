@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 import numpy as np
 from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
 from core.validators import (
-    clamp_input, format_attribution,
+    clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
@@ -47,6 +47,14 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
            f_time=1.0, threshold_override=None, temporal_config=None):
     """Detect asymmetric opportunity when directional harmony achieved."""
     
+    # INPUT VALIDATION
+    require_finite_inputs({
+        "technical_setup": technical_setup,
+        "macro_tailwind": macro_tailwind,
+        "flow_positioning": flow_positioning,
+        "risk_compression": risk_compression,
+    })
+
     # OVERRIDES PROCESSING
     threshold_info = {}
     active_thresholds = DEFAULT_THRESHOLDS.copy()
@@ -118,7 +126,8 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
     flow_favorable = abs(L_raw[2]) > flow_extreme_threshold
     flow_direction = "long" if L_raw[2] < 0 else "short"
     risk_ok = L_raw[3] > risk_ok_threshold
-    all_favorable = min(L_normalized) > 0.5
+    # Flow can be contrarian (negative) and still favorable; require non-flow layers > 0.5
+    all_favorable = min(L_raw[0], L_raw[1], L_raw[3]) > 0.5
     
     window_detected = False
     setup_quality = None

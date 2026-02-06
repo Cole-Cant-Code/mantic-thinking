@@ -101,6 +101,29 @@ def validate_layers(layer_values, layer_names=None):
     return validated
 
 
+def require_finite_inputs(values):
+    """
+    Ensure required inputs are present and finite numbers.
+
+    Args:
+        values: Dict or iterable of (name, value) pairs
+
+    Raises:
+        ValueError: If any value is None or not finite
+        TypeError: If any value is not a number
+    """
+    items = values.items() if isinstance(values, dict) else values
+    for name, value in items:
+        if value is None:
+            raise ValueError(f"{name} is required and cannot be None")
+        try:
+            val = float(value)
+        except (TypeError, ValueError):
+            raise TypeError(f"{name} must be a number, got {type(value).__name__}")
+        if not np.isfinite(val):
+            raise ValueError(f"{name} must be a finite number")
+
+
 def check_mismatch(layer_values, threshold=0.4, comparison_mode="variance"):
     """
     Check for mismatches between layer values.
@@ -223,22 +246,34 @@ def clamp_threshold_override(requested, default,
     if requested is None:
         return default, False, {"used": "default", "value": default}
     
-    try:
-        val = float(requested)
-    except (TypeError, ValueError):
-        return default, True, {
-            "used": "default", 
-            "value": default,
-            "reason": f"Invalid type: {type(requested).__name__}"
-        }
-    
-    # Calculate percent-based bounds
+    # Calculate percent-based bounds (independent of requested value)
     min_pct = default * (1 - max_drift_pct)
     max_pct = default * (1 + max_drift_pct)
     
     # Combine with hard bounds (most restrictive wins)
     effective_min = max(hard_bounds[0], min_pct)
     effective_max = min(hard_bounds[1], max_pct)
+
+    try:
+        val = float(requested)
+    except (TypeError, ValueError):
+        return default, True, {
+            "requested": requested,
+            "used": float(default),
+            "default": default,
+            "bounds": {"min": effective_min, "max": effective_max},
+            "was_clamped": True,
+            "reason": f"Invalid type: {type(requested).__name__}"
+        }
+    if not np.isfinite(val):
+        return default, True, {
+            "requested": requested,
+            "used": float(default),
+            "default": default,
+            "bounds": {"min": effective_min, "max": effective_max},
+            "was_clamped": True,
+            "reason": "Not a finite number"
+        }
     
     # Apply clamping
     clamped = np.clip(val, effective_min, effective_max)
@@ -301,32 +336,39 @@ def validate_temporal_config(config, domain=None):
     if alpha is not None:
         try:
             val = float(alpha)
+            if not np.isfinite(val):
+                raise ValueError("Not a finite number")
             clamped_val = np.clip(val, ALPHA_BOUNDS[0], ALPHA_BOUNDS[1])
             validated["alpha"] = float(clamped_val)
             if not np.isclose(clamped_val, val, atol=1e-10):
                 clamped["alpha"] = {"requested": val, "used": clamped_val, "bounds": ALPHA_BOUNDS}
         except (TypeError, ValueError):
-            rejected["alpha"] = {"requested": alpha, "reason": "Not a valid number"}
+            rejected["alpha"] = {"requested": alpha, "reason": "Not a finite number"}
     
     # Clamp n (novelty)
     n = config.get("n")
     if n is not None:
         try:
             val = float(n)
+            if not np.isfinite(val):
+                raise ValueError("Not a finite number")
             clamped_val = np.clip(val, NOVELTY_BOUNDS[0], NOVELTY_BOUNDS[1])
             validated["n"] = float(clamped_val)
             if not np.isclose(clamped_val, val, atol=1e-10):
                 clamped["n"] = {"requested": val, "used": clamped_val, "bounds": NOVELTY_BOUNDS}
         except (TypeError, ValueError):
-            rejected["n"] = {"requested": n, "reason": "Not a valid number"}
+            rejected["n"] = {"requested": n, "reason": "Not a finite number"}
     
     # Pass through other params (t, t0, exponent, frequency, etc.) with basic validation
     for key in ["t", "t0", "exponent", "frequency", "memory_strength"]:
         if key in config:
             try:
-                validated[key] = float(config[key])
+                val = float(config[key])
+                if not np.isfinite(val):
+                    raise ValueError("Not a finite number")
+                validated[key] = val
             except (TypeError, ValueError):
-                rejected[key] = {"requested": config[key], "reason": "Not a valid number"}
+                rejected[key] = {"requested": config[key], "reason": "Not a finite number"}
     
     return validated, rejected, clamped
 
@@ -347,7 +389,17 @@ def clamp_f_time(f_time):
     try:
         val = float(f_time)
     except (TypeError, ValueError):
-        return 1.0, True, {"used": 1.0, "reason": f"Invalid type: {type(f_time).__name__}"}
+        return 1.0, True, {
+            "used": 1.0,
+            "was_clamped": True,
+            "reason": f"Invalid type: {type(f_time).__name__}"
+        }
+    if not np.isfinite(val):
+        return 1.0, True, {
+            "used": 1.0,
+            "was_clamped": True,
+            "reason": "Not a finite number"
+        }
     
     clamped = np.clip(val, F_TIME_BOUNDS[0], F_TIME_BOUNDS[1])
     was_clamped = not np.isclose(clamped, val, atol=1e-10)

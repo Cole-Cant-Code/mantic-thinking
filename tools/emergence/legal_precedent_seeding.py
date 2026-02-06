@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 import numpy as np
 from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
 from core.validators import (
-    clamp_input, format_attribution,
+    clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
@@ -45,6 +45,14 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
            f_time=1.0, threshold_override=None, temporal_config=None):
     """Spot windows for favorable precedent establishment."""
     
+    # INPUT VALIDATION
+    require_finite_inputs({
+        "socio_political_climate": socio_political_climate,
+        "institutional_capacity": institutional_capacity,
+        "statutory_ambiguity": statutory_ambiguity,
+        "circuit_split": circuit_split,
+    })
+
     # OVERRIDES PROCESSING
     threshold_info = {}
     active_thresholds = DEFAULT_THRESHOLDS.copy()

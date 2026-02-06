@@ -131,6 +131,68 @@ class TestValidators:
         assert np.isnan(layers[2])
 
 
+class TestInputRequirements:
+    """Ensure tool entrypoints reject missing inputs."""
+
+    @pytest.mark.parametrize("func, kwargs", [
+        (healthcare_phenotype_genotype.detect, {
+            "phenotypic": 0.6, "genomic": 0.7, "environmental": 0.5, "psychosocial": 0.5
+        }),
+        (finance_regime_conflict.detect, {
+            "technical": 0.6, "macro": 0.7, "flow": 0.1, "risk": 0.5
+        }),
+        (cyber_attribution_resolver.detect, {
+            "technical": 0.7, "threat_intel": 0.6, "operational_impact": 0.5, "geopolitical": 0.4
+        }),
+        (climate_maladaptation.detect, {
+            "atmospheric": 0.6, "ecological": 0.5, "infrastructure": 0.7, "policy": 0.6
+        }),
+        (legal_precedent_drift.detect, {
+            "black_letter": 0.7, "precedent": 0.6, "operational": 0.5, "socio_political": 0.1
+        }),
+        (military_friction_forecast.detect, {
+            "maneuver": 0.7, "intelligence": 0.6, "sustainment": 0.5, "political": 0.5
+        }),
+        (social_narrative_rupture.detect, {
+            "individual": 0.6, "network": 0.6, "institutional": 0.6, "cultural": 0.2
+        }),
+        (healthcare_precision_therapeutic.detect, {
+            "genomic_predisposition": 0.7, "environmental_readiness": 0.7,
+            "phenotypic_timing": 0.7, "psychosocial_engagement": 0.7
+        }),
+        (finance_confluence_alpha.detect, {
+            "technical_setup": 0.7, "macro_tailwind": 0.7,
+            "flow_positioning": 0.6, "risk_compression": 0.7
+        }),
+        (cyber_adversary_overreach.detect, {
+            "threat_intel_stretch": 0.7, "geopolitical_pressure": 0.7,
+            "operational_hardening": 0.7, "tool_reuse_fatigue": 0.7
+        }),
+        (climate_resilience_multiplier.detect, {
+            "atmospheric_benefit": 0.7, "ecological_benefit": 0.7,
+            "infrastructure_benefit": 0.7, "policy_alignment": 0.7
+        }),
+        (legal_precedent_seeding.detect, {
+            "socio_political_climate": 0.7, "institutional_capacity": 0.7,
+            "statutory_ambiguity": 0.7, "circuit_split": 0.7
+        }),
+        (military_strategic_initiative.detect, {
+            "enemy_ambiguity": 0.7, "positional_advantage": 0.7,
+            "logistic_readiness": 0.7, "authorization_clarity": 0.7
+        }),
+        (social_catalytic_alignment.detect, {
+            "individual_readiness": 0.7, "network_bridges": 0.7,
+            "policy_window": 0.7, "paradigm_momentum": 0.7
+        }),
+    ])
+    def test_missing_inputs_rejected(self, func, kwargs):
+        key = next(iter(kwargs))
+        bad = dict(kwargs)
+        bad[key] = None
+        with pytest.raises(ValueError):
+            func(**bad)
+
+
 # =============================================================================
 # Domain Tool Tests
 # =============================================================================
@@ -171,6 +233,15 @@ class TestHealthcareTool:
         )
         # Should clamp inputs and still produce valid result
         assert "m_score" in result
+
+    def test_nan_threshold_override_rejected(self):
+        """NaN overrides should be rejected and defaults used."""
+        result = healthcare_phenotype_genotype.detect(
+            phenotypic=0.6, genomic=0.7, environmental=0.5, psychosocial=0.5,
+            threshold_override={"buffering": float("nan")}
+        )
+        assert result["threshold"] == 0.4
+        assert result["overrides_applied"]["threshold_overrides"]["clamped"] is True
 
 
 class TestFinanceTool:
@@ -343,8 +414,19 @@ class TestFinanceEmergence:
         assert result["window_detected"] is True
         assert result["setup_quality"] in {"HIGH_CONVICTION", "MODERATE_CONVICTION"}
 
+    def test_contrarian_flow_window(self):
+        """Contrarian flow should be eligible for confluence detection."""
+        result = finance_confluence_alpha.detect(
+            technical_setup=0.85,
+            macro_tailwind=0.80,
+            flow_positioning=-0.75,
+            risk_compression=0.70,
+        )
+        assert result["window_detected"] is True
+        assert result["position_direction"] == "long"
+
     def test_no_confluence(self):
-        """Test no confluence due to flow."""
+        """Test no confluence due to weak flow magnitude."""
         result = finance_confluence_alpha.detect(
             technical_setup=0.75,
             macro_tailwind=0.70,
