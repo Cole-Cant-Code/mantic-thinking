@@ -215,6 +215,11 @@ These provide layer mappings and cross-domain coupling patterns for implementing
 5. **Complementary Suites**: Friction for risks, Emergence for opportunities
 6. **Simple Logic**: Each tool <100 lines, threshold-based
 
+## Contributing
+
+See `CONTRIBUTING.md`. We accept contributions from individuals only and require
+Signed-off-by commits (DCO).
+
 ## License
 
 ### Source-Available License (Default)
