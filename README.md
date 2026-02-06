@@ -252,4 +252,4 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
-1.1.0 - Bounded overrides + internal planning tool
+1.1.1 - Public override params in schemas/adapters

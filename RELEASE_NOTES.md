@@ -1,4 +1,4 @@
-# Release Notes — 2026-02-06
+# Release Notes — 2026-02-06 (v1.1.1)
 
 ## Summary
 
