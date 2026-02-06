@@ -972,3 +972,121 @@ class TestInternalCodebaseTools:
         assert not hasattr(tools, 'codebase_alignment_window')
         assert 'codebase_layer_conflict' not in dir(tools)
         assert 'codebase_alignment_window' not in dir(tools)
+
+
+class TestInternalPlanTool:
+    """
+    Smoke tests for internal plan alignment tool.
+
+    This tool is intentionally NOT exported in tools/__init__.py
+    and NOT wired into adapters. It exists as a universal utility.
+    """
+
+    def test_plan_alignment_imports(self):
+        """Verify internal plan tool can be imported directly."""
+        from tools.emergence.plan_alignment_window import detect, WEIGHTS, LAYER_NAMES
+        assert callable(detect)
+        assert len(WEIGHTS) == 4
+        assert sum(WEIGHTS) == 1.0
+        assert len(LAYER_NAMES) == 4
+
+    def test_plan_not_in_public_api(self):
+        """Verify plan tool is NOT exported in tools.__init__."""
+        import tools
+        assert not hasattr(tools, 'plan_alignment_window')
+        assert 'plan_alignment_window' not in dir(tools)
+
+    def test_optimal_plan(self):
+        """Test optimal plan detection (all layers > 0.80)."""
+        from tools.emergence.plan_alignment_window import detect
+        result = detect(
+            immediate_actions=0.85,
+            coordination=0.82,
+            constraints=0.88,
+            adaptation=0.81
+        )
+        assert result['plan_ready'] is True
+        assert result['readiness_tier'] == 'OPTIMAL'
+        assert result['m_score'] > 0
+        assert result['balance_score'] > 0
+
+    def test_ready_plan(self):
+        """Test ready (non-optimal) plan detection."""
+        from tools.emergence.plan_alignment_window import detect
+        result = detect(
+            immediate_actions=0.75,
+            coordination=0.65,
+            constraints=0.70,
+            adaptation=0.62
+        )
+        assert result['plan_ready'] is True
+        assert result['readiness_tier'] == 'READY'
+        assert result['limiting_factor'] == 'adaptation'
+
+    def test_conditional_plan(self):
+        """Test conditional plan detection (gaps but no critical)."""
+        from tools.emergence.plan_alignment_window import detect
+        result = detect(
+            immediate_actions=0.80,
+            coordination=0.70,
+            constraints=0.45,
+            adaptation=0.55
+        )
+        assert result['plan_ready'] is False
+        assert result['readiness_tier'] == 'CONDITIONAL'
+        assert 'improvement_needed' in result
+        assert 'constraints' in result['improvement_needed']
+
+    def test_not_ready_plan(self):
+        """Test not-ready plan with critical gaps."""
+        from tools.emergence.plan_alignment_window import detect
+        result = detect(
+            immediate_actions=0.85,
+            coordination=0.75,
+            constraints=0.30,
+            adaptation=0.20
+        )
+        assert result['plan_ready'] is False
+        assert result['readiness_tier'] == 'NOT_READY'
+        assert 'adaptation' in result['critical_gaps']
+        assert 'constraints' in result['critical_gaps']
+
+    def test_threshold_override(self):
+        """Test bounded threshold override."""
+        from tools.emergence.plan_alignment_window import detect
+        # Without override: adaptation=0.55 is below readiness=0.60 -> CONDITIONAL
+        result_default = detect(
+            immediate_actions=0.65,
+            coordination=0.62,
+            constraints=0.61,
+            adaptation=0.55
+        )
+        assert result_default['plan_ready'] is False
+
+        # With override: lower readiness to 0.50 -> READY
+        result_override = detect(
+            immediate_actions=0.65,
+            coordination=0.62,
+            constraints=0.61,
+            adaptation=0.55,
+            threshold_override={"readiness": 0.50}
+        )
+        assert result_override['plan_ready'] is True
+        assert 'overrides_applied' in result_override
+
+    def test_balance_score(self):
+        """Test balance score: balanced layers score higher than imbalanced."""
+        from tools.emergence.plan_alignment_window import detect
+        result_balanced = detect(
+            immediate_actions=0.70,
+            coordination=0.70,
+            constraints=0.70,
+            adaptation=0.70
+        )
+        result_imbalanced = detect(
+            immediate_actions=0.90,
+            coordination=0.90,
+            constraints=0.30,
+            adaptation=0.30
+        )
+        assert result_balanced['balance_score'] > result_imbalanced['balance_score']

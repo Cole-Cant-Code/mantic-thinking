@@ -6,16 +6,18 @@ Catches virality that outpaces institutional sense-making capacity.
 Input Layers:
     individual: Individual sentiment velocity (0-1)
     network: Network propagation speed (0-1)
-    institutional: Institutional response lag (0-1, higher = slower response)
-    cultural: Cultural archetype alignment (-1 to 1, where -1 = counter-narrative, 1 = aligned)
+    institutional: Institutional response lag (0-1, higher = slower)
+    cultural: Cultural archetype alignment (-1 to 1)
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"rapid_propagation": 0.75, "institutional_lag": 0.65, "rupture": 0.55}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
 
 Output:
-    alert: Detection message or None
-    rupture_timing: imminent/ongoing/contained
-    recommended_adjustment: Strategy recommendation
-    m_score: Final mantic anomaly score
-    spatial_component: Raw S value
-    layer_attribution: Percentage contribution per layer
+    alert, rupture_timing, recommended_adjustment, m_score, overrides_applied
 """
 
 import sys
@@ -23,11 +25,14 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Domain weights (must sum to 1)
 WEIGHTS = {
     'individual': 0.25,
     'network': 0.30,
@@ -37,37 +42,60 @@ WEIGHTS = {
 
 LAYER_NAMES = ['individual', 'network', 'institutional', 'cultural']
 
-# Detection thresholds
-RAPID_PROPAGATION = 0.7
-INSTITUTIONAL_LAG = 0.6
-Rupture_THRESHOLD = 0.5
+DEFAULT_THRESHOLDS = {
+    'rapid_propagation': 0.7,  # Rapid propagation threshold
+    'institutional_lag': 0.6,  # Institutional lag threshold
+    'rupture': 0.5             # Rupture detection threshold
+}
+
+DOMAIN = "social"
 
 
-def detect(individual, network, institutional, cultural, f_time=1.0):
-    """
-    Detect narrative ruptures in social/cultural systems.
+def detect(individual, network, institutional, cultural, f_time=1.0,
+           threshold_override=None, temporal_config=None):
+    """Detect narrative ruptures in social/cultural systems."""
     
-    Args:
-        individual: Individual sentiment velocity (0-1)
-        network: Network propagation speed (0-1)
-        institutional: Institutional response lag (0-1, higher = slower)
-        cultural: Cultural archetype alignment (-1 to 1)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with alert, rupture_timing, recommended_adjustment, m_score, etc.
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
     
-    Example:
-        >>> result = detect(
-        ...     individual=0.8,
-        ...     network=0.9,
-        ...     institutional=0.7,
-        ...     cultural=-0.4
-        ... )
-        >>> print(result['rupture_timing'])
-        'imminent'
-    """
-    # Clamp inputs
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L = [
         clamp_input(individual, name="individual"),
         clamp_input(network, name="network"),
@@ -75,7 +103,6 @@ def detect(individual, network, institutional, cultural, f_time=1.0):
         clamp_input(cultural, min_val=-1, max_val=1, name="cultural")
     ]
     
-    # Normalize cultural to 0-1 for kernel
     L_normalized = [
         L[0],
         L[1],
@@ -86,26 +113,23 @@ def detect(individual, network, institutional, cultural, f_time=1.0):
     W = list(WEIGHTS.values())
     I = [1.0, 1.0, 1.0, 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(W, L_normalized, I, f_time)
+    M, S, attr = mantic_kernel(W, L_normalized, I, f_time_clamped)
     
-    # Detection logic
     alert = None
     rupture_timing = "contained"
     recommended_adjustment = None
     
-    # Calculate propagation vs response gap
+    rapid_threshold = active_thresholds['rapid_propagation']
+    lag_threshold = active_thresholds['institutional_lag']
+    rupture_threshold = active_thresholds['rupture']
+    
     propagation_speed = (L[0] + L[1]) / 2
-    institutional_capacity = 1 - L[2]  # Invert: higher institutional = lower capacity
-    
+    institutional_capacity = 1 - L[2]
     velocity_gap = propagation_speed - institutional_capacity
-    
-    # Cultural counter-alignment magnitude
     cultural_stress = abs(L[3])
     is_counter_narrative = L[3] < -0.3
     
-    # Determine rupture timing
-    if velocity_gap > Rupture_THRESHOLD and propagation_speed > RAPID_PROPAGATION:
+    if velocity_gap > rupture_threshold and propagation_speed > rapid_threshold:
         rupture_timing = "imminent"
         if is_counter_narrative:
             alert = "NARRATIVE RUPTURE IMMINENT: Counter-cultural narrative spreading faster than institutional response"
@@ -123,7 +147,7 @@ def detect(individual, network, institutional, cultural, f_time=1.0):
             )
     elif velocity_gap > 0.3:
         rupture_timing = "ongoing"
-        if L[2] > INSTITUTIONAL_LAG:
+        if L[2] > lag_threshold:
             alert = "SENSE-MAKING GAP: Institutional response significantly lagging narrative spread"
             recommended_adjustment = (
                 "Accelerate decision cycles. Current lag of {:.0%} exceeds safe threshold. "
@@ -143,6 +167,37 @@ def detect(individual, network, institutional, cultural, f_time=1.0):
     else:
         recommended_adjustment = "Current narrative management approach sufficient."
     
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
     return {
         "alert": alert,
         "rupture_timing": rupture_timing,
@@ -153,29 +208,26 @@ def detect(individual, network, institutional, cultural, f_time=1.0):
         "propagation_speed": float(propagation_speed),
         "institutional_capacity": float(institutional_capacity),
         "velocity_gap": float(velocity_gap),
-        "cultural_alignment": float(L[3])
+        "cultural_alignment": float(L[3]),
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied
     }
 
 
 if __name__ == "__main__":
     print("=== Social Narrative Rupture Detector ===\n")
     
-    # Test 1: Imminent rupture (counter-cultural + fast spread)
     print("Test 1: Counter-cultural narrative spreading fast")
     result = detect(individual=0.8, network=0.9, institutional=0.7, cultural=-0.6)
     print(f"  Alert: {result['alert']}")
-    print(f"  Rupture Timing: {result['rupture_timing']}")
-    print(f"  Recommended Adjustment: {result['recommended_adjustment']}\n")
+    print(f"  Rupture Timing: {result['rupture_timing']}\n")
     
-    # Test 2: Contained narrative
     print("Test 2: Contained narrative")
     result = detect(individual=0.4, network=0.3, institutional=0.3, cultural=0.5)
     print(f"  Alert: {result['alert']}")
-    print(f"  Rupture Timing: {result['rupture_timing']}")
-    print(f"  Adjustment: {result['recommended_adjustment']}\n")
+    print(f"  Rupture Timing: {result['rupture_timing']}\n")
     
-    # Test 3: Sense-making gap
-    print("Test 3: Institutional lag (slow response)")
+    print("Test 3: Institutional lag")
     result = detect(individual=0.7, network=0.75, institutional=0.8, cultural=0.2)
     print(f"  Alert: {result['alert']}")
     print(f"  Rupture Timing: {result['rupture_timing']}")

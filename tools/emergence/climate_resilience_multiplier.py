@@ -5,6 +5,16 @@ Surfaces interventions with positive cross-domain coupling
 solving multiple layer problems simultaneously.
 
 Confluence Logic: Strong positive coupling across all 4 domains = multiplier effect
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"coupling": 0.55, "min_layer": 0.55, "multiplier": 0.75}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
+
+Output:
+    window_detected, intervention_type, cross_domain_coupling, m_score, overrides_applied
 """
 
 import sys
@@ -12,35 +22,71 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Equal weight for multi-domain solutions
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
 LAYER_NAMES = ['atmospheric', 'ecological', 'infrastructure', 'policy']
 
-# Thresholds
-COUPLING_THRESHOLD = 0.50
-MIN_LAYER_THRESHOLD = 0.50
-MULTIPLIER_THRESHOLD = 0.70
+DEFAULT_THRESHOLDS = {
+    'coupling': 0.50,      # Coupling threshold
+    'min_layer': 0.50,     # Minimum layer threshold
+    'multiplier': 0.70     # High multiplier threshold
+}
+
+DOMAIN = "climate"
 
 
-def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, policy_alignment, f_time=1.0):
-    """
-    Identify interventions that solve multiple layer problems simultaneously.
+def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, policy_alignment,
+           f_time=1.0, threshold_override=None, temporal_config=None):
+    """Identify interventions that solve multiple layer problems simultaneously."""
     
-    Args:
-        atmospheric_benefit: Atmospheric/climate benefit (0-1)
-        ecological_benefit: Ecosystem benefit (0-1)
-        infrastructure_benefit: Infrastructure resilience benefit (0-1)
-        policy_alignment: Policy coherence/support (0-1)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with window_detected, intervention_type, cross_domain_coupling, etc.
-    """
-    # Clamp inputs
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
+    
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L = [
         clamp_input(atmospheric_benefit, name="atmospheric_benefit"),
         clamp_input(ecological_benefit, name="ecological_benefit"),
@@ -48,22 +94,20 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         clamp_input(policy_alignment, name="policy_alignment")
     ]
     
-    # Interactions: Positive coupling between layers
     I = [1.0, 1.0, 1.0, 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time)
+    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    # CONFLUENCE LOGIC: Positive coupling across all domains
-    # Calculate pairwise coupling (all layers benefiting each other)
+    coupling_threshold = active_thresholds['coupling']
+    min_layer_threshold = active_thresholds['min_layer']
+    multiplier_threshold = active_thresholds['multiplier']
+    
     pairwise_products = [
-        L[0]*L[1], L[0]*L[2], L[0]*L[3],  # Atmospheric with others
-        L[1]*L[2], L[1]*L[3],              # Ecological with others
-        L[2]*L[3]                          # Infrastructure with policy
+        L[0]*L[1], L[0]*L[2], L[0]*L[3],
+        L[1]*L[2], L[1]*L[3],
+        L[2]*L[3]
     ]
     coupling = sum(pairwise_products) / len(pairwise_products)
-    
-    # Count high-benefit layers
     high_benefit_count = sum(1 for l in L if l > 0.7)
     
     window_detected = False
@@ -72,11 +116,10 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
     recommended_action = None
     funding_priority = None
     
-    if coupling > COUPLING_THRESHOLD and min(L) > MIN_LAYER_THRESHOLD:
+    if coupling > coupling_threshold and min(L) > min_layer_threshold:
         window_detected = True
         
-        # Determine multiplier tier
-        if coupling > MULTIPLIER_THRESHOLD and high_benefit_count >= 3:
+        if coupling > multiplier_threshold and high_benefit_count >= 3:
             intervention_type = "HIGH_MULTIPLIER"
             funding_priority = "URGENT - High leverage across 4 domain columns"
             example_intervention = "Urban forestry with green infrastructure: heat reduction + biodiversity + stormwater + equity"
@@ -91,7 +134,39 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
             funding_priority = "MODERATE - Dual benefits"
             example_intervention = "Solar canopy parking: renewable energy + heat reduction"
             recommended_action = "Include in funding round. Good but not exceptional cross-domain coupling."
-        
+    
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
+    if window_detected:
         return {
             "window_detected": True,
             "intervention_type": intervention_type,
@@ -103,6 +178,8 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
+            "thresholds": active_thresholds,
+            "overrides_applied": overrides_applied,
             "benefit_profile": {
                 "atmospheric": float(L[0]),
                 "ecological": float(L[1]),
@@ -111,8 +188,7 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
             }
         }
     
-    # No multiplier window
-    below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= MIN_LAYER_THRESHOLD]
+    below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= min_layer_threshold]
     
     return {
         "window_detected": False,
@@ -122,28 +198,25 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         "limiting_factors": below_threshold,
         "m_score": float(M),
         "spatial_component": float(S),
-        "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling."
+        "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied
     }
 
 
 if __name__ == "__main__":
     print("=== Climate Resilience Multiplier ===\n")
     
-    # Test 1: High multiplier (urban forestry)
-    print("Test 1: High multiplier (all domains > 0.7)")
+    print("Test 1: High multiplier")
     result = detect(
-        atmospheric_benefit=0.75,   # Heat reduction
-        ecological_benefit=0.80,    # Biodiversity
-        infrastructure_benefit=0.78, # Stormwater
-        policy_alignment=0.82       # Equity/policy support
+        atmospheric_benefit=0.75,
+        ecological_benefit=0.80,
+        infrastructure_benefit=0.78,
+        policy_alignment=0.82
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}")
-    print(f"  Coupling: {result.get('cross_domain_coupling', 0):.3f}")
-    print(f"  Example: {result.get('example_intervention', 'N/A')[:50]}...")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
     
-    # Test 2: Moderate multiplier
     print("Test 2: Moderate multiplier")
     result = detect(
         atmospheric_benefit=0.70,
@@ -152,16 +225,14 @@ if __name__ == "__main__":
         policy_alignment=0.68
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
     
-    # Test 3: No multiplier (single domain focus)
-    print("Test 3: No multiplier (single domain strong)")
+    print("Test 3: No multiplier")
     result = detect(
         atmospheric_benefit=0.30,
         ecological_benefit=0.25,
-        infrastructure_benefit=0.85,  # Only infrastructure strong
+        infrastructure_benefit=0.85,
         policy_alignment=0.40
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Status: {result.get('status', 'N/A')}")
+    print(f"  Status: {result['status']}")

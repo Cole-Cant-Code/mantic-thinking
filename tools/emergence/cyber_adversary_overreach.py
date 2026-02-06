@@ -5,6 +5,16 @@ Identifies defensive advantage windows when attacker TTPs are stretched,
 geopolitically pressured, and operationally fatigued.
 
 Confluence Logic: Attacker strained + defender hardened = counter-attack window
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"overreach": 0.75, "hardening": 0.65}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
+
+Output:
+    window_detected, attacker_state, defender_advantage, m_score, overrides_applied
 """
 
 import sys
@@ -12,35 +22,70 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Threat intel and operational hardening weighted higher
 WEIGHTS = [0.30, 0.20, 0.30, 0.20]
 LAYER_NAMES = ['threat_stretch', 'geopolitical_pressure', 'operational_hardening', 'tool_reuse_fatigue']
 
-# Thresholds
-OVERREACH_THRESHOLD = 0.70
-HARDENING_THRESHOLD = 0.60
+DEFAULT_THRESHOLDS = {
+    'overreach': 0.70,  # Overreach detection threshold
+    'hardening': 0.60   # Defender hardening threshold
+}
+
+DOMAIN = "cyber"
 
 
-def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, tool_reuse_fatigue, f_time=1.0):
-    """
-    Detect when attacker is vulnerable due to overextension.
-    High values = defender advantage window.
+def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, tool_reuse_fatigue,
+           f_time=1.0, threshold_override=None, temporal_config=None):
+    """Detect when attacker is vulnerable due to overextension."""
     
-    Args:
-        threat_intel_stretch: Attacker TTPs overextended/visible (0-1)
-        geopolitical_pressure: External pressure on attacker (0-1)
-        operational_hardening: Defender readiness/hardening (0-1)
-        tool_reuse_fatigue: Attacker tool reuse/indicators (0-1)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with window_detected, attacker_state, defender_advantage, etc.
-    """
-    # Clamp inputs
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
+    
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L = [
         clamp_input(threat_intel_stretch, name="threat_intel_stretch"),
         clamp_input(geopolitical_pressure, name="geopolitical_pressure"),
@@ -48,15 +93,14 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         clamp_input(tool_reuse_fatigue, name="tool_reuse_fatigue")
     ]
     
-    # Interactions: Stretch + Fatigue compound, Pressure + Hardening synergize
     I = [1.0, 1.0, 1.0, 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time)
+    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    # CONFLUENCE LOGIC: Attacker overreach indicators
-    # Overreach = high stretch + high pressure + high fatigue, but only if we're hardened
-    attacker_strain = (L[0] + L[1] + L[3]) / 3  # Stretch, pressure, fatigue average
+    overreach_threshold = active_thresholds['overreach']
+    hardening_threshold = active_thresholds['hardening']
+    
+    attacker_strain = (L[0] + L[1] + L[3]) / 3
     
     window_detected = False
     attacker_state = "RESILIENT"
@@ -65,10 +109,9 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
     duration_estimate = None
     counter_attack_viability = None
     
-    if attacker_strain > OVERREACH_THRESHOLD and L[2] > HARDENING_THRESHOLD:
+    if attacker_strain > overreach_threshold and L[2] > hardening_threshold:
         window_detected = True
         
-        # Determine advantage level
         if attacker_strain > 0.85 and L[2] > 0.75:
             defender_advantage = "CRITICAL"
             attacker_state = "SEVERELY_OVEREXTENDED"
@@ -87,7 +130,39 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
             recommended_action = "Increase monitoring. Prepare countermeasures."
             duration_estimate = "72-96 hour window"
             counter_attack_viability = "Low - maintain defensive posture"
-        
+    
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
+    if window_detected:
         return {
             "window_detected": True,
             "attacker_state": attacker_state,
@@ -99,6 +174,8 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
+            "thresholds": active_thresholds,
+            "overrides_applied": overrides_applied,
             "strain_indicators": {
                 "ttp_stretch": float(L[0]),
                 "geopolitical_pressure": float(L[1]),
@@ -106,10 +183,9 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
             }
         }
     
-    # No window - assess why
-    if L[2] <= HARDENING_THRESHOLD:
+    if L[2] <= hardening_threshold:
         limiting_factor = "Defender not sufficiently hardened"
-    elif attacker_strain <= OVERREACH_THRESHOLD:
+    elif attacker_strain <= overreach_threshold:
         limiting_factor = "Attacker not showing strain indicators"
     else:
         limiting_factor = "Confluence not achieved"
@@ -123,15 +199,16 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         "limiting_factor": limiting_factor,
         "m_score": float(M),
         "spatial_component": float(S),
-        "status": "Defensive window not yet open"
+        "status": "Defensive window not yet open",
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied
     }
 
 
 if __name__ == "__main__":
     print("=== Cyber Adversary Overreach Detector ===\n")
     
-    # Test 1: Critical overreach
-    print("Test 1: Critical overreach (high strain + high hardening)")
+    print("Test 1: Critical overreach")
     result = detect(
         threat_intel_stretch=0.90,
         geopolitical_pressure=0.85,
@@ -139,12 +216,8 @@ if __name__ == "__main__":
         tool_reuse_fatigue=0.88
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Attacker State: {result.get('attacker_state', 'N/A')}")
-    print(f"  Defender Advantage: {result.get('defender_advantage', 'N/A')}")
-    print(f"  Strain Score: {result.get('attacker_strain_score', 0):.3f}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Attacker State: {result['attacker_state']}\n")
     
-    # Test 2: Moderate overreach
     print("Test 2: Moderate overreach")
     result = detect(
         threat_intel_stretch=0.75,
@@ -153,17 +226,14 @@ if __name__ == "__main__":
         tool_reuse_fatigue=0.72
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Attacker State: {result.get('attacker_state', 'N/A')}")
-    print(f"  Defender Advantage: {result.get('defender_advantage', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Attacker State: {result['attacker_state']}\n")
     
-    # Test 3: No window (defender not ready)
-    print("Test 3: No window (defender not hardened)")
+    print("Test 3: No window")
     result = detect(
         threat_intel_stretch=0.85,
         geopolitical_pressure=0.80,
-        operational_hardening=0.45,  # Too low
+        operational_hardening=0.45,
         tool_reuse_fatigue=0.75
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Limiting Factor: {result.get('limiting_factor', 'N/A')}")
+    print(f"  Limiting Factor: {result['limiting_factor']}")

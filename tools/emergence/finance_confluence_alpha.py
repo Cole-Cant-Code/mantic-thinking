@@ -5,6 +5,16 @@ Detects asymmetric opportunity when technical setup, macro tailwind,
 flow positioning, and risk compression achieve directional harmony.
 
 Confluence Logic: Technical/Macro aligned + Flow against crowd + Risk OK
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"alignment": 0.65, "flow_extreme": 0.55, "risk_ok": 0.55, "tech_macro_gap": 0.25}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
+
+Output:
+    window_detected, setup_quality, conviction_score, m_score, overrides_applied
 """
 
 import sys
@@ -12,36 +22,72 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Technical and Macro weighted higher
 WEIGHTS = [0.30, 0.30, 0.20, 0.20]
 LAYER_NAMES = ['technical', 'macro', 'flow', 'risk']
 
-# Thresholds
-ALIGNMENT_THRESHOLD = 0.60
-FLOW_EXTREME = 0.50
-RISK_OK = 0.50
-TECHNICAL_MACRO_GAP = 0.20
+DEFAULT_THRESHOLDS = {
+    'alignment': 0.60,       # Technical/macro alignment threshold
+    'flow_extreme': 0.50,    # Flow extreme threshold
+    'risk_ok': 0.50,         # Risk OK threshold
+    'tech_macro_gap': 0.20   # Technical/macro max gap
+}
+
+DOMAIN = "finance"
 
 
-def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, f_time=1.0):
-    """
-    Detect asymmetric opportunity when directional harmony achieved.
+def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
+           f_time=1.0, threshold_override=None, temporal_config=None):
+    """Detect asymmetric opportunity when directional harmony achieved."""
     
-    Args:
-        technical_setup: Technical indicators favorable (0-1)
-        macro_tailwind: Fundamental/macro support (0-1)
-        flow_positioning: Crowd positioning (-1 to 1, -1 = crowded long, 1 = crowded short)
-        risk_compression: Risk appetite/safety (0-1, 1 = compressed/favorable)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with window_detected, setup_quality, conviction_score, etc.
-    """
-    # Clamp inputs
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
+    
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L_raw = [
         clamp_input(technical_setup, name="technical_setup"),
         clamp_input(macro_tailwind, name="macro_tailwind"),
@@ -49,7 +95,6 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
         clamp_input(risk_compression, name="risk_compression")
     ]
     
-    # Normalize flow to 0-1 for kernel
     L_normalized = [
         L_raw[0],
         L_raw[1],
@@ -57,27 +102,22 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
         L_raw[3]
     ]
     
-    # Interaction terms: Flow against crowd amplifies technical setup
-    # If flow is extreme (-1 or 1), boost the interaction (capped at 1.0)
+    # Interaction terms (respecting original logic)
     flow_boost = abs(L_raw[2]) * 0.2
     I = [min(1.0, 0.9 + flow_boost), 1.0, min(1.0, 0.9 + flow_boost * 1.5), 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(WEIGHTS, L_normalized, I, f_time)
+    M, S, attr = mantic_kernel(WEIGHTS, L_normalized, I, f_time_clamped)
     
-    # CONFLUENCE LOGIC: Check for directional harmony
-    # 1. Technical and Macro aligned (similar values, both high)
+    alignment_threshold = active_thresholds['alignment']
+    flow_extreme_threshold = active_thresholds['flow_extreme']
+    risk_ok_threshold = active_thresholds['risk_ok']
+    tech_macro_gap_max = active_thresholds['tech_macro_gap']
+    
     technical_macro_gap = abs(L_raw[0] - L_raw[1])
-    technical_macro_aligned = technical_macro_gap < TECHNICAL_MACRO_GAP and L_raw[0] > ALIGNMENT_THRESHOLD
-    
-    # 2. Flow is extreme (crowd positioned opposite to our direction)
-    flow_favorable = abs(L_raw[2]) > FLOW_EXTREME
-    flow_direction = "long" if L_raw[2] < 0 else "short"  # Crowd is here, we go opposite
-    
-    # 3. Risk environment is acceptable
-    risk_ok = L_raw[3] > RISK_OK
-    
-    # 4. All layers at minimum threshold
+    technical_macro_aligned = technical_macro_gap < tech_macro_gap_max and L_raw[0] > alignment_threshold
+    flow_favorable = abs(L_raw[2]) > flow_extreme_threshold
+    flow_direction = "long" if L_raw[2] < 0 else "short"
+    risk_ok = L_raw[3] > risk_ok_threshold
     all_favorable = min(L_normalized) > 0.5
     
     window_detected = False
@@ -91,12 +131,10 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
     if technical_macro_aligned and flow_favorable and risk_ok and all_favorable:
         window_detected = True
         
-        # Calculate conviction
         base_conviction = (L_raw[0] + L_raw[1]) / 2
         flow_boost_factor = 1 + abs(L_raw[2]) * 0.2
         conviction_score = min(base_conviction * flow_boost_factor, 1.0)
         
-        # Determine quality tier
         if conviction_score > 0.85 and min(L_raw[0], L_raw[1]) > 0.75:
             setup_quality = "HIGH_CONVICTION"
             edge_source = "Strong Technical/Macro harmony + Extreme flow against crowd"
@@ -109,7 +147,39 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
             recommended_action = f"Enter half position size ({flow_direction})"
             stop_loss = "Technical support/resistance break"
             risk_reward = "Favorable (2:1)"
-        
+    
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
+    if window_detected:
         return {
             "window_detected": True,
             "setup_quality": setup_quality,
@@ -121,12 +191,13 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
+            "thresholds": active_thresholds,
+            "overrides_applied": overrides_applied,
             "flow_raw": float(L_raw[2]),
             "technical_macro_gap": float(technical_macro_gap),
             "position_direction": flow_direction
         }
     
-    # No window - explain why
     missing = []
     if not technical_macro_aligned:
         missing.append("Technical/Macro divergence")
@@ -141,6 +212,8 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
         "reason": "; ".join(missing) if missing else "Layers below threshold",
         "m_score": float(M),
         "spatial_component": float(S),
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied,
         "technical_macro_aligned": technical_macro_aligned,
         "flow_favorable": flow_favorable,
         "risk_ok": risk_ok
@@ -150,39 +223,31 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression, 
 if __name__ == "__main__":
     print("=== Finance Confluence Alpha Engine ===\n")
     
-    # Test 1: High conviction setup (crowd short, we're long)
     print("Test 1: High conviction (crowd short, technical/macro bullish)")
     result = detect(
         technical_setup=0.85,
         macro_tailwind=0.80,
-        flow_positioning=0.75,  # Crowd is short (positive = short for us going long)
+        flow_positioning=0.75,
         risk_compression=0.70
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Quality: {result.get('setup_quality', 'N/A')}")
-    print(f"  Conviction: {result.get('conviction_score', 0):.3f}")
-    print(f"  Direction: {result.get('position_direction', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Quality: {result.get('setup_quality', 'N/A')}\n")
     
-    # Test 2: Moderate setup
     print("Test 2: Moderate conviction")
     result = detect(
         technical_setup=0.70,
         macro_tailwind=0.65,
-        flow_positioning=-0.60,  # Crowd is long (we go short)
+        flow_positioning=-0.60,
         risk_compression=0.60
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Quality: {result.get('setup_quality', 'N/A')}")
-    print(f"  Direction: {result.get('position_direction', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Quality: {result.get('setup_quality', 'N/A')}\n")
     
-    # Test 3: No confluence (flow not extreme)
-    print("Test 3: No confluence (flow not extreme)")
+    print("Test 3: No confluence")
     result = detect(
         technical_setup=0.75,
         macro_tailwind=0.70,
-        flow_positioning=-0.20,  # Not extreme
+        flow_positioning=-0.20,
         risk_compression=0.65
     )
     print(f"  Window Detected: {result['window_detected']}")

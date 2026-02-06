@@ -5,6 +5,16 @@ Spots windows when socio-political climate, institutional capacity,
 statutory ambiguity, and circuit splits align for favorable case law establishment.
 
 Confluence Logic: Receptive climate + ambiguity + capacity + split = ripe for precedent
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"ripeness": 0.65, "split": 0.55}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
+
+Output:
+    window_detected, precedent_opportunity, strategy, m_score, overrides_applied
 """
 
 import sys
@@ -12,34 +22,70 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Climate and ambiguity weighted higher
 WEIGHTS = [0.30, 0.20, 0.30, 0.20]
 LAYER_NAMES = ['socio_political', 'institutional_capacity', 'statutory_ambiguity', 'circuit_split']
 
-# Thresholds
-RIPENESS_THRESHOLD = 0.60
-SPLIT_THRESHOLD = 0.50
+DEFAULT_THRESHOLDS = {
+    'ripeness': 0.60,  # Ripeness threshold for precedent window
+    'split': 0.50      # Circuit split threshold
+}
+
+DOMAIN = "legal"
 
 
-def detect(socio_political_climate, institutional_capacity, statutory_ambiguity, circuit_split, f_time=1.0):
-    """
-    Spot windows for favorable precedent establishment.
+def detect(socio_political_climate, institutional_capacity, statutory_ambiguity, circuit_split,
+           f_time=1.0, threshold_override=None, temporal_config=None):
+    """Spot windows for favorable precedent establishment."""
     
-    Args:
-        socio_political_climate: Receptiveness to legal change (0-1)
-        institutional_capacity: Courts/resources to handle case (0-1)
-        statutory_ambiguity: Statutory text ambiguity/openness (0-1)
-        circuit_split: Degree of circuit split (0-1)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with window_detected, precedent_opportunity, strategy, etc.
-    """
-    # Clamp inputs
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
+    
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L = [
         clamp_input(socio_political_climate, name="socio_political_climate"),
         clamp_input(institutional_capacity, name="institutional_capacity"),
@@ -47,17 +93,15 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
         clamp_input(circuit_split, name="circuit_split")
     ]
     
-    # Interactions: Climate + Ambiguity compound, Capacity + Split enable action
     I = [1.0, 1.0, 1.0, 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time)
+    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    # CONFLUENCE LOGIC: Ripeness for precedent setting
-    # Ripeness = receptive climate + ambiguity floor, boosted by capacity
-    # Must have circuit split to create urgency
+    ripeness_threshold = active_thresholds['ripeness']
+    split_threshold = active_thresholds['split']
+    
     climate_ambiguity_floor = min(L[0], L[2])
-    ripeness = climate_ambiguity_floor * L[1]  # Floor is climate+ambiguity, scaled by capacity
+    ripeness = climate_ambiguity_floor * L[1]
     
     window_detected = False
     precedent_opportunity = None
@@ -66,11 +110,10 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
     forum_recommendation = None
     timeline = None
     
-    if ripeness > RIPENESS_THRESHOLD and circuit_split > SPLIT_THRESHOLD:
+    if ripeness > ripeness_threshold and circuit_split > split_threshold:
         window_detected = True
         circuit_split_exploitable = True
         
-        # Determine opportunity level
         if ripeness > 0.80 and L[3] > 0.75:
             precedent_opportunity = "EXCEPTIONAL"
             strategy = ("File test case in most favorable circuit immediately. "
@@ -92,7 +135,39 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
                        "Build record and coalition while conditions favorable.")
             forum_recommendation = "Select circuit with favorable precedent + active split"
             timeline = "18-24 months to decision"
-        
+    
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
+    if window_detected:
         return {
             "window_detected": True,
             "precedent_opportunity": precedent_opportunity,
@@ -104,6 +179,8 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
+            "thresholds": active_thresholds,
+            "overrides_applied": overrides_applied,
             "favorable_conditions": {
                 "socio_political_receptiveness": float(L[0]),
                 "statutory_ambiguity": float(L[2]),
@@ -112,12 +189,11 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
             }
         }
     
-    # No window - explain why
-    if L[3] <= SPLIT_THRESHOLD:
+    if L[3] <= split_threshold:
         limiting_factor = "No exploitable circuit split"
-    elif L[0] <= RIPENESS_THRESHOLD:
+    elif L[0] <= ripeness_threshold:
         limiting_factor = "Socio-political climate not receptive"
-    elif L[2] <= RIPENESS_THRESHOLD:
+    elif L[2] <= ripeness_threshold:
         limiting_factor = "Statutory text too clear/ambiguous"
     else:
         limiting_factor = "Insufficient institutional capacity"
@@ -126,20 +202,21 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
         "window_detected": False,
         "ripeness_score": float(ripeness),
         "precedent_opportunity": "LOW",
-        "circuit_split_exploitable": L[3] > SPLIT_THRESHOLD,
+        "circuit_split_exploitable": L[3] > split_threshold,
         "limiting_factor": limiting_factor,
         "m_score": float(M),
         "spatial_component": float(S),
         "status": f"Precedent window not yet ripe. {limiting_factor}.",
-        "recommendation": "Monitor for circuit split development or socio-political shift."
+        "recommendation": "Monitor for circuit split development or socio-political shift.",
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied
     }
 
 
 if __name__ == "__main__":
     print("=== Legal Precedent Seeding Optimizer ===\n")
     
-    # Test 1: Exceptional opportunity
-    print("Test 1: Exceptional precedent opportunity")
+    print("Test 1: Exceptional opportunity")
     result = detect(
         socio_political_climate=0.85,
         institutional_capacity=0.80,
@@ -147,12 +224,8 @@ if __name__ == "__main__":
         circuit_split=0.82
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Opportunity Level: {result.get('precedent_opportunity', 'N/A')}")
-    print(f"  Ripeness Score: {result.get('ripeness_score', 0):.3f}")
-    print(f"  Timeline: {result.get('timeline', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Opportunity Level: {result['precedent_opportunity']}\n")
     
-    # Test 2: High opportunity
     print("Test 2: High opportunity")
     result = detect(
         socio_political_climate=0.75,
@@ -161,16 +234,14 @@ if __name__ == "__main__":
         circuit_split=0.72
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Opportunity Level: {result.get('precedent_opportunity', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Opportunity Level: {result['precedent_opportunity']}\n")
     
-    # Test 3: No window (no circuit split)
-    print("Test 3: No window (no circuit split)")
+    print("Test 3: No window")
     result = detect(
         socio_political_climate=0.80,
         institutional_capacity=0.75,
         statutory_ambiguity=0.82,
-        circuit_split=0.30  # No split
+        circuit_split=0.30
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Limiting Factor: {result.get('limiting_factor', 'N/A')}")
+    print(f"  Limiting Factor: {result['limiting_factor']}")

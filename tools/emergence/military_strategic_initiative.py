@@ -5,6 +5,16 @@ Identifies decisive action opportunities when intelligence ambiguity,
 positional advantage, logistic readiness, and political authorization synchronize.
 
 Confluence Logic: Fog helps us + we're ready + authorized = initiative window
+
+Optional Overrides (Bounded):
+    threshold_override: Dict of threshold overrides
+        e.g., {"initiative": 0.75, "minimum_floor": 0.65}
+    temporal_config: Dict for temporal kernel tuning (domain-restricted)
+    
+    NOTE: Domain weights (W) are IMMUTABLE.
+
+Output:
+    window_detected, maneuver_type, advantage, m_score, overrides_applied
 """
 
 import sys
@@ -12,34 +22,70 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
-from core.validators import clamp_input, format_attribution
+from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.validators import (
+    clamp_input, format_attribution,
+    clamp_threshold_override, validate_temporal_config,
+    clamp_f_time, build_overrides_audit
+)
 
 
-# Equal weight for initiative requirements
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
 LAYER_NAMES = ['enemy_ambiguity', 'positional_advantage', 'logistic_readiness', 'authorization_clarity']
 
-# Thresholds
-INITIATIVE_THRESHOLD = 0.70
-MINIMUM_FLOOR = 0.60
+DEFAULT_THRESHOLDS = {
+    'initiative': 0.70,     # Initiative window threshold
+    'minimum_floor': 0.60   # Minimum floor for all layers
+}
+
+DOMAIN = "military"
 
 
-def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorization_clarity, f_time=1.0):
-    """
-    Identify decisive action windows (offensive leverage).
+def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorization_clarity,
+           f_time=1.0, threshold_override=None, temporal_config=None):
+    """Identify decisive action windows (offensive leverage)."""
     
-    Args:
-        enemy_ambiguity: Intelligence gaps favoring surprise (0-1)
-        positional_advantage: Geographical/tactical position (0-1)
-        logistic_readiness: Sustainment capability ready (0-1)
-        authorization_clarity: Political authority clear (0-1)
-        f_time: Temporal kernel multiplier (default 1.0)
+    # OVERRIDES PROCESSING
+    threshold_info = {}
+    active_thresholds = DEFAULT_THRESHOLDS.copy()
+    ignored_threshold_keys = []
     
-    Returns:
-        dict with window_detected, maneuver_type, advantage, etc.
-    """
-    # Clamp inputs
+    if threshold_override and isinstance(threshold_override, dict):
+        for key, requested in threshold_override.items():
+            if key in DEFAULT_THRESHOLDS:
+                clamped_val, was_clamped, info = clamp_threshold_override(
+                    requested, DEFAULT_THRESHOLDS[key]
+                )
+                active_thresholds[key] = clamped_val
+                threshold_info[key] = info
+            else:
+                ignored_threshold_keys.append(key)
+    
+    temporal_validated, temporal_rejected, temporal_clamped = None, {}, {}
+    temporal_applied = None
+    if temporal_config and isinstance(temporal_config, dict):
+        temporal_validated, temporal_rejected, temporal_clamped = validate_temporal_config(
+            temporal_config, domain=DOMAIN
+        )
+        if "kernel_type" not in temporal_validated:
+            if "kernel_type" not in temporal_rejected:
+                temporal_rejected["kernel_type"] = {
+                    "requested": temporal_config.get("kernel_type"),
+                    "reason": "kernel_type required and must be allowed for domain"
+                }
+        if "t" not in temporal_validated:
+            if "t" not in temporal_rejected:
+                temporal_rejected["t"] = {
+                    "requested": temporal_config.get("t"),
+                    "reason": "t required for temporal_config"
+                }
+        if "kernel_type" in temporal_validated and "t" in temporal_validated:
+            f_time = compute_temporal_kernel(**temporal_validated)
+            temporal_applied = temporal_validated
+    
+    f_time_clamped, _, f_time_info = clamp_f_time(f_time)
+    
+    # CORE DETECTION
     L = [
         clamp_input(enemy_ambiguity, name="enemy_ambiguity"),
         clamp_input(positional_advantage, name="positional_advantage"),
@@ -47,18 +93,16 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
         clamp_input(authorization_clarity, name="authorization_clarity")
     ]
     
-    # Interactions: Ambiguity + Position compound for advantage
     I = [1.0, 1.0, 1.0, 1.0]
     
-    # Calculate Mantic score
-    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time)
+    M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    # CONFLUENCE LOGIC: Initiative window calculation
-    # Initiative = min(Ambiguity, Readiness, Auth) * Position
-    # Fog helps us, we're ready, we're authorized, AND we have position
-    critical_factors = [L[0], L[2], L[3]]  # Ambiguity, Readiness, Authorization
+    initiative_threshold = active_thresholds['initiative']
+    minimum_floor = active_thresholds['minimum_floor']
+    
+    critical_factors = [L[0], L[2], L[3]]
     initiative_floor = min(critical_factors)
-    initiative_score = initiative_floor * L[1]  # Scaled by positional advantage
+    initiative_score = initiative_floor * L[1]
     
     window_detected = False
     maneuver_type = None
@@ -67,10 +111,9 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
     execution_window = None
     risk_assessment = None
     
-    if initiative_score > INITIATIVE_THRESHOLD and min(L) > MINIMUM_FLOOR:
+    if initiative_score > initiative_threshold and min(L) > minimum_floor:
         window_detected = True
         
-        # Determine initiative quality
         if initiative_score > 0.85 and all(l > 0.75 for l in L):
             maneuver_type = "DECISIVE_ACTION"
             advantage_description = ("Synchronized ambiguity/readiness/authorization with "
@@ -90,7 +133,39 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
             recommended_action = "Develop courses of action, prepare for exploitation"
             execution_window = "72-96 hours"
             risk_assessment = "MODERATE-HIGH - Contingency plans required"
-        
+    
+    # Build audit
+    threshold_clamped_any = any(
+        info.get("was_clamped", False) 
+        for info in threshold_info.values()
+    ) if threshold_info else False
+    
+    threshold_audit_info = None
+    if threshold_info:
+        threshold_audit_info = {
+            "overrides": {
+                key: {
+                    "requested": info.get("requested"),
+                    "used": info.get("used"),
+                    "was_clamped": info.get("was_clamped", False)
+                }
+                for key, info in threshold_info.items()
+            },
+            "was_clamped": threshold_clamped_any,
+            "ignored_keys": ignored_threshold_keys if ignored_threshold_keys else None
+        }
+    
+    overrides_applied = build_overrides_audit(
+        threshold_overrides=threshold_override if threshold_override else None,
+        temporal_config=temporal_config if temporal_config else None,
+        threshold_info=threshold_audit_info,
+        temporal_validated=temporal_applied,
+        temporal_rejected=temporal_rejected if temporal_rejected else None,
+        temporal_clamped=temporal_clamped if temporal_clamped else None,
+        f_time_info=f_time_info
+    )
+    
+    if window_detected:
         return {
             "window_detected": True,
             "maneuver_type": maneuver_type,
@@ -102,6 +177,8 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
+            "thresholds": active_thresholds,
+            "overrides_applied": overrides_applied,
             "synchronization_status": {
                 "enemy_ambiguity": float(L[0]),
                 "positional_advantage": float(L[1]),
@@ -110,15 +187,14 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
             }
         }
     
-    # No initiative window
     limiting_factors = []
-    if L[0] <= MINIMUM_FLOOR:
+    if L[0] <= minimum_floor:
         limiting_factors.append("insufficient enemy ambiguity (too clear)")
-    if L[1] <= MINIMUM_FLOOR:
+    if L[1] <= minimum_floor:
         limiting_factors.append("weak positional advantage")
-    if L[2] <= MINIMUM_FLOOR:
+    if L[2] <= minimum_floor:
         limiting_factors.append("logistics not ready")
-    if L[3] <= MINIMUM_FLOOR:
+    if L[3] <= minimum_floor:
         limiting_factors.append("authorization unclear")
     
     return {
@@ -129,28 +205,25 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
         "m_score": float(M),
         "spatial_component": float(S),
         "status": f"Initiative window closed. {', '.join(limiting_factors) if limiting_factors else 'Conditions unfavorable'}.",
-        "recommendation": "Maintain readiness, seek to improve positional advantage or wait for authorization."
+        "recommendation": "Maintain readiness, seek to improve positional advantage or wait for authorization.",
+        "thresholds": active_thresholds,
+        "overrides_applied": overrides_applied
     }
 
 
 if __name__ == "__main__":
     print("=== Military Strategic Initiative Window ===\n")
     
-    # Test 1: Decisive action window
     print("Test 1: Decisive action window")
     result = detect(
-        enemy_ambiguity=0.85,      # Fog of war helps us
-        positional_advantage=0.88, # Good position
-        logistic_readiness=0.82,   # Ready to go
-        authorization_clarity=0.90 # Clear to act
+        enemy_ambiguity=0.85,
+        positional_advantage=0.88,
+        logistic_readiness=0.82,
+        authorization_clarity=0.90
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Maneuver Type: {result.get('maneuver_type', 'N/A')}")
-    print(f"  Initiative Score: {result.get('initiative_score', 0):.3f}")
-    print(f"  Execution Window: {result.get('execution_window', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Maneuver Type: {result['maneuver_type']}\n")
     
-    # Test 2: Offensive operation
     print("Test 2: Offensive operation")
     result = detect(
         enemy_ambiguity=0.75,
@@ -159,16 +232,14 @@ if __name__ == "__main__":
         authorization_clarity=0.80
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Maneuver Type: {result.get('maneuver_type', 'N/A')}")
-    print(f"  M-Score: {result['m_score']:.3f}\n")
+    print(f"  Maneuver Type: {result['maneuver_type']}\n")
     
-    # Test 3: No window (logistics not ready)
-    print("Test 3: No window (logistics not ready)")
+    print("Test 3: No window")
     result = detect(
         enemy_ambiguity=0.80,
         positional_advantage=0.75,
-        logistic_readiness=0.45,  # Too low
+        logistic_readiness=0.45,
         authorization_clarity=0.85
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Limiting Factors: {result.get('limiting_factors', [])}")
+    print(f"  Limiting Factors: {result['limiting_factors']}")

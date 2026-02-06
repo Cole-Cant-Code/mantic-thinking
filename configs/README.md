@@ -33,6 +33,7 @@ Tested with: MiniMax M2.1, GPT-OSS, GLM-4, Llama 3.1/3.2, Qwen 2.5, and other to
 | `mantic_legal.md` | Legal | Legal reasoning & case strategy |
 | `mantic_social.md` | Social/Cultural | Social movement analysis & cultural narrative tracking |
 | `mantic_command.md` | Military/Command | Strategic decision-making & operational planning |
+| `mantic_plan.md` | Planning | Universal planning reasoning for structured plan development & readiness assessment |
 | `mantic_current.md` | Current Affairs | Real-time event analysis & trend monitoring |
 
 ## Usage
