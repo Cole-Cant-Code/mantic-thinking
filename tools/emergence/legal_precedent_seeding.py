@@ -19,10 +19,16 @@ Output:
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Avoid mutating sys.path on import; only adjust for direct script execution.
+if __name__ == "__main__":
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
@@ -214,6 +220,7 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
         "limiting_factor": limiting_factor,
         "m_score": float(M),
         "spatial_component": float(S),
+        "layer_attribution": format_attribution(attr, LAYER_NAMES),
         "status": f"Precedent window not yet ripe. {limiting_factor}.",
         "recommendation": "Monitor for circuit split development or socio-political shift.",
         "thresholds": active_thresholds,

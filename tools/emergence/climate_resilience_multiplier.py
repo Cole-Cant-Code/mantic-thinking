@@ -19,10 +19,16 @@ Output:
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Avoid mutating sys.path on import; only adjust for direct script execution.
+if __name__ == "__main__":
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
@@ -206,6 +212,7 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         "limiting_factors": below_threshold,
         "m_score": float(M),
         "spatial_component": float(S),
+        "layer_attribution": format_attribution(attr, LAYER_NAMES),
         "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied

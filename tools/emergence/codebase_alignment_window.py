@@ -10,10 +10,15 @@ Confluence Logic: All 4 layers must be favorable simultaneously (not just averag
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Avoid mutating sys.path on import; only adjust for direct script execution.
+if __name__ == "__main__":
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel
+from core.safe_kernel import safe_mantic_kernel as mantic_kernel
 from core.validators import clamp_input, require_finite_inputs, format_attribution
 
 

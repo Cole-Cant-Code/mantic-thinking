@@ -254,6 +254,10 @@ def clamp_threshold_override(requested, default,
     effective_min = max(hard_bounds[0], min_pct)
     effective_max = min(hard_bounds[1], max_pct)
 
+    # Ensure min <= max (handles edge case when default=0 or near hard bounds)
+    if effective_min > effective_max:
+        effective_max = effective_min
+
     try:
         val = float(requested)
     except (TypeError, ValueError):
@@ -320,16 +324,22 @@ def validate_temporal_config(config, domain=None):
     # Validate kernel_type against domain allowlist
     kernel_type = config.get("kernel_type")
     if kernel_type is not None:
-        allowed = DOMAIN_KERNEL_ALLOWLIST.get(domain, [])
-        if allowed and kernel_type not in allowed:
+        if domain is not None and domain not in DOMAIN_KERNEL_ALLOWLIST:
             rejected["kernel_type"] = {
                 "requested": kernel_type,
-                "reason": f"Not allowed for domain '{domain}'",
-                "allowed": allowed
+                "reason": f"Unknown domain '{domain}' — no kernel allowlist defined",
+                "allowed": []
             }
-            # Don't include kernel_type in validated
         else:
-            validated["kernel_type"] = kernel_type
+            allowed = DOMAIN_KERNEL_ALLOWLIST.get(domain, [])
+            if allowed and kernel_type not in allowed:
+                rejected["kernel_type"] = {
+                    "requested": kernel_type,
+                    "reason": f"Not allowed for domain '{domain}'",
+                    "allowed": allowed
+                }
+            else:
+                validated["kernel_type"] = kernel_type
     
     # Clamp alpha
     alpha = config.get("alpha")

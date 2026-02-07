@@ -20,6 +20,8 @@ if __name__ == "__main__":
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
 
+import inspect
+
 from adapters.openai_adapter import TOOL_MAP, get_openai_tools
 
 
@@ -95,8 +97,14 @@ def execute_tool(tool_name, arguments):
     """
     if tool_name not in TOOL_MAP:
         raise ValueError(f"Unknown tool: {tool_name}. Available: {list(TOOL_MAP.keys())}")
-    
-    return TOOL_MAP[tool_name](**arguments)
+
+    # Filter arguments to only those expected by the function
+    func = TOOL_MAP[tool_name]
+    sig = inspect.signature(func)
+    valid_params = set(sig.parameters.keys())
+    filtered_args = {k: v for k, v in arguments.items() if k in valid_params}
+
+    return func(**filtered_args)
 
 
 def format_for_gemini(result, tool_name=None):

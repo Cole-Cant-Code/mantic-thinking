@@ -22,10 +22,16 @@ Output:
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# Avoid mutating sys.path on import; only adjust for direct script execution.
+if __name__ == "__main__":
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
@@ -127,9 +133,9 @@ def detect(atmospheric, ecological, infrastructure, policy, f_time=1.0,
     low_policy = L[3] < 0.3
     short_term_focus = L[0] > 0.6 and L[1] < 0.4
     
-    if infra_eco_gap > 0.5:
+    if infra_eco_gap > block_threshold:
         maladaptation_score = infra_eco_gap
-        if L[1] < 0.3:
+        if L[1] < caution_threshold:
             decision = "block"
             alert = "MALADAPTATION RISK: Infrastructure solution threatens ecosystem collapse"
             alternative_suggestion = (
@@ -143,7 +149,7 @@ def detect(atmospheric, ecological, infrastructure, policy, f_time=1.0,
             alternative_suggestion = "Add ecological safeguards. Monitor ecosystem indicators during implementation."
     elif short_term_focus:
         maladaptation_score = L[0] - L[1]
-        if L[3] < 0.4:
+        if L[3] < caution_threshold:
             decision = "block"
             alert = "MALADAPTATION RISK: Short-term atmospheric fix without policy framework or ecological consideration"
             alternative_suggestion = (
@@ -154,7 +160,7 @@ def detect(atmospheric, ecological, infrastructure, policy, f_time=1.0,
             decision = "caution"
             alert = "MALADAPTATION WARNING: Atmospheric intervention may have downstream ecological impacts"
             alternative_suggestion = "Strengthen ecological monitoring and adaptive management protocols."
-    elif low_policy and (L[0] > 0.5 or L[2] > 0.5):
+    elif low_policy and (L[0] > block_threshold or L[2] > block_threshold):
         decision = "caution"
         maladaptation_score = 0.4
         alert = "POLICY GAP: Technical solution lacks policy coherence - may face implementation barriers"

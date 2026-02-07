@@ -251,6 +251,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.1.6 - Safe kernel wrapper + adapter/tool fixes
 1.1.5 - Ignore pytest cache in git
 1.1.4 - Adapter import hygiene (no sys.path mutation)
 1.1.3 - Input validation and confluence logic refinement
