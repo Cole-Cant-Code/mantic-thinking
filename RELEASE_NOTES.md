@@ -1,16 +1,14 @@
-# Release Notes — 2026-02-06 (v1.1.4)
+# Release Notes — 2026-02-06 (v1.1.5)
 
 ## Summary
 
-This release removes import-time `sys.path` mutation from adapters and limits
-path adjustments to direct script execution. The immutable core kernel remains
-unchanged.
+This release adds `.pytest_cache/` to `.gitignore` to keep working trees clean
+after running tests. The immutable core kernel remains unchanged.
 
 ## Highlights
 
-- **Adapter import hygiene**
-  - Adapters no longer mutate `sys.path` on import; path adjustments only occur
-    for direct script execution.
+- **Git hygiene**
+  - Ignore pytest cache artifacts by default.
 
 ## Compatibility
 
@@ -18,14 +16,14 @@ unchanged.
 
 ## Tests
 
-- `python3 -m pytest -q` → 99 passed
+- Not required for this change.
 
 ## Files Changed (High-Level)
 
-- `adapters/*.py` — guard `sys.path` modification behind `__main__`
+- `.gitignore` — ignore `.pytest_cache/`
 - `README.md` — version line updated
 - `pyproject.toml` — version bump
 
 ## Notes
 
-- No functional changes to tool behavior or kernel math.
+- No functional code changes in this release.
