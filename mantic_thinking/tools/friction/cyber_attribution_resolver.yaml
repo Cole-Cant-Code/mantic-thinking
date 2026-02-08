@@ -1,0 +1,65 @@
+tool: cyber_attribution_resolver
+type: friction
+domain: cyber
+
+selection:
+  use_when:
+    - "Technical sophistication and geopolitical context disagree (attribution uncertainty)."
+    - "Threat intel confidence is low relative to observed capability (false flag / unknown actor)."
+    - "High impact incident with weak corroboration on actor/motive."
+  not_for:
+    - "Basic vulnerability remediation without attribution questions."
+    - "Pure incident response runbooks (no cross-signal mismatch)."
+
+parameters:
+  technical:
+    layer: Micro
+    low: "Commodity tooling; low sophistication"
+    mid: "Mixed TTPs; moderate capability"
+    high: "Advanced tradecraft; high sophistication"
+  threat_intel:
+    layer: Meso
+    low: "Sparse/uncorroborated intel"
+    mid: "Partial attribution indicators"
+    high: "Strong corroboration across sources"
+  operational_impact:
+    layer: Meso
+    low: "Limited impact; contained"
+    mid: "Meaningful disruption"
+    high: "Severe impact; systemic risk"
+  geopolitical:
+    layer: Macro
+    low: "Low motive/context alignment"
+    mid: "Ambiguous context"
+    high: "Strong motive/context alignment"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for consistent comparisons across incidents."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to dampen untrusted intel feeds or amplify validated signals."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing the tool's mismatch logic."
+  dampen_when:
+    threat_intel: "Intel is single-source, politically motivated, or outdated."
+    geopolitical: "Context is speculative or driven by narrative rather than evidence."
+  amplify_when:
+    technical: "Multiple artifacts confirm sophistication (malware + infra + ops)."
+    operational_impact: "Impact data is well-measured (scope, dwell time, blast radius)."
+  examples:
+    - scenario: "High sophistication artifacts; intel feed unreliable"
+      interaction_mode: dynamic
+      interaction_override: {technical: 1.2, threat_intel: 0.7}
+      interaction_override_mode: scale
+      rationale: "Trust artifacts more than weak intel; reflect uncertainty in attribution."
+
+interpretation:
+  high_m: "Friction: attribution gap; capability/context/intel disagree."
+  low_m: "Signals align; attribution picture is more coherent."
+  check:
+    - "High technical + low intel often implies unknown actor or deception."
+    - "High geo context + low technical can imply proxy activity or misattribution."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

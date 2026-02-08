@@ -1,0 +1,1962 @@
+[
+  {
+    "name": "healthcare_phenotype_genotype",
+    "description": "FRICTION: Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "phenotypic": {
+          "type": "number",
+          "description": "Current symptoms/vitals (0-1)"
+        },
+        "genomic": {
+          "type": "number",
+          "description": "Genetic risk score (0-1)"
+        },
+        "environmental": {
+          "type": "number",
+          "description": "Exposure load (0-1)"
+        },
+        "psychosocial": {
+          "type": "number",
+          "description": "Stress/resilience (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "phenotypic",
+        "genomic",
+        "environmental",
+        "psychosocial"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "healthcare",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "finance_regime_conflict",
+    "description": "FRICTION: Spots when technical price action contradicts fundamentals, flow, or risk signals.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "technical": {
+          "type": "number",
+          "description": "Price action signals (0-1)"
+        },
+        "macro": {
+          "type": "number",
+          "description": "Fundamental indicators (0-1)"
+        },
+        "flow": {
+          "type": "number",
+          "description": "Capital flow direction (-1 to 1)"
+        },
+        "risk": {
+          "type": "number",
+          "description": "Risk appetite metrics (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "technical",
+        "macro",
+        "flow",
+        "risk"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "finance",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "cyber_attribution_resolver",
+    "description": "FRICTION: Scores confidence when technical sophistication doesn't align with geopolitical context.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "technical": {
+          "type": "number",
+          "description": "Technical sophistication (0-1)"
+        },
+        "threat_intel": {
+          "type": "number",
+          "description": "Threat intel confidence (0-1)"
+        },
+        "operational_impact": {
+          "type": "number",
+          "description": "Operational impact severity (0-1)"
+        },
+        "geopolitical": {
+          "type": "number",
+          "description": "Geopolitical context alignment (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "technical",
+        "threat_intel",
+        "operational_impact",
+        "geopolitical"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "cyber",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "climate_maladaptation",
+    "description": "FRICTION: Blocks solutions that solve immediate micro problems but create macro/meta harms.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "atmospheric": {
+          "type": "number",
+          "description": "Atmospheric metrics (0-1)"
+        },
+        "ecological": {
+          "type": "number",
+          "description": "Ecosystem health (0-1)"
+        },
+        "infrastructure": {
+          "type": "number",
+          "description": "Infrastructure resilience (0-1)"
+        },
+        "policy": {
+          "type": "number",
+          "description": "Policy coherence (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "atmospheric",
+        "ecological",
+        "infrastructure",
+        "policy"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "climate",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "legal_precedent_drift",
+    "description": "FRICTION: Warns when judicial philosophy shifts threaten current precedent-based strategies.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "black_letter": {
+          "type": "number",
+          "description": "Statutory text alignment (0-1)"
+        },
+        "precedent": {
+          "type": "number",
+          "description": "Precedent consistency (0-1)"
+        },
+        "operational": {
+          "type": "number",
+          "description": "Implementation feasibility (0-1)"
+        },
+        "socio_political": {
+          "type": "number",
+          "description": "Social/political context (-1 to 1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "black_letter",
+        "precedent",
+        "operational",
+        "socio_political"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "legal",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "military_friction_forecast",
+    "description": "FRICTION: Identifies where tactical plans hit logistics or political constraints.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "maneuver": {
+          "type": "number",
+          "description": "Tactical maneuver feasibility (0-1)"
+        },
+        "intelligence": {
+          "type": "number",
+          "description": "Intelligence confidence (0-1)"
+        },
+        "sustainment": {
+          "type": "number",
+          "description": "Logistics sustainability (0-1)"
+        },
+        "political": {
+          "type": "number",
+          "description": "Political authorization (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "maneuver",
+        "intelligence",
+        "sustainment",
+        "political"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "military",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "social_narrative_rupture",
+    "description": "FRICTION: Catches virality that outpaces institutional sense-making capacity.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "individual": {
+          "type": "number",
+          "description": "Sentiment velocity (0-1)"
+        },
+        "network": {
+          "type": "number",
+          "description": "Propagation speed (0-1)"
+        },
+        "institutional": {
+          "type": "number",
+          "description": "Response lag (0-1)"
+        },
+        "cultural": {
+          "type": "number",
+          "description": "Archetype alignment (-1 to 1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "individual",
+        "network",
+        "institutional",
+        "cultural"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "social",
+      "tool_type": "friction",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "healthcare_precision_therapeutic",
+    "description": "CONFLUENCE: Identifies rare alignment of genomic predisposition, environmental readiness, phenotypic timing, and psychosocial engagement for maximum treatment efficacy.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "genomic_predisposition": {
+          "type": "number",
+          "description": "Genetic readiness for treatment (0-1)"
+        },
+        "environmental_readiness": {
+          "type": "number",
+          "description": "Exposure/toxin levels favorable (0-1)"
+        },
+        "phenotypic_timing": {
+          "type": "number",
+          "description": "Disease progression stage optimal (0-1)"
+        },
+        "psychosocial_engagement": {
+          "type": "number",
+          "description": "Patient motivation/support high (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "genomic_predisposition",
+        "environmental_readiness",
+        "phenotypic_timing",
+        "psychosocial_engagement"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "healthcare",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "finance_confluence_alpha",
+    "description": "CONFLUENCE: Detects asymmetric opportunity when technical setup, macro tailwind, flow positioning, and risk compression achieve directional harmony.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "technical_setup": {
+          "type": "number",
+          "description": "Technical indicators favorable (0-1)"
+        },
+        "macro_tailwind": {
+          "type": "number",
+          "description": "Fundamental/macro support (0-1)"
+        },
+        "flow_positioning": {
+          "type": "number",
+          "description": "Crowd positioning (-1 to 1, extreme = contrarian signal)"
+        },
+        "risk_compression": {
+          "type": "number",
+          "description": "Risk appetite favorable (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "technical_setup",
+        "macro_tailwind",
+        "flow_positioning",
+        "risk_compression"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "finance",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "cyber_adversary_overreach",
+    "description": "CONFLUENCE: Identifies defensive advantage windows when attacker TTPs are stretched, geopolitically pressured, and operationally fatigued.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "threat_intel_stretch": {
+          "type": "number",
+          "description": "Attacker TTPs overextended/visible (0-1)"
+        },
+        "geopolitical_pressure": {
+          "type": "number",
+          "description": "External pressure on attacker (0-1)"
+        },
+        "operational_hardening": {
+          "type": "number",
+          "description": "Defender readiness/hardening (0-1)"
+        },
+        "tool_reuse_fatigue": {
+          "type": "number",
+          "description": "Attacker tool reuse/indicators (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "threat_intel_stretch",
+        "geopolitical_pressure",
+        "operational_hardening",
+        "tool_reuse_fatigue"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "cyber",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "climate_resilience_multiplier",
+    "description": "CONFLUENCE: Surfaces interventions with positive cross-domain coupling solving multiple layer problems simultaneously.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "atmospheric_benefit": {
+          "type": "number",
+          "description": "Atmospheric/climate benefit (0-1)"
+        },
+        "ecological_benefit": {
+          "type": "number",
+          "description": "Ecosystem benefit (0-1)"
+        },
+        "infrastructure_benefit": {
+          "type": "number",
+          "description": "Infrastructure resilience benefit (0-1)"
+        },
+        "policy_alignment": {
+          "type": "number",
+          "description": "Policy coherence/support (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "atmospheric_benefit",
+        "ecological_benefit",
+        "infrastructure_benefit",
+        "policy_alignment"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "climate",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "legal_precedent_seeding",
+    "description": "CONFLUENCE: Spots windows when socio-political climate, institutional capacity, statutory ambiguity, and circuit splits align for favorable case law establishment.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "socio_political_climate": {
+          "type": "number",
+          "description": "Receptiveness to legal change (0-1)"
+        },
+        "institutional_capacity": {
+          "type": "number",
+          "description": "Courts/resources to handle case (0-1)"
+        },
+        "statutory_ambiguity": {
+          "type": "number",
+          "description": "Statutory text ambiguity/openness (0-1)"
+        },
+        "circuit_split": {
+          "type": "number",
+          "description": "Degree of circuit split (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "socio_political_climate",
+        "institutional_capacity",
+        "statutory_ambiguity",
+        "circuit_split"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "legal",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "military_strategic_initiative",
+    "description": "CONFLUENCE: Identifies decisive action opportunities when intelligence ambiguity, positional advantage, logistic readiness, and political authorization synchronize.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "enemy_ambiguity": {
+          "type": "number",
+          "description": "Intelligence gaps favoring surprise (0-1)"
+        },
+        "positional_advantage": {
+          "type": "number",
+          "description": "Geographical/tactical position (0-1)"
+        },
+        "logistic_readiness": {
+          "type": "number",
+          "description": "Sustainment capability ready (0-1)"
+        },
+        "authorization_clarity": {
+          "type": "number",
+          "description": "Political authority clear (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "enemy_ambiguity",
+        "positional_advantage",
+        "logistic_readiness",
+        "authorization_clarity"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "military",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  },
+  {
+    "name": "social_catalytic_alignment",
+    "description": "CONFLUENCE: Spots transformative potential when individual readiness, network bridges, policy windows, and paradigm momentum converge.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "individual_readiness": {
+          "type": "number",
+          "description": "Population psychological readiness (0-1)"
+        },
+        "network_bridges": {
+          "type": "number",
+          "description": "Cross-cutting network connections (0-1)"
+        },
+        "policy_window": {
+          "type": "number",
+          "description": "Policy opportunity open (0-1)"
+        },
+        "paradigm_momentum": {
+          "type": "number",
+          "description": "Cultural paradigm shift underway (0-1)"
+        },
+        "f_time": {
+          "type": "number",
+          "default": 1.0
+        },
+        "threshold_override": {
+          "type": "object",
+          "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "temporal_config": {
+          "type": "object",
+          "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+          "properties": {
+            "kernel_type": {
+              "type": "string",
+              "description": "Temporal kernel type (domain-allowed)"
+            },
+            "alpha": {
+              "type": "number",
+              "description": "Sensitivity (bounded)"
+            },
+            "n": {
+              "type": "number",
+              "description": "Novelty (bounded)"
+            },
+            "t": {
+              "type": "number",
+              "description": "Time delta"
+            },
+            "t0": {
+              "type": "number",
+              "description": "S-curve inflection point"
+            },
+            "exponent": {
+              "type": "number",
+              "description": "Power-law exponent"
+            },
+            "frequency": {
+              "type": "number",
+              "description": "Oscillation frequency"
+            },
+            "memory_strength": {
+              "type": "number",
+              "description": "Memory strength"
+            }
+          }
+        },
+        "interaction_mode": {
+          "type": "string",
+          "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+          "enum": [
+            "dynamic",
+            "base"
+          ],
+          "default": "dynamic"
+        },
+        "interaction_override": {
+          "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "interaction_override_mode": {
+          "type": "string",
+          "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+          "enum": [
+            "scale",
+            "replace"
+          ],
+          "default": "scale"
+        }
+      },
+      "required": [
+        "individual_readiness",
+        "network_bridges",
+        "policy_window",
+        "paradigm_momentum"
+      ]
+    },
+    "_mantic_meta": {
+      "version": "1.0.0",
+      "domain": "social",
+      "tool_type": "emergence",
+      "requires_clamping": true,
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
+    }
+  }
+]

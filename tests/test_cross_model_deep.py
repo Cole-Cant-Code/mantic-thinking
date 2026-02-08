@@ -14,10 +14,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from adapters.openai_adapter import get_openai_tools, execute_tool as execute_openai, TOOL_MAP
-from adapters.kimi_adapter import get_kimi_tools, execute as execute_kimi
-from adapters.claude_adapter import get_claude_tools, execute_tool as execute_claude
-from adapters.gemini_adapter import get_gemini_tools, get_gemini_tools_flat, execute_tool as execute_gemini
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool as execute_openai, TOOL_MAP
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute as execute_kimi
+from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool as execute_claude
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools, get_gemini_tools_flat, execute_tool as execute_gemini
 
 
 # Standard test inputs for each tool

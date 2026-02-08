@@ -1,0 +1,64 @@
+tool: healthcare_precision_therapeutic
+type: emergence
+domain: healthcare
+
+selection:
+  use_when:
+    - "You suspect a rare high-alignment window for maximal therapeutic efficacy."
+    - "All four factors (genomic readiness, environment, timing, engagement) may be simultaneously favorable."
+    - "You want to identify the limiting factor blocking a favorable window."
+  not_for:
+    - "General medical questions without quantified readiness inputs."
+    - "Selecting specific drugs or protocols."
+
+parameters:
+  genomic_predisposition:
+    layer: Micro
+    low: "Low biological readiness / weak responder likelihood"
+    mid: "Partial readiness"
+    high: "Strong biological readiness"
+  environmental_readiness:
+    layer: Meso
+    low: "Environment not supportive (toxins, instability)"
+    mid: "Mixed environment"
+    high: "Supportive environment"
+  phenotypic_timing:
+    layer: Micro
+    low: "Wrong stage/timing"
+    mid: "Somewhat aligned"
+    high: "Optimal stage/timing"
+  psychosocial_engagement:
+    layer: Meso
+    low: "Low engagement/adherence"
+    mid: "Mixed engagement"
+    high: "High engagement/support"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability across patients/cohorts."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode evidence quality per factor (e.g., timing poorly measured)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence; keep W immutable."
+  dampen_when:
+    phenotypic_timing: "Timing estimate is coarse (no staging, sparse data)."
+    psychosocial_engagement: "Engagement claims are unverified."
+  amplify_when:
+    genomic_predisposition: "Genetic/biomarker evidence is strong and specific."
+    environmental_readiness: "Environment measures are objective (exposure panels, stable housing)."
+  examples:
+    - scenario: "Timing uncertain, but biomarkers strong"
+      interaction_mode: dynamic
+      interaction_override: {phenotypic_timing: 0.8, genomic_predisposition: 1.2}
+      interaction_override_mode: scale
+      rationale: "Discount uncertain timing; emphasize strong biomarker readiness."
+
+interpretation:
+  high_m: "Opportunity: alignment window; act quickly while conditions hold."
+  low_m: "No window: one or more factors are limiting; improve the weakest layer(s)."
+  check:
+    - "Limiting factor is typically the minimum layer value."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

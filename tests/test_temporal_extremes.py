@@ -14,9 +14,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.mantic_kernel import compute_temporal_kernel
-from core.validators import clamp_f_time
-from tools.friction.healthcare_phenotype_genotype import detect as healthcare_detect
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.validators import clamp_f_time
+from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect as healthcare_detect
 
 
 # =============================================================================

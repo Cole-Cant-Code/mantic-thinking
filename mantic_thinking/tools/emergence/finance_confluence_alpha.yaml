@@ -1,0 +1,64 @@
+tool: finance_confluence_alpha
+type: emergence
+domain: finance
+
+selection:
+  use_when:
+    - "Technical setup aligns with macro tailwind and flow/risk conditions for asymmetric opportunity."
+    - "You want to detect 'high conviction' windows when multiple signals converge."
+    - "Flow is extreme (crowded) and may provide contrarian edge when aligned."
+  not_for:
+    - "Single-signal trade ideas without cross-factor inputs."
+    - "Position sizing/execution mechanics."
+
+parameters:
+  technical_setup:
+    layer: Micro
+    low: "Poor structure; breakdown risk"
+    mid: "Mixed setup"
+    high: "Clean high-quality setup"
+  macro_tailwind:
+    layer: Macro
+    low: "Macro headwind"
+    mid: "Mixed macro"
+    high: "Strong tailwind"
+  flow_positioning:
+    layer: Meso
+    low: "Crowd/flows net short (-1)"
+    mid: "Neutral (0)"
+    high: "Crowd/flows net long (+1)"
+  risk_compression:
+    layer: Meso
+    low: "Risk expanding; volatility rising"
+    mid: "Mixed risk"
+    high: "Risk compressed; supportive vol/liquidity"
+
+interaction_guidance:
+  modes:
+    base: "Use I=[1,1,1,1] (no flow interaction boost)."
+    dynamic: "Default; tool dynamically adjusts I based on flow extremes (preserves existing behavior)."
+    override: "Use to encode confidence in flow proxy or macro regime call."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scaling preserves dynamic behavior while expressing confidence."
+  dampen_when:
+    flow_positioning: "Flow proxy is indirect/lagging or estimated from weak data."
+    macro_tailwind: "Macro interpretation is uncertain (mixed indicators)."
+  amplify_when:
+    technical_setup: "Setup is confirmed across timeframes."
+    risk_compression: "Risk regime is clearly supportive (vol, credit, liquidity agree)."
+  examples:
+    - scenario: "Flow proxy noisy; technical/macro strong"
+      interaction_mode: dynamic
+      interaction_override: {flow_positioning: 0.8, technical_setup: 1.1}
+      interaction_override_mode: scale
+      rationale: "Reduce reliance on noisy flow; slightly emphasize validated setup."
+
+interpretation:
+  high_m: "Opportunity: confluence window; consider acting with defined risk."
+  low_m: "No window: factors not aligned; wait or improve weakest factor."
+  check:
+    - "Switch interaction_mode to base to see sensitivity to tool dynamic interactions."
+
+iteration:
+  note: "Coupling is based on L only; use I/mode to encode confidence and compare m_score/attribution/visibility."

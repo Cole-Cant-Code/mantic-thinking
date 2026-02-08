@@ -1,3 +1,62 @@
+# Release Notes — 2026-02-08 (v1.4.0)
+
+## Summary
+
+This release adds tunable interaction coefficients (I) across all 14 tools and
+ships structured per-tool YAML configs for selection guidance and parameter
+meaning.
+
+## Highlights
+
+- New optional inputs for every tool:
+  - `interaction_mode` (`dynamic` or `base`)
+  - `interaction_override` (list/dict of 4 coefficients)
+  - `interaction_override_mode` (`scale` or `replace`)
+- New YAML files (one per tool) describing:
+  - when to use the tool,
+  - what inputs mean (low/mid/high),
+  - how to tune interaction coefficients safely.
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- Existing tool behavior unchanged when interaction parameters are omitted.
+
+## Tests
+
+- `pip install -e .`
+- `python3 -c "from mantic_thinking.core.mantic_kernel import mantic_kernel; print('namespace works')"`
+- `python3 -m pytest -q`
+
+---
+
+# Release Notes — 2026-02-08 (v1.3.0)
+
+## Summary
+
+This release moves all previously bare top-level packages (`mantic_thinking/core/`, `mantic_thinking/tools/`,
+`mantic_thinking/adapters/`, `mantic_thinking/mantic/`, `mantic_thinking/configs/`, `mantic_thinking/schemas/`, `mantic_thinking/visualization/`) under the
+`mantic_thinking/` namespace to avoid site-packages collisions with other
+libraries.
+
+## Breaking Change
+
+- All consumer import paths must be updated (e.g. `from core...` becomes
+  `from mantic_thinking.core...`).
+
+## Compatibility
+
+- Core formula unchanged.
+- Tool logic unchanged.
+
+## Tests
+
+- `pip install -e .`
+- `python3 -c "from mantic_thinking.core.mantic_kernel import mantic_kernel; print('namespace works')"`
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.2.5)
 
 ## Summary
@@ -36,9 +95,9 @@ Documentation and schema alignment for `layer_coupling` (v1.2.3) and
 ## Highlights
 
 - **SKILL.md**: Added `layer_coupling` section with reasoning guidance.
-- **schemas/openapi.json**: Added `layer_visibility` and `layer_coupling` to
+- **mantic_thinking/schemas/openapi.json**: Added `layer_visibility` and `layer_coupling` to
   all 14 response schemas; set `additionalProperties: true`.
-- **schemas/kimi-tools.json**: Added `response_includes` under `_mantic_meta`
+- **mantic_thinking/schemas/kimi-tools.json**: Added `response_includes` under `_mantic_meta`
   for all 14 tools.
 - **README.md**: Fixed misleading threshold pseudocode, added `layer_coupling`
   to "How It Works" overview, restored Contributing link.
@@ -64,7 +123,7 @@ No changes to the public tool set or immutable core formula.
 
 ## Highlights
 
-- Added `compute_layer_coupling()` helper in `core/validators.py`.
+- Added `compute_layer_coupling()` helper in `mantic_thinking/core/validators.py`.
 - All tools now include `layer_coupling` alongside `layer_visibility`.
 
 ## Compatibility
@@ -90,12 +149,12 @@ public tool set or immutable core formula.
 ## Highlights
 
 - Removed internal/unwired modules:
-  - `tools/friction/codebase_layer_conflict.py`
-  - `tools/emergence/codebase_alignment_window.py`
-  - `tools/emergence/plan_alignment_window.py`
+  - `mantic_thinking/tools/friction/codebase_layer_conflict.py`
+  - `mantic_thinking/tools/emergence/codebase_alignment_window.py`
+  - `mantic_thinking/tools/emergence/plan_alignment_window.py`
 - Removed internal self-analysis docs/scripts:
-  - `configs/mantic_codebase.md`
-  - `configs/mantic_self_analysis_results.md`
+  - `mantic_thinking/configs/mantic_codebase.md`
+  - `mantic_thinking/configs/mantic_self_analysis_results.md`
 
 ## Compatibility
 
@@ -148,10 +207,10 @@ backward-compatible and additive.
   - Interpretive aid for reasoning; does not affect M-score calculation
 
 - **Introspection Module**
-  - New `mantic/introspection/` module with layer hierarchy mappings
+  - New `mantic_thinking/mantic/introspection/` module with layer hierarchy mappings
   - `get_layer_visibility()` function for programmatic access
   - `LAYER_DEFINITIONS` for canonical layer descriptions
-  - `mantic/__init__.py` added for reliable packaging
+  - `mantic_thinking/mantic/__init__.py` added for reliable packaging
 
 - **Adapter Helpers**
   - New `explain_result()` function in all adapters (Kimi/Claude/OpenAI/Gemini)
@@ -161,7 +220,7 @@ backward-compatible and additive.
 ## Compatibility
 
 - **100% Backward Compatible**: All changes are additive
-- Core formula (`core/mantic_kernel.py`) unchanged
+- Core formula (`mantic_thinking/core/mantic_kernel.py`) unchanged
 - All existing fields preserved
 - No breaking changes
 
@@ -172,7 +231,7 @@ result = detect(phenotypic=0.3, genomic=0.9, ...)
 print(result["layer_visibility"]["dominant"])  # "Micro"
 print(result["layer_visibility"]["rationale"])  # Why Micro dominates
 
-from adapters.kimi_adapter import explain_result
+from mantic_thinking.adapters.kimi_adapter import explain_result
 explanation = explain_result("healthcare_phenotype_genotype", result)
 print(explanation["reasoning_hints"])
 # ["Trust immediate signals but check for noise/outliers", ...]
@@ -191,8 +250,8 @@ makes emergence outputs consistent. No changes to the immutable core formula.
 ## Highlights
 
 - **Safe kernel wrapper**
-  - New `core/safe_kernel.py` enforces `k_n > 0` without modifying
-    `core/mantic_kernel.py`.
+  - New `mantic_thinking/core/safe_kernel.py` enforces `k_n > 0` without modifying
+    `mantic_thinking/core/mantic_kernel.py`.
   - Tools now call the safe wrapper.
 - **Override correctness**
   - Clamp bounds fixed when defaults are near 0; unknown domain now fails closed
@@ -207,7 +266,7 @@ makes emergence outputs consistent. No changes to the immutable core formula.
 
 ## Compatibility
 
-- Core formula (`core/mantic_kernel.py`) unchanged.
+- Core formula (`mantic_thinking/core/mantic_kernel.py`) unchanged.
 
 ## Tests
 
@@ -215,10 +274,10 @@ makes emergence outputs consistent. No changes to the immutable core formula.
 
 ## Files Changed (High-Level)
 
-- `core/safe_kernel.py` — safe wrapper with k_n guard
-- `core/validators.py` — clamp edge-case + unknown domain allowlist handling
-- `tools/**` — safe kernel import + output consistency + import hygiene
-- `adapters/claude_adapter.py`, `adapters/gemini_adapter.py` — kwargs filtering
+- `mantic_thinking/core/safe_kernel.py` — safe wrapper with k_n guard
+- `mantic_thinking/core/validators.py` — clamp edge-case + unknown domain allowlist handling
+- `mantic_thinking/tools/**` — safe kernel import + output consistency + import hygiene
+- `mantic_thinking/adapters/claude_adapter.py`, `mantic_thinking/adapters/gemini_adapter.py` — kwargs filtering
 - `README.md`, `pyproject.toml` — version bump
 
 ## Notes

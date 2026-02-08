@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.2.5
+**version:** 1.4.0
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
@@ -35,7 +35,7 @@ This allows time-aware scoring — signals decay, grow, saturate, or oscillate d
 ### Usage
 
 ```python
-from core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
 
 # Compute temporal modifier, then pass to any tool
 f_time = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="exponential")
@@ -478,25 +478,68 @@ The Mantic Framework provides **14 tools** across 7 domains, with two complement
 ## Execution Model
 
 **Type:** Python function call  
-**Entry Point:** `tools/{suite}/{tool_id}.py::detect`  
+**Entry Point:** `mantic_thinking/tools/{suite}/{tool_id}.py::detect`  
 **Language:** Python 3.8+  
 **Dependencies:** numpy
 
 ### Function Signature
 ```python
-def detect(layer1, layer2, layer3, layer4, f_time=1.0) -> dict:
+def detect(
+    layer1,
+    layer2,
+    layer3,
+    layer4,
+    f_time=1.0,
+    threshold_override=None,
+    temporal_config=None,
+    interaction_mode="dynamic",
+    interaction_override=None,
+    interaction_override_mode="scale",
+) -> dict:
     """
     Execute mantic detection for the specific domain.
     
     Args:
         layer1-4: Domain-specific float values (0-1, some support -1 to 1)
         f_time: Temporal kernel multiplier (default 1.0)
+        threshold_override: Optional dict of per-tool thresholds (bounded/clamped internally)
+        temporal_config: Optional dict for temporal kernel tuning (bounded/clamped, domain-allowed)
+        interaction_mode: "dynamic" (default) or "base" interaction coefficients
+        interaction_override: Optional per-layer interaction coefficients (list of 4 floats or dict keyed by layer)
+        interaction_override_mode: "scale" (default) or "replace"
     
     Returns:
         dict with m_score, spatial_component, layer_attribution, 
         and domain-specific fields
     """
 ```
+
+### Universal Optional Inputs (All 14 Tools)
+
+All tools accept these optional tuning inputs in addition to their four domain-specific layer inputs:
+
+- `threshold_override`: dict of threshold-name to float (bounded internally)
+- `temporal_config`: dict configuring temporal kernels (bounded internally; `kernel_type` must be allowed for the tool domain)
+- `interaction_mode`: `"dynamic"` or `"base"`
+- `interaction_override`: either a list of 4 floats (tool layer order) or a dict keyed by layer name; values bounded to `[0.1, 2.0]`
+- `interaction_override_mode`: `"scale"` (multiply `I_pre` elementwise) or `"replace"` (use override as-is)
+
+### Iteration Pattern (Correct)
+
+`layer_coupling` is computed from **layer values (L) only**. Changing interaction coefficients (I) will **not** change coupling.
+
+Use this loop:
+- Call tool with defaults (`interaction_mode="dynamic"`, no override)
+- Read `layer_coupling` to identify disagreement/noise between layers (input quality problem)
+- If needed:
+  - adjust the underlying inputs (preferred), or
+  - apply `interaction_override` to dampen noisy layers / amplify confident layers
+- Re-call and compare `m_score`, `layer_attribution`, and `layer_visibility` (these can change with I)
+
+### Tool Config Files (YAML)
+
+Each tool has a companion YAML config next to its module with structured guidance:
+`mantic_thinking/tools/{suite}/{tool_id}.yaml` (selection, parameter meaning, interaction tuning examples).
 
 ---
 
@@ -505,8 +548,8 @@ def detect(layer1, layer2, layer3, layer4, f_time=1.0) -> dict:
 ### For Claude (Computer Use)
 ```python
 # Read SKILL.md to discover tools
-# Import via adapters/claude_adapter.py
-from adapters.claude_adapter import get_claude_tools, execute_tool
+# Import via mantic_thinking/adapters/claude_adapter.py
+from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool
 
 tools = get_claude_tools()  # Returns 14 tools in Computer Use format
 
@@ -524,8 +567,8 @@ result = execute_tool("healthcare_precision_therapeutic", {
 
 ### For Kimi (Native Tools)
 ```python
-# Import via adapters/kimi_adapter.py
-from adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
+# Import via mantic_thinking/adapters/kimi_adapter.py
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
 tools = get_kimi_tools()  # Returns 14 tools in Kimi native format
 
@@ -541,14 +584,14 @@ comparison = compare_friction_emergence(
 
 ### For Gemini (Function Declaration)
 ```python
-# Import via adapters/gemini_adapter.py
-from adapters.gemini_adapter import get_gemini_tools, execute_tool
+# Import via mantic_thinking/adapters/gemini_adapter.py
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools, execute_tool
 
 # Get tools in Gemini FunctionDeclaration format
 tools = get_gemini_tools()  # Returns [{"function_declarations": [...]}]
 
 # Or get flat list
-from adapters.gemini_adapter import get_gemini_tools_flat
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools_flat
 declarations = get_gemini_tools_flat()
 
 # Execute tool
@@ -560,8 +603,8 @@ result = execute_tool("climate_resilience_multiplier", {
 
 ### For Codex/OpenAI (Function Calling)
 ```python
-# Import via adapters/openai_adapter.py
-from adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
+# Import via mantic_thinking/adapters/openai_adapter.py
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
 # Get all 14 tools
 all_tools = get_openai_tools()
@@ -576,8 +619,8 @@ result = execute_tool("cyber_adversary_overreach", {...})   # Emergence
 
 ### For Ollama (Local/Cloud Models)
 ```python
-# Import via adapters/openai_adapter.py (Ollama is OpenAI-compatible)
-from adapters.openai_adapter import get_openai_tools, execute_tool
+# Import via mantic_thinking/adapters/openai_adapter.py (Ollama is OpenAI-compatible)
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool
 import openai
 
 # Point at Ollama's OpenAI-compatible endpoint
@@ -671,7 +714,7 @@ All tools now include layer visibility to aid reasoning:
 
 Get explanations via adapters:
 ```python
-from adapters.kimi_adapter import explain_result
+from mantic_thinking.adapters.kimi_adapter import explain_result
 
 result = execute("healthcare_phenotype_genotype", {...})
 explanation = explain_result("healthcare_phenotype_genotype", result)
@@ -737,5 +780,5 @@ Expected: All 14 tools pass with 3 test cases each.
 
 Quick sanity check:
 ```bash
-python -c "from adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools available')"
+python -c "from mantic_thinking.adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools available')"
 ```

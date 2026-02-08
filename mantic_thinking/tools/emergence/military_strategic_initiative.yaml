@@ -1,0 +1,64 @@
+tool: military_strategic_initiative
+type: emergence
+domain: military
+
+selection:
+  use_when:
+    - "You suspect a perishable initiative window for decisive action."
+    - "Positional advantage is high and logistics/authorization are aligned."
+    - "Enemy ambiguity creates exploitable uncertainty."
+  not_for:
+    - "Detailed operational planning or force design."
+    - "Questions without quantified estimates."
+
+parameters:
+  enemy_ambiguity:
+    layer: Meso
+    low: "Enemy intent/capability is clear (low ambiguity)"
+    mid: "Some ambiguity"
+    high: "High ambiguity/fog"
+  positional_advantage:
+    layer: Micro
+    low: "Weak position"
+    mid: "Mixed position"
+    high: "Strong positional edge"
+  logistic_readiness:
+    layer: Macro
+    low: "Logistics not ready"
+    mid: "Partial readiness"
+    high: "Logistics ready"
+  authorization_clarity:
+    layer: Meta
+    low: "Authorization unclear"
+    mid: "Conditional"
+    high: "Clear durable authorization"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode confidence (enemy ambiguity often uncertain)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing domain weights."
+  dampen_when:
+    enemy_ambiguity: "Ambiguity estimate is guesswork."
+    authorization_clarity: "Authorization is volatile."
+  amplify_when:
+    logistic_readiness: "Readiness is measured and current."
+    positional_advantage: "Advantage is confirmed by ISR and terrain analysis."
+  examples:
+    - scenario: "Enemy ambiguity uncertain; logistics strong"
+      interaction_mode: dynamic
+      interaction_override: {enemy_ambiguity: 0.8, logistic_readiness: 1.2}
+      interaction_override_mode: scale
+      rationale: "Discount uncertain fog estimate; emphasize hard readiness."
+
+interpretation:
+  high_m: "Opportunity: initiative window; act within the perishable horizon."
+  low_m: "No window: one or more factors limit initiative."
+  check:
+    - "Minimum floor across layers is often the gating constraint."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

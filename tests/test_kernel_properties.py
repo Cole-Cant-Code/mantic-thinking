@@ -16,8 +16,8 @@ import numpy as np
 import random
 
 # Tools call the safe kernel wrapper; keep the core kernel immutable.
-from core.safe_kernel import safe_mantic_kernel as mantic_kernel
-from core.mantic_kernel import compute_temporal_kernel, verify_kernel_integrity
+from mantic_thinking.core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel, verify_kernel_integrity
 
 
 # =============================================================================

@@ -1,0 +1,65 @@
+tool: climate_maladaptation
+type: friction
+domain: climate
+
+selection:
+  use_when:
+    - "A proposed climate intervention may solve one layer while harming another (maladaptation risk)."
+    - "Infrastructure-heavy plan risks ecological collapse or policy blowback."
+    - "Short-term atmospheric gains without governance/ecological safeguards."
+  not_for:
+    - "Pure emissions accounting without intervention tradeoffs."
+    - "Local weather forecasts (not an intervention design tool)."
+
+parameters:
+  atmospheric:
+    layer: Micro
+    low: "Limited direct atmospheric benefit"
+    mid: "Moderate atmospheric impact"
+    high: "Strong short-term atmospheric effect"
+  ecological:
+    layer: Meso
+    low: "Ecosystem stress; low resilience"
+    mid: "Mixed ecological response"
+    high: "Ecosystem benefits; high resilience"
+  infrastructure:
+    layer: Macro
+    low: "Weak infrastructure fit"
+    mid: "Moderate resilience/fit"
+    high: "Strong infrastructure resilience/benefit"
+  policy:
+    layer: Meta
+    low: "Low policy coherence/legitimacy"
+    mid: "Partial alignment"
+    high: "Strong governance alignment and enforceability"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability across interventions."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use when one layer's evidence quality differs materially."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence rather than re-weighting theory (W is immutable)."
+  dampen_when:
+    atmospheric: "Atmospheric benefit claim is model-only with weak validation."
+    infrastructure: "Resilience estimates are speculative or vendor-driven."
+  amplify_when:
+    ecological: "Ecological impact is supported by field data and monitoring."
+    policy: "Policy support is durable (multi-stakeholder, funded, enforceable)."
+  examples:
+    - scenario: "Big infrastructure project with weak ecological monitoring"
+      interaction_mode: dynamic
+      interaction_override: {infrastructure: 0.8, ecological: 1.2}
+      interaction_override_mode: scale
+      rationale: "Dampen speculative infra optimism; amplify well-evidenced ecological constraints."
+
+interpretation:
+  high_m: "Friction: maladaptation risk; cross-layer harms likely without redesign."
+  low_m: "Lower maladaptation tension; intervention is more balanced."
+  check:
+    - "Infra >> eco is a classic maladaptation signature."
+    - "Low policy coherence can turn a technical win into a long-term loss."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

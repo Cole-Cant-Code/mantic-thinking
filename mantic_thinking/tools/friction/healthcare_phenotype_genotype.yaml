@@ -1,0 +1,65 @@
+tool: healthcare_phenotype_genotype
+type: friction
+domain: healthcare
+
+selection:
+  use_when:
+    - "Genomic risk and clinical presentation appear misaligned (buffering or hidden burden)."
+    - "High genetic risk but patient is doing unexpectedly well (resilience/protection hypothesis)."
+    - "Low genetic risk but symptoms are severe (acute environment/stress hypothesis)."
+  not_for:
+    - "General health questions without quantified inputs or a risk-vs-symptom framing."
+    - "Choosing specific medications or dosing."
+
+parameters:
+  phenotypic:
+    layer: Micro
+    low: "Minimal symptoms; vitals/labs stable"
+    mid: "Moderate symptoms; mixed clinical picture"
+    high: "Severe symptoms; clear clinical deterioration"
+  genomic:
+    layer: Micro
+    low: "Low genetic risk; no strong variants"
+    mid: "Moderate polygenic/variant risk"
+    high: "High genetic risk; strong evidence of predisposition"
+  environmental:
+    layer: Meso
+    low: "Low exposure burden; protective context"
+    mid: "Mixed exposures; some risk factors present"
+    high: "High exposure/toxic load; compounding risk factors"
+  psychosocial:
+    layer: Meso
+    low: "High stress; poor support/adherence"
+    mid: "Mixed coping; partial support"
+    high: "Strong support; good adherence; high resilience"
+
+interaction_guidance:
+  modes:
+    base: "Use fixed I=[1,1,1,1] for maximum comparability."
+    dynamic: "Default; this tool's dynamic I equals base (no hidden interaction logic)."
+    override: "Use to express confidence: dampen noisy layers; amplify trusted layers."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scaling preserves the baseline score structure while adjusting confidence."
+  dampen_when:
+    phenotypic: "Symptoms are self-reported only; limited objective confirmation."
+    genomic: "Genetic signal is uncertain/indirect for the condition." 
+  amplify_when:
+    phenotypic: "Multiple objective measures agree (labs + imaging + vitals)."
+    psychosocial: "Support/adherence is strongly evidenced (stable routines, reliable caregiving)."
+  examples:
+    - scenario: "High genetic risk but symptom report is noisy; strong support system"
+      interaction_mode: dynamic
+      interaction_override: {phenotypic: 0.7, psychosocial: 1.2}
+      interaction_override_mode: scale
+      rationale: "Dampen noisy symptoms; amplify well-evidenced resilience/support."
+
+interpretation:
+  high_m: "Friction: mismatch between genetic risk and observed phenotype; investigate buffering vs hidden burden."
+  low_m: "Alignment: clinical presentation matches genetic and context signals."
+  check:
+    - "If genomic high and phenotypic low: look for buffering (psychosocial/environmental protection)."
+    - "If genomic low and phenotypic high: consider acute exposures, infection, or stressors."
+
+iteration:
+  note: "layer_coupling reflects L only; changing I will not change coupling. Use coupling to find disagreements, then tune inputs or I; compare m_score/attribution/visibility."

@@ -17,12 +17,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from tools.friction.healthcare_phenotype_genotype import detect as hc_friction
-from tools.emergence.healthcare_precision_therapeutic import detect as hc_emergence
-from tools.friction.finance_regime_conflict import detect as fin_friction
-from tools.emergence.finance_confluence_alpha import detect as fin_emergence
-from tools.friction.social_narrative_rupture import detect as soc_friction
-from tools.emergence.social_catalytic_alignment import detect as soc_emergence
+from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect as hc_friction
+from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import detect as hc_emergence
+from mantic_thinking.tools.friction.finance_regime_conflict import detect as fin_friction
+from mantic_thinking.tools.emergence.finance_confluence_alpha import detect as fin_emergence
+from mantic_thinking.tools.friction.social_narrative_rupture import detect as soc_friction
+from mantic_thinking.tools.emergence.social_catalytic_alignment import detect as soc_emergence
 
 
 # =============================================================================
@@ -73,8 +73,8 @@ class TestWeightDifferences:
 
     def test_healthcare_weight_difference(self):
         """Healthcare friction uses asymmetric weights; emergence uses uniform."""
-        from tools.friction.healthcare_phenotype_genotype import WEIGHTS as hc_f_w
-        from tools.emergence.healthcare_precision_therapeutic import WEIGHTS as hc_e_w
+        from mantic_thinking.tools.friction.healthcare_phenotype_genotype import WEIGHTS as hc_f_w
+        from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import WEIGHTS as hc_e_w
 
         # Friction: {phenotypic: 0.40, genomic: 0.20, environmental: 0.25, psychosocial: 0.15}
         assert isinstance(hc_f_w, dict)
@@ -86,8 +86,8 @@ class TestWeightDifferences:
 
     def test_finance_weight_difference(self):
         """Finance friction vs emergence weights differ."""
-        from tools.friction.finance_regime_conflict import WEIGHTS as fin_f_w
-        from tools.emergence.finance_confluence_alpha import WEIGHTS as fin_e_w
+        from mantic_thinking.tools.friction.finance_regime_conflict import WEIGHTS as fin_f_w
+        from mantic_thinking.tools.emergence.finance_confluence_alpha import WEIGHTS as fin_e_w
 
         # Friction: asymmetric
         assert fin_f_w['technical'] > fin_f_w['risk']

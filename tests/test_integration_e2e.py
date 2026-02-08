@@ -15,10 +15,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.mantic_kernel import mantic_kernel, compute_temporal_kernel
-from adapters.openai_adapter import TOOL_MAP, execute_tool as execute_openai
-from adapters.kimi_adapter import batch_execute
-from adapters.claude_adapter import format_for_claude
+from mantic_thinking.core.mantic_kernel import mantic_kernel, compute_temporal_kernel
+from mantic_thinking.adapters.openai_adapter import TOOL_MAP, execute_tool as execute_openai
+from mantic_thinking.adapters.kimi_adapter import batch_execute
+from mantic_thinking.adapters.claude_adapter import format_for_claude
 
 
 # =============================================================================
@@ -155,7 +155,7 @@ class TestVisualizationEdgeCases:
 
     def test_gauge_extreme_values(self):
         """draw_m_gauge should handle M=0, M=1, M>1."""
-        from visualization.ascii_charts import draw_m_gauge
+        from mantic_thinking.visualization.ascii_charts import draw_m_gauge
         # Normal case
         output = draw_m_gauge(0.5, 0.5)
         assert isinstance(output, str)
@@ -171,7 +171,7 @@ class TestVisualizationEdgeCases:
 
     def test_attribution_treemap_empty(self):
         """draw_attribution_treemap with zero attributions."""
-        from visualization.ascii_charts import draw_attribution_treemap
+        from mantic_thinking.visualization.ascii_charts import draw_attribution_treemap
         output = draw_attribution_treemap([0.0, 0.0, 0.0, 0.0],
                                            ["A", "B", "C", "D"])
         assert isinstance(output, str)

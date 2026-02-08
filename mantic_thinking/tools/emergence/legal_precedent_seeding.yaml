@@ -1,0 +1,64 @@
+tool: legal_precedent_seeding
+type: emergence
+domain: legal
+
+selection:
+  use_when:
+    - "You suspect a window to set favorable precedent (ripeness + split + capacity)."
+    - "Circuit split exists and socio-political climate may be receptive."
+    - "Need a strategic read on timing/forum for a test case."
+  not_for:
+    - "Routine litigation tasks without systemic precedent objectives."
+    - "Jurisdiction-specific legal advice without quantified inputs."
+
+parameters:
+  socio_political_climate:
+    layer: Meta
+    low: "Hostile climate (-1)"
+    mid: "Neutral/mixed (0)"
+    high: "Favorable climate (+1)"
+  institutional_capacity:
+    layer: Macro
+    low: "Weak institutional readiness"
+    mid: "Partial readiness"
+    high: "Strong readiness/resources"
+  statutory_ambiguity:
+    layer: Meso
+    low: "Text clear (little opening)"
+    mid: "Some ambiguity"
+    high: "High ambiguity/open doctrinal space"
+  circuit_split:
+    layer: Meso
+    low: "No meaningful split"
+    mid: "Emerging split"
+    high: "Strong exploitable split"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use when climate/split signals are uncertain or strongly evidenced."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing doctrinal weights."
+  dampen_when:
+    socio_political_climate: "Climate inference is speculative."
+    circuit_split: "Split is overstated or based on weak precedent."
+  amplify_when:
+    statutory_ambiguity: "Ambiguity is well-grounded in text/history."
+    institutional_capacity: "Capacity is demonstrated (resources, allies, procedural posture)."
+  examples:
+    - scenario: "Split strong; climate uncertain"
+      interaction_mode: dynamic
+      interaction_override: {circuit_split: 1.2, socio_political_climate: 0.8}
+      interaction_override_mode: scale
+      rationale: "Lean on hard doctrinal split; discount speculative climate read."
+
+interpretation:
+  high_m: "Opportunity: precedent window; pursue test case strategy."
+  low_m: "No window: build split, improve capacity, or wait for climate shift."
+  check:
+    - "Windows often require both split strength and receptivity/capacity."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

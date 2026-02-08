@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from mantic.introspection import get_layer_visibility, LAYER_DEFINITIONS
+from mantic_thinking.mantic.introspection import get_layer_visibility, LAYER_DEFINITIONS
 
 
 class TestLayerDefinitions:
@@ -105,7 +105,7 @@ class TestToolResponses:
 
     def test_healthcare_friction_includes_layer_visibility(self):
         """Test healthcare friction returns layer_visibility."""
-        from tools.friction.healthcare_phenotype_genotype import detect
+        from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect
         
         result = detect(
             phenotypic=0.3,
@@ -120,7 +120,7 @@ class TestToolResponses:
 
     def test_healthcare_emergence_includes_layer_visibility(self):
         """Test healthcare emergence returns layer_visibility."""
-        from tools.emergence.healthcare_precision_therapeutic import detect
+        from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import detect
         
         result = detect(
             genomic_predisposition=0.85,
@@ -135,7 +135,7 @@ class TestToolResponses:
 
     def test_finance_friction_includes_layer_visibility(self):
         """Test finance friction returns layer_visibility."""
-        from tools.friction.finance_regime_conflict import detect
+        from mantic_thinking.tools.friction.finance_regime_conflict import detect
         
         result = detect(
             technical=0.7,
@@ -148,7 +148,7 @@ class TestToolResponses:
 
     def test_finance_emergence_includes_layer_visibility(self):
         """Test finance emergence returns layer_visibility."""
-        from tools.emergence.finance_confluence_alpha import detect
+        from mantic_thinking.tools.emergence.finance_confluence_alpha import detect
         
         result = detect(
             technical_setup=0.85,
@@ -161,7 +161,7 @@ class TestToolResponses:
 
     def test_all_tools_include_layer_visibility(self):
         """Test all 14 tools include layer_visibility."""
-        from adapters.openai_adapter import TOOL_MAP
+        from mantic_thinking.adapters.openai_adapter import TOOL_MAP
         
         test_params = {
             "healthcare_phenotype_genotype": {
@@ -239,7 +239,7 @@ class TestBackwardCompatibility:
 
     def test_original_fields_still_present(self):
         """Test that old fields are not removed."""
-        from tools.friction.healthcare_phenotype_genotype import detect
+        from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect
         
         result = detect(
             phenotypic=0.3, genomic=0.9, environmental=0.4, psychosocial=0.8
@@ -258,7 +258,7 @@ class TestAdapterExplainResult:
 
     def test_kimi_explain_result(self):
         """Test Kimi adapter explain_result."""
-        from adapters.kimi_adapter import explain_result
+        from mantic_thinking.adapters.kimi_adapter import explain_result
         
         result = {
             "m_score": 0.75,
@@ -278,7 +278,7 @@ class TestAdapterExplainResult:
 
     def test_explain_result_no_layer_visibility(self):
         """Test explain_result returns None if no layer_visibility."""
-        from adapters.kimi_adapter import explain_result
+        from mantic_thinking.adapters.kimi_adapter import explain_result
         
         result = {"m_score": 0.75}  # No layer_visibility
         explanation = explain_result("test_tool", result)

@@ -12,13 +12,13 @@ import sys
 # Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import tools
-from adapters.openai_adapter import get_openai_tools
-from adapters.kimi_adapter import get_kimi_tools
+import mantic_thinking.tools as tools
+from mantic_thinking.adapters.openai_adapter import get_openai_tools
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCHEMAS_DIR = os.path.join(ROOT, "schemas")
+SCHEMAS_DIR = os.path.join(ROOT, "mantic_thinking", "schemas")
 OPENAPI_PATH = os.path.join(SCHEMAS_DIR, "openapi.json")
 KIMI_PATH = os.path.join(SCHEMAS_DIR, "kimi-tools.json")
 
