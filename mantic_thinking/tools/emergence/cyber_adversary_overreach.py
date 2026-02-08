@@ -32,7 +32,8 @@ from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
 from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit, compute_layer_coupling
+    clamp_f_time, build_overrides_audit, compute_layer_coupling,
+    resolve_interaction_coefficients
 )
 from mantic_thinking.mantic.introspection import get_layer_visibility
 
@@ -49,7 +50,9 @@ DOMAIN = "cyber"
 
 
 def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, tool_reuse_fatigue,
-           f_time=1.0, threshold_override=None, temporal_config=None):
+           f_time=1.0, threshold_override=None, temporal_config=None,
+           interaction_mode="dynamic", interaction_override=None,
+           interaction_override_mode="scale"):
     """Detect when attacker is vulnerable due to overextension."""
     
     # INPUT VALIDATION
@@ -108,7 +111,17 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         clamp_input(tool_reuse_fatigue, name="tool_reuse_fatigue")
     ]
     
-    I = [1.0, 1.0, 1.0, 1.0]
+    # Interaction coefficients: base, optional tool-dynamic, optional caller override.
+    I_base = [1.0, 1.0, 1.0, 1.0]
+    I_dynamic = I_base
+    I, interaction_audit = resolve_interaction_coefficients(
+        LAYER_NAMES,
+        I_base=I_base,
+        I_dynamic=I_dynamic,
+        interaction_mode=interaction_mode,
+        interaction_override=interaction_override,
+        interaction_override_mode=interaction_override_mode,
+    )
     
     M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
@@ -174,12 +187,19 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         temporal_validated=temporal_applied,
         temporal_rejected=temporal_rejected if temporal_rejected else None,
         temporal_clamped=temporal_clamped if temporal_clamped else None,
-        f_time_info=f_time_info
+        f_time_info=f_time_info,
+        interaction=interaction_audit
     )
     
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
-    layer_visibility = get_layer_visibility("cyber_adversary_overreach", _weights_dict, _layer_values_dict)
+    _layer_interactions = dict(zip(LAYER_NAMES, I))
+    layer_visibility = get_layer_visibility(
+        "cyber_adversary_overreach",
+        _weights_dict,
+        _layer_values_dict,
+        _layer_interactions
+    )
     layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     if window_detected:

@@ -1,0 +1,64 @@
+tool: social_narrative_rupture
+type: friction
+domain: social
+
+selection:
+  use_when:
+    - "Virality/propagation is outpacing institutional response capacity."
+    - "Counter-cultural narrative is spreading rapidly."
+    - "Need to detect rupture timing (contained/ongoing/imminent)."
+  not_for:
+    - "General sentiment analysis without propagation/institution context."
+    - "Choosing specific messaging copy."
+
+parameters:
+  individual:
+    layer: Micro
+    low: "Low individual-level activation"
+    mid: "Moderate activation"
+    high: "High activation/urgency"
+  network:
+    layer: Meso
+    low: "Slow spread; weak bridging"
+    mid: "Moderate propagation"
+    high: "Rapid propagation"
+  institutional:
+    layer: Macro
+    low: "High lag / low capacity"
+    mid: "Mixed capacity"
+    high: "Strong response capacity"
+  cultural:
+    layer: Meta
+    low: "Counter-archetype / antagonistic (-1)"
+    mid: "Neutral/mixed (0)"
+    high: "Aligned with archetypes (+1)"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability across narratives."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode confidence in measurement (platform metrics vs surveys)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing narrative structure."
+  dampen_when:
+    individual: "Self-report/small sample; unclear representativeness."
+    cultural: "Archetype framing is speculative."
+  amplify_when:
+    network: "Multiple platforms show consistent propagation patterns."
+    institutional: "Institutional capacity measures are reliable (staffing, response times)."
+  examples:
+    - scenario: "Network metrics reliable; cultural framing uncertain"
+      interaction_mode: dynamic
+      interaction_override: {network: 1.2, cultural: 0.8}
+      interaction_override_mode: scale
+      rationale: "Trust propagation data; discount uncertain archetype claims."
+
+interpretation:
+  high_m: "Friction: rupture risk; response capacity mismatched to propagation speed."
+  low_m: "Lower rupture tension; propagation and institutions are more balanced."
+  check:
+    - "High network + low institutional is the canonical rupture signature."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

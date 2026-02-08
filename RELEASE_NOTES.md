@@ -1,3 +1,35 @@
+# Release Notes — 2026-02-08 (v1.4.0)
+
+## Summary
+
+This release adds tunable interaction coefficients (I) across all 14 tools and
+ships structured per-tool YAML configs for selection guidance and parameter
+meaning.
+
+## Highlights
+
+- New optional inputs for every tool:
+  - `interaction_mode` (`dynamic` or `base`)
+  - `interaction_override` (list/dict of 4 coefficients)
+  - `interaction_override_mode` (`scale` or `replace`)
+- New YAML files (one per tool) describing:
+  - when to use the tool,
+  - what inputs mean (low/mid/high),
+  - how to tune interaction coefficients safely.
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- Existing tool behavior unchanged when interaction parameters are omitted.
+
+## Tests
+
+- `pip install -e .`
+- `python3 -c "from mantic_thinking.core.mantic_kernel import mantic_kernel; print('namespace works')"`
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.3.0)
 
 ## Summary

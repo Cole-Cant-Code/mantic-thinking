@@ -32,7 +32,8 @@ from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
 from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit, compute_layer_coupling
+    clamp_f_time, build_overrides_audit, compute_layer_coupling,
+    resolve_interaction_coefficients
 )
 from mantic_thinking.mantic.introspection import get_layer_visibility
 
@@ -51,7 +52,9 @@ DOMAIN = "finance"
 
 
 def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
-           f_time=1.0, threshold_override=None, temporal_config=None):
+           f_time=1.0, threshold_override=None, temporal_config=None,
+           interaction_mode="dynamic", interaction_override=None,
+           interaction_override_mode="scale"):
     """Detect asymmetric opportunity when directional harmony achieved."""
     
     # INPUT VALIDATION
@@ -117,9 +120,21 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
         L_raw[3]
     ]
     
-    # Interaction terms (respecting original logic)
+    # Interaction coefficients: base, tool-dynamic, optional caller override.
+    I_base = [1.0, 1.0, 1.0, 1.0]
+
+    # Tool-dynamic interactions (respecting original logic)
     flow_boost = abs(L_raw[2]) * 0.2
-    I = [min(1.0, 0.9 + flow_boost), 1.0, min(1.0, 0.9 + flow_boost * 1.5), 1.0]
+    I_dynamic = [min(1.0, 0.9 + flow_boost), 1.0, min(1.0, 0.9 + flow_boost * 1.5), 1.0]
+
+    I, interaction_audit = resolve_interaction_coefficients(
+        LAYER_NAMES,
+        I_base=I_base,
+        I_dynamic=I_dynamic,
+        interaction_mode=interaction_mode,
+        interaction_override=interaction_override,
+        interaction_override_mode=interaction_override_mode,
+    )
     
     M, S, attr = mantic_kernel(WEIGHTS, L_normalized, I, f_time_clamped)
     
@@ -192,12 +207,19 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
         temporal_validated=temporal_applied,
         temporal_rejected=temporal_rejected if temporal_rejected else None,
         temporal_clamped=temporal_clamped if temporal_clamped else None,
-        f_time_info=f_time_info
+        f_time_info=f_time_info,
+        interaction=interaction_audit
     )
     
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L_normalized))
-    layer_visibility = get_layer_visibility("finance_confluence_alpha", _weights_dict, _layer_values_dict)
+    _layer_interactions = dict(zip(LAYER_NAMES, I))
+    layer_visibility = get_layer_visibility(
+        "finance_confluence_alpha",
+        _weights_dict,
+        _layer_values_dict,
+        _layer_interactions
+    )
     layer_coupling = compute_layer_coupling(L_normalized, LAYER_NAMES)
     
     if window_detected:

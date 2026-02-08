@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.3.0
+**version:** 1.4.0
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
@@ -484,19 +484,62 @@ The Mantic Framework provides **14 tools** across 7 domains, with two complement
 
 ### Function Signature
 ```python
-def detect(layer1, layer2, layer3, layer4, f_time=1.0) -> dict:
+def detect(
+    layer1,
+    layer2,
+    layer3,
+    layer4,
+    f_time=1.0,
+    threshold_override=None,
+    temporal_config=None,
+    interaction_mode="dynamic",
+    interaction_override=None,
+    interaction_override_mode="scale",
+) -> dict:
     """
     Execute mantic detection for the specific domain.
     
     Args:
         layer1-4: Domain-specific float values (0-1, some support -1 to 1)
         f_time: Temporal kernel multiplier (default 1.0)
+        threshold_override: Optional dict of per-tool thresholds (bounded/clamped internally)
+        temporal_config: Optional dict for temporal kernel tuning (bounded/clamped, domain-allowed)
+        interaction_mode: "dynamic" (default) or "base" interaction coefficients
+        interaction_override: Optional per-layer interaction coefficients (list of 4 floats or dict keyed by layer)
+        interaction_override_mode: "scale" (default) or "replace"
     
     Returns:
         dict with m_score, spatial_component, layer_attribution, 
         and domain-specific fields
     """
 ```
+
+### Universal Optional Inputs (All 14 Tools)
+
+All tools accept these optional tuning inputs in addition to their four domain-specific layer inputs:
+
+- `threshold_override`: dict of threshold-name to float (bounded internally)
+- `temporal_config`: dict configuring temporal kernels (bounded internally; `kernel_type` must be allowed for the tool domain)
+- `interaction_mode`: `"dynamic"` or `"base"`
+- `interaction_override`: either a list of 4 floats (tool layer order) or a dict keyed by layer name; values bounded to `[0.1, 2.0]`
+- `interaction_override_mode`: `"scale"` (multiply `I_pre` elementwise) or `"replace"` (use override as-is)
+
+### Iteration Pattern (Correct)
+
+`layer_coupling` is computed from **layer values (L) only**. Changing interaction coefficients (I) will **not** change coupling.
+
+Use this loop:
+- Call tool with defaults (`interaction_mode="dynamic"`, no override)
+- Read `layer_coupling` to identify disagreement/noise between layers (input quality problem)
+- If needed:
+  - adjust the underlying inputs (preferred), or
+  - apply `interaction_override` to dampen noisy layers / amplify confident layers
+- Re-call and compare `m_score`, `layer_attribution`, and `layer_visibility` (these can change with I)
+
+### Tool Config Files (YAML)
+
+Each tool has a companion YAML config next to its module with structured guidance:
+`mantic_thinking/tools/{suite}/{tool_id}.yaml` (selection, parameter meaning, interaction tuning examples).
 
 ---
 

@@ -59,6 +59,25 @@ OVERRIDE_PROPERTIES = {
             "frequency": {"type": "number", "description": "Oscillation frequency"},
             "memory_strength": {"type": "number", "description": "Memory strength"}
         }
+    },
+    "interaction_mode": {
+        "type": "string",
+        "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
+        "enum": ["dynamic", "base"],
+        "default": "dynamic"
+    },
+    "interaction_override": {
+        "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
+        "anyOf": [
+            {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
+            {"type": "object", "additionalProperties": {"type": "number"}}
+        ]
+    },
+    "interaction_override_mode": {
+        "type": "string",
+        "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
+        "enum": ["scale", "replace"],
+        "default": "scale"
     }
 }
 

@@ -1,0 +1,64 @@
+tool: social_catalytic_alignment
+type: emergence
+domain: social
+
+selection:
+  use_when:
+    - "You suspect a movement-building window (readiness + bridges + policy + momentum)."
+    - "Need to distinguish moderate vs transformative catalytic alignment."
+    - "Planning mobilization timing and urgency."
+  not_for:
+    - "Choosing slogans/messaging without quantified alignment inputs."
+    - "General cultural commentary without a mobilization objective."
+
+parameters:
+  individual_readiness:
+    layer: Micro
+    low: "Low readiness; apathy/fatigue"
+    mid: "Mixed readiness"
+    high: "High readiness; activation"
+  network_bridges:
+    layer: Meso
+    low: "Siloed networks"
+    mid: "Some bridging"
+    high: "Strong cross-cutting bridges"
+  policy_window:
+    layer: Macro
+    low: "Closed policy window"
+    mid: "Partially open"
+    high: "Open policy window"
+  paradigm_momentum:
+    layer: Meta
+    low: "Paradigm stable"
+    mid: "Shifting slowly"
+    high: "Shift underway; momentum"
+
+interaction_guidance:
+  modes:
+    base: "Use fixed I for comparability."
+    dynamic: "Default; tool has minor dynamic interaction on network_bridges (preserves existing behavior)."
+    override: "Use to encode confidence in measurement (bridging often proxy-based)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scaling preserves tool dynamics while expressing confidence."
+  dampen_when:
+    network_bridges: "Bridge metric is proxy-based or platform-specific."
+    paradigm_momentum: "Momentum estimate is speculative."
+  amplify_when:
+    policy_window: "Policy window is verified (legislative calendar, sponsor commitments)."
+    individual_readiness: "Readiness measured across multiple sources."
+  examples:
+    - scenario: "Policy window confirmed; network bridge metric uncertain"
+      interaction_mode: dynamic
+      interaction_override: {policy_window: 1.2, network_bridges: 0.8}
+      interaction_override_mode: scale
+      rationale: "Emphasize verified opportunity; discount noisy bridge proxy."
+
+interpretation:
+  high_m: "Opportunity: catalytic window; mobilize with urgency."
+  low_m: "No window: build readiness/bridges or wait for policy opening."
+  check:
+    - "Transformative windows require both bridging and policy opening with momentum."
+
+iteration:
+  note: "Coupling is based on L only; use I/mode to encode confidence and compare m_score/attribution/visibility."

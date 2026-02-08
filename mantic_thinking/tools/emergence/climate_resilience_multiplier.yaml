@@ -1,0 +1,64 @@
+tool: climate_resilience_multiplier
+type: emergence
+domain: climate
+
+selection:
+  use_when:
+    - "You want interventions with multi-layer benefits (atmospheric + ecological + infrastructure + policy)."
+    - "Seeking high-leverage funding priorities (multiplier effects)."
+    - "Need to screen for cross-domain coupling strength."
+  not_for:
+    - "Single-metric climate accounting without intervention design."
+    - "Local weather projection."
+
+parameters:
+  atmospheric_benefit:
+    layer: Micro
+    low: "Limited direct atmospheric benefit"
+    mid: "Moderate benefit"
+    high: "High benefit"
+  ecological_benefit:
+    layer: Meso
+    low: "Weak ecosystem benefit"
+    mid: "Mixed benefit"
+    high: "Strong ecosystem benefit"
+  infrastructure_benefit:
+    layer: Macro
+    low: "Weak resilience benefit"
+    mid: "Moderate resilience"
+    high: "Strong resilience benefit"
+  policy_alignment:
+    layer: Meta
+    low: "Weak governance fit"
+    mid: "Partial alignment"
+    high: "Strong policy/legitimacy fit"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use when evidence quality differs between benefits (e.g., infra benefits speculative)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing theory weights."
+  dampen_when:
+    infrastructure_benefit: "Benefits rely on optimistic assumptions."
+    policy_alignment: "Policy commitment is short-lived or unfunded."
+  amplify_when:
+    ecological_benefit: "Field evidence supports ecosystem outcomes."
+    atmospheric_benefit: "Atmospheric impacts are validated across models/measurements."
+  examples:
+    - scenario: "Ecological benefits well-evidenced; infrastructure estimates uncertain"
+      interaction_mode: dynamic
+      interaction_override: {ecological_benefit: 1.2, infrastructure_benefit: 0.8}
+      interaction_override_mode: scale
+      rationale: "Trust ecology; discount speculative infra benefits."
+
+interpretation:
+  high_m: "Opportunity: multiplier intervention; prioritize."
+  low_m: "Limited multiplier; consider alternatives or redesign."
+  check:
+    - "High coupling + high minimum layer supports strong multiplier classification."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

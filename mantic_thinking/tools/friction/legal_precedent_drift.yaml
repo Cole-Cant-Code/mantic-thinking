@@ -1,0 +1,65 @@
+tool: legal_precedent_drift
+type: friction
+domain: legal
+
+selection:
+  use_when:
+    - "Statutory text, precedent stability, operational feasibility, and socio-political climate are diverging."
+    - "You suspect judicial philosophy shift threatens precedent-based strategy."
+    - "Forum selection or litigation posture depends on drift risk."
+  not_for:
+    - "Simple contract interpretation without systemic drift concerns."
+    - "Giving legal advice for a specific jurisdiction without inputs."
+
+parameters:
+  black_letter:
+    layer: Micro
+    low: "Weak statutory text support"
+    mid: "Ambiguous text support"
+    high: "Strong textual support"
+  precedent:
+    layer: Meso
+    low: "Precedent unstable/contested"
+    mid: "Mixed precedent landscape"
+    high: "Precedent strong and consistent"
+  operational:
+    layer: Macro
+    low: "Hard to implement/enforce"
+    mid: "Feasible with caveats"
+    high: "Operationally straightforward"
+  socio_political:
+    layer: Meta
+    low: "Hostile climate (-1)"
+    mid: "Neutral/mixed (0)"
+    high: "Favorable climate (+1)"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability across cases."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use when precedent or socio-political signals are especially uncertain/strong."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence without changing doctrine weights."
+  dampen_when:
+    precedent: "Precedent citations are cherry-picked or non-binding."
+    socio_political: "Context is speculative or media-driven."
+  amplify_when:
+    black_letter: "Textual interpretation is strong and widely accepted."
+    operational: "Implementation constraints are well-understood (agency guidance, enforcement history)."
+  examples:
+    - scenario: "Strong statutory text; precedent uncertain; political context noisy"
+      interaction_mode: dynamic
+      interaction_override: {black_letter: 1.2, precedent: 0.8, socio_political: 0.8}
+      interaction_override_mode: scale
+      rationale: "Lean on text; discount shaky precedent and noisy climate."
+
+interpretation:
+  high_m: "Friction: drift risk; strategy relying on precedent may be brittle."
+  low_m: "Lower drift tension; precedent/text/operations/context are aligned."
+  check:
+    - "Text vs precedent gap often signals impending doctrinal pivot."
+    - "Meta-level socio-political drift can dominate long-horizon outcomes."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

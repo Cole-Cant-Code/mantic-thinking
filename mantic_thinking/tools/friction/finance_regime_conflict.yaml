@@ -1,0 +1,65 @@
+tool: finance_regime_conflict
+type: friction
+domain: finance
+
+selection:
+  use_when:
+    - "Technical price action conflicts with macro/fundamentals or risk regime."
+    - "Flows contradict price (accumulation/distribution vs tape)."
+    - "Risk-off backdrop but bullish technicals (or vice versa)."
+  not_for:
+    - "Pure valuation questions without cross-signal inputs."
+    - "Trade execution details (order types, broker mechanics)."
+
+parameters:
+  technical:
+    layer: Micro
+    low: "Bearish/weak tape"
+    mid: "Choppy/indecisive"
+    high: "Strong bullish technical structure"
+  macro:
+    layer: Macro
+    low: "Macro headwinds"
+    mid: "Mixed macro"
+    high: "Macro tailwinds"
+  flow:
+    layer: Meso
+    low: "Net outflows / selling pressure (-1)"
+    mid: "Neutral / balanced (0)"
+    high: "Net inflows / buying pressure (+1)"
+  risk:
+    layer: Meso
+    low: "Risk-off / de-leveraging"
+    mid: "Mixed risk appetite"
+    high: "Risk-on / supportive liquidity"
+
+interaction_guidance:
+  modes:
+    base: "Use fixed I for comparability across scenarios."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode confidence in specific signals (e.g., unreliable flow proxy)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale noisy signals down rather than rewriting the tool."
+  dampen_when:
+    technical: "Technical signal is distorted (illiquid, event-driven gap)."
+    flow: "Flow proxy is indirect/lagging."
+  amplify_when:
+    macro: "Macro regime signal is robust (multiple indicators align)."
+    risk: "Risk regime is clearly defined (vol + credit + liquidity agree)."
+  examples:
+    - scenario: "Illiquid tape makes technical noisy; macro/risk signals strong"
+      interaction_mode: dynamic
+      interaction_override: {technical: 0.7, macro: 1.2, risk: 1.2}
+      interaction_override_mode: scale
+      rationale: "Reduce micro noise; emphasize regime-level constraints."
+
+interpretation:
+  high_m: "Friction: regime conflict; be cautious with one-signal narratives."
+  low_m: "Signals are broadly consistent; less regime conflict."
+  check:
+    - "Technical vs macro gap is a classic 'story vs tape' mismatch."
+    - "Flow contradiction suggests hidden positioning or artificial support."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution changes."

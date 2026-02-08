@@ -220,6 +220,9 @@ THRESHOLD_MAX_DRIFT_PCT = 0.20
 # f_time clamp bounds (prevent runaway growth)
 F_TIME_BOUNDS = (0.1, 3.0)
 
+# Interaction coefficient clamp bounds (per-layer I)
+INTERACTION_BOUNDS = (0.1, 2.0)
+
 # Temporal parameter bounds
 ALPHA_BOUNDS = (0.01, 0.5)
 NOVELTY_BOUNDS = (-2.0, 2.0)
@@ -383,6 +386,181 @@ def validate_temporal_config(config, domain=None):
     return validated, rejected, clamped
 
 
+def validate_interaction_override(override, layer_names):
+    """
+    Validate and clamp interaction coefficient overrides (I).
+
+    Supports:
+      - list/tuple of 4 floats in layer_names order
+      - dict mapping layer_name -> float (missing keys filled with 1.0)
+
+    Returns:
+        tuple: (validated_list, rejected, clamped)
+            validated_list: list[float] length 4 in layer_names order
+            rejected: dict of rejected keys/indices with reasons
+            clamped: dict of values clamped with requested/used/bounds
+    """
+    rejected = {}
+    clamped = {}
+
+    if override is None:
+        return [1.0, 1.0, 1.0, 1.0], rejected, clamped
+
+    # List-like input: positional coefficients
+    if isinstance(override, (list, tuple, np.ndarray)):
+        if len(override) != 4:
+            rejected["__all__"] = {
+                "requested": override,
+                "reason": f"Expected 4 coefficients, got {len(override)}",
+            }
+            return [1.0, 1.0, 1.0, 1.0], rejected, clamped
+
+        validated = []
+        for idx, raw in enumerate(override):
+            try:
+                val = float(raw)
+                if not np.isfinite(val):
+                    raise ValueError("Not a finite number")
+            except (TypeError, ValueError):
+                rejected[str(idx)] = {"requested": raw, "reason": "Not a finite number"}
+                validated.append(1.0)
+                continue
+
+            used = float(np.clip(val, INTERACTION_BOUNDS[0], INTERACTION_BOUNDS[1]))
+            validated.append(used)
+            if not np.isclose(used, val, atol=1e-10):
+                clamped[str(idx)] = {"requested": val, "used": used, "bounds": INTERACTION_BOUNDS}
+
+        return validated, rejected, clamped
+
+    # Dict input: named coefficients
+    if isinstance(override, dict):
+        # Start with identity scaling for all layers.
+        validated_map = {name: 1.0 for name in layer_names}
+
+        for key, raw in override.items():
+            if key not in layer_names:
+                rejected[key] = {"requested": raw, "reason": "Unknown layer key"}
+                continue
+            try:
+                val = float(raw)
+                if not np.isfinite(val):
+                    raise ValueError("Not a finite number")
+            except (TypeError, ValueError):
+                rejected[key] = {"requested": raw, "reason": "Not a finite number"}
+                continue
+
+            used = float(np.clip(val, INTERACTION_BOUNDS[0], INTERACTION_BOUNDS[1]))
+            validated_map[key] = used
+            if not np.isclose(used, val, atol=1e-10):
+                clamped[key] = {"requested": val, "used": used, "bounds": INTERACTION_BOUNDS}
+
+        return [validated_map[name] for name in layer_names], rejected, clamped
+
+    rejected["__all__"] = {
+        "requested": override,
+        "reason": f"Unsupported override type: {type(override).__name__}",
+    }
+    return [1.0, 1.0, 1.0, 1.0], rejected, clamped
+
+
+def apply_interaction_override(I_pre, override_list, mode="scale"):
+    """
+    Apply an interaction override to a precomputed interaction vector.
+
+    Args:
+        I_pre: list-like of 4 floats
+        override_list: list-like of 4 floats (already validated/clamped)
+        mode: "scale" or "replace"
+
+    Returns:
+        tuple: (I_used, clamped)
+            I_used: list[float] length 4
+            clamped: dict with per-index clamp details if final clamp changed values
+    """
+    try:
+        base = [float(x) for x in I_pre]
+    except Exception:
+        base = [1.0, 1.0, 1.0, 1.0]
+
+    override_vals = [float(x) for x in override_list]
+
+    if mode == "replace":
+        raw_used = override_vals
+    else:
+        # Default: scale
+        raw_used = [b * o for b, o in zip(base, override_vals)]
+
+    clamped = {}
+    used = []
+    for idx, val in enumerate(raw_used):
+        used_val = float(np.clip(val, INTERACTION_BOUNDS[0], INTERACTION_BOUNDS[1]))
+        used.append(used_val)
+        if not np.isclose(used_val, val, atol=1e-10):
+            clamped[str(idx)] = {"requested": float(val), "used": used_val, "bounds": INTERACTION_BOUNDS}
+
+    return used, clamped
+
+
+def resolve_interaction_coefficients(layer_names, I_base, I_dynamic,
+                                     interaction_mode="dynamic",
+                                     interaction_override=None,
+                                     interaction_override_mode="scale"):
+    """
+    Resolve final interaction coefficients for a tool, with audit.
+
+    Returns:
+        tuple: (I_used, interaction_audit_or_none)
+    """
+    # Normalize inputs
+    I_base_list = [float(x) for x in I_base]
+    I_dynamic_list = [float(x) for x in I_dynamic]
+
+    mode = interaction_mode if interaction_mode in ("base", "dynamic") else "dynamic"
+    I_pre = I_base_list if mode == "base" else I_dynamic_list
+
+    engaged = (
+        interaction_override is not None or
+        mode != "dynamic" or
+        (interaction_override_mode not in (None, "scale"))
+    )
+
+    if interaction_override is not None:
+        override_valid, override_rejected, override_clamped = validate_interaction_override(
+            interaction_override, layer_names
+        )
+        I_used, final_clamped = apply_interaction_override(
+            I_pre, override_valid, mode=interaction_override_mode or "scale"
+        )
+        # Merge clamp details (override clamp + final clamp).
+        merged_clamped = {}
+        merged_clamped.update(override_clamped or {})
+        merged_clamped.update(final_clamped or {})
+
+        audit = {
+            "interaction_mode": mode,
+            "override_mode": interaction_override_mode or "scale",
+            "requested": interaction_override,
+            "validated": override_valid,
+            "used": I_used,
+            "rejected": override_rejected if override_rejected else None,
+            "clamped": merged_clamped if merged_clamped else None,
+        }
+        return I_used, audit if engaged else None
+
+    # No override: use the selected mode
+    audit = {
+        "interaction_mode": mode,
+        "override_mode": None,
+        "requested": None,
+        "validated": None,
+        "used": I_pre,
+        "rejected": None,
+        "clamped": None,
+    }
+    return I_pre, audit if engaged else None
+
+
 def clamp_f_time(f_time):
     """
     Clamp f_time to prevent runaway growth from extreme temporal kernels.
@@ -429,7 +607,7 @@ def clamp_f_time(f_time):
 def build_overrides_audit(threshold_overrides=None, temporal_config=None, 
                           threshold_info=None, temporal_validated=None, 
                           temporal_rejected=None, temporal_clamped=None,
-                          f_time_info=None):
+                          f_time_info=None, interaction=None):
     """
     Build the overrides_applied audit block for tool responses.
     
@@ -441,6 +619,7 @@ def build_overrides_audit(threshold_overrides=None, temporal_config=None,
         temporal_rejected: Rejected temporal params
         temporal_clamped: Clamped temporal params
         f_time_info: Dict from clamp_f_time
+        interaction: Optional dict describing interaction tuning (I)
     
     Returns:
         dict: Audit block showing what was tuned and what was constrained
@@ -474,6 +653,10 @@ def build_overrides_audit(threshold_overrides=None, temporal_config=None,
             "used": float(f_time_used) if f_time_used is not None else None,
             "clamped": f_time_info.get("was_clamped", False)
         }
+
+    # Interaction audit (only include when caller engaged interaction controls)
+    if interaction:
+        audit["interaction"] = interaction
     
     return audit
 

@@ -1,0 +1,64 @@
+tool: military_friction_forecast
+type: friction
+domain: military
+
+selection:
+  use_when:
+    - "Tactical plan may fail due to logistics or political constraints."
+    - "You need to identify the bottleneck layer (maneuver/intel/sustainment/political)."
+    - "Assess readiness mismatch between tactical and support layers."
+  not_for:
+    - "Detailed operational planning or force employment."
+    - "Questions without quantified readiness estimates."
+
+parameters:
+  maneuver:
+    layer: Micro
+    low: "Limited maneuver options; constrained"
+    mid: "Some maneuver flexibility"
+    high: "High maneuver feasibility"
+  intelligence:
+    layer: Meso
+    low: "Low confidence / high uncertainty"
+    mid: "Partial situational awareness"
+    high: "High intel confidence"
+  sustainment:
+    layer: Macro
+    low: "Logistics fragile"
+    mid: "Sustainment adequate with risk"
+    high: "Sustainment robust"
+  political:
+    layer: Meta
+    low: "Authorization unclear/fragile"
+    mid: "Mixed political constraints"
+    high: "Clear durable authorization"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for comparability across assessments."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode confidence in estimates (intel often uncertain)."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Dampen uncertain estimates rather than forcing a decision."
+  dampen_when:
+    intelligence: "Intel inputs are stale, single-source, or contested."
+    political: "Political authorization is volatile or conditional."
+  amplify_when:
+    sustainment: "Logistics data is measured and current (fuel, spares, lift)."
+    maneuver: "Terrain/enemy disposition well-characterized."
+  examples:
+    - scenario: "Intel uncertain; sustainment clearly constrained"
+      interaction_mode: dynamic
+      interaction_override: {intelligence: 0.8, sustainment: 1.2}
+      interaction_override_mode: scale
+      rationale: "Discount uncertainty; emphasize hard logistics limits."
+
+interpretation:
+  high_m: "Friction: readiness mismatch; bottleneck likely determines outcome."
+  low_m: "Less friction; readiness across layers is more coherent."
+  check:
+    - "Bottleneck layer is usually the minimum of L (or the largest readiness gap)."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."

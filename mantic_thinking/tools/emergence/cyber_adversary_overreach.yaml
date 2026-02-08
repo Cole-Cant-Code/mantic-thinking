@@ -1,0 +1,64 @@
+tool: cyber_adversary_overreach
+type: emergence
+domain: cyber
+
+selection:
+  use_when:
+    - "Attacker appears overextended while defender posture is hardened (defensive opportunity)."
+    - "You want to detect a window for active defense/deception/takedown."
+    - "Tool reuse fatigue plus geopolitical pressure suggests brittleness."
+  not_for:
+    - "Routine patching/vuln management without an attacker-overreach hypothesis."
+    - "Attribution questions (use cyber_attribution_resolver)."
+
+parameters:
+  threat_intel_stretch:
+    layer: Meso
+    low: "Attacker appears stable; no stretch"
+    mid: "Some stretch indicators"
+    high: "Attacker stretched/thinly resourced"
+  geopolitical_pressure:
+    layer: Macro
+    low: "Low pressure"
+    mid: "Moderate pressure"
+    high: "High pressure driving risky ops"
+  operational_hardening:
+    layer: Meso
+    low: "Weak hardening"
+    mid: "Partial hardening"
+    high: "Strong detection/controls"
+  tool_reuse_fatigue:
+    layer: Micro
+    low: "Fresh tooling; low reuse"
+    mid: "Some reuse"
+    high: "High reuse; signatures brittle"
+
+interaction_guidance:
+  modes:
+    base: "Fixed I for consistent comparisons."
+    dynamic: "Default; dynamic I equals base (no hidden interaction logic)."
+    override: "Use to encode confidence in telemetry (tool reuse) vs strategic context."
+  override_mode_defaults:
+    override_mode: scale
+    rationale: "Scale confidence; keep W immutable."
+  dampen_when:
+    geopolitical_pressure: "Pressure assessment is narrative-driven without evidence."
+    threat_intel_stretch: "Stretch is inferred from weak intel."
+  amplify_when:
+    operational_hardening: "Hardening is confirmed by control coverage + recent tests."
+    tool_reuse_fatigue: "Telemetry clearly shows reuse (hashes, infra, TTP repetition)."
+  examples:
+    - scenario: "Strong telemetry; geopolitical context uncertain"
+      interaction_mode: dynamic
+      interaction_override: {tool_reuse_fatigue: 1.2, geopolitical_pressure: 0.8}
+      interaction_override_mode: scale
+      rationale: "Emphasize evidence; discount speculative context."
+
+interpretation:
+  high_m: "Opportunity: attacker brittle while defender strong; consider action window."
+  low_m: "No clear overreach window; continue monitoring/hardening."
+  check:
+    - "A window requires both attacker strain and defender hardening."
+
+iteration:
+  note: "Coupling is based on L only; use I to encode confidence and compare m_score/attribution/visibility."
