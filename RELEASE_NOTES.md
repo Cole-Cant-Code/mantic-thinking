@@ -1,3 +1,25 @@
+# Release Notes — 2026-02-08 (v1.2.1)
+
+## Summary
+
+This release improves README clarity around purpose, value, and novelty. No
+functional code changes.
+
+## Highlights
+
+- **README purpose/value framing**
+  - Added a concise "Why Mantic" section.
+
+## Compatibility
+
+- Core formula unchanged.
+
+## Tests
+
+- Not required for this change.
+
+---
+
 # Release Notes — 2026-02-07 (v1.2.0)
 
 ## Summary

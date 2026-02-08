@@ -5,6 +5,26 @@ Compatible with Claude, Kimi, Gemini, OpenAI, and Ollama.
 
 **14 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection)
 
+## Why Mantic
+
+Mantic is a decision framework that makes expert-level pattern detection usable
+for non-experts. It turns multi-signal situations into structured scores with
+explicit reasoning cues, so an LLM can explain what is happening and why.
+
+What it does:
+- Flags risk when signals diverge (Friction tools)
+- Flags opportunity when signals align (Emergence tools)
+- Exposes which layer drove the signal (layer_visibility)
+
+What makes it valuable:
+- Consistent math across domains
+- Human-readable outputs for LLM-guided decisions
+- No external services or black-box models
+
+What is novel:
+- Same core formula across all domains
+- Layer-level interpretability without changing the math
+
 ## Core Formula (Immutable)
 
 ```
@@ -274,6 +294,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.2.1 - README: clearer purpose and value
 1.2.0 - Layer visibility for architectural reasoning (all tools include `layer_visibility` field)
 1.1.6 - Safe kernel wrapper + adapter/tool fixes
 1.1.5 - Ignore pytest cache in git
