@@ -1,3 +1,31 @@
+# Release Notes — 2026-02-08 (v1.2.5)
+
+## Summary
+
+This release tightens documentation around temporal scaling (so M-scores above 1.0
+are correctly interpreted when `f_time > 1.0`), adds deeper regression test
+coverage, and improves repo hygiene (ignoring `dist/` and `build/`).
+
+## Highlights
+
+- SKILL.md: Added a temporal scaling note clarifying that `m_score` can exceed 1.0
+  when `f_time > 1.0`.
+- Tests: Added deeper regression/integration coverage while remaining safe in CI
+  (demo script smoke test is skipped when not present).
+- Repo hygiene: Ignore `dist/` and `build/`.
+
+## Compatibility
+
+- Public adapters still expose **14 tools** (7 friction + 7 emergence).
+- Core formula unchanged.
+- No tool/API changes.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.2.4)
 
 ## Summary

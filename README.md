@@ -387,6 +387,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.2.5 - SKILL guidance: clarified temporal scaling; added deep regression tests (CI-safe)
 1.2.4 - Aligned docs/schemas with `layer_coupling` and `layer_visibility`
 1.2.3 - Added `layer_coupling` (coherence/agreement/tension) to all 14 tools
 1.2.2 - Removed orphaned internal tools, cleaned configs

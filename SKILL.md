@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.2.4
+**version:** 1.2.5
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
@@ -720,6 +720,8 @@ All tools now include layer coupling to reveal agreement and tension between lay
 | 0.7-0.9 | High risk, urgent action needed | Optimal window, act now |
 
 **Key Principle:** The M-score measures intensity. Friction tools interpret high intensity as danger. Emergence tools interpret high intensity as opportunity.
+
+> **Temporal scaling:** When `f_time > 1.0`, `m_score` can exceed `1.0`. The table above assumes `f_time = 1.0` (default) and `k_n = 1.0`. Interpret scores above `1.0` as amplified intensity: the signal is strengthening over time.
 
 ---
 
