@@ -32,7 +32,7 @@ from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit
+    clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
 from mantic.introspection import get_layer_visibility
 
@@ -184,6 +184,7 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
     layer_visibility = get_layer_visibility("climate_resilience_multiplier", _weights_dict, _layer_values_dict)
+    layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     if window_detected:
         return {
@@ -205,7 +206,8 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
                 "infrastructure": float(L[2]),
                 "policy": float(L[3])
             },
-            "layer_visibility": layer_visibility
+            "layer_visibility": layer_visibility,
+            "layer_coupling": layer_coupling
         }
     
     below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= min_layer_threshold]
@@ -222,7 +224,8 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
-        "layer_visibility": layer_visibility
+        "layer_visibility": layer_visibility,
+        "layer_coupling": layer_coupling
     }
 
 

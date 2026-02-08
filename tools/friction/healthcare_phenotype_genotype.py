@@ -43,7 +43,7 @@ from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit
+    clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
 from mantic.introspection import get_layer_visibility
 
@@ -254,6 +254,7 @@ def detect(phenotypic, genomic, environmental, psychosocial, f_time=1.0,
         "psychosocial": float(I[3]),
     }
     layer_visibility = get_layer_visibility("healthcare_phenotype_genotype", WEIGHTS, layer_values_dict, layer_interactions)
+    layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     return {
         "alert": alert,
@@ -265,7 +266,8 @@ def detect(phenotypic, genomic, environmental, psychosocial, f_time=1.0,
         "threshold": threshold,
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
-        "layer_visibility": layer_visibility
+        "layer_visibility": layer_visibility,
+        "layer_coupling": layer_coupling
     }
 
 

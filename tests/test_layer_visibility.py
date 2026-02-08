@@ -220,6 +220,18 @@ class TestToolResponses:
             result = func(**params)
             assert "layer_visibility" in result, f"{tool_name} missing layer_visibility"
             assert "dominant" in result["layer_visibility"], f"{tool_name} layer_visibility missing dominant"
+            assert "layer_coupling" in result, f"{tool_name} missing layer_coupling"
+            coupling = result["layer_coupling"]
+            assert coupling is not None, f"{tool_name} layer_coupling should not be None"
+            assert 0.0 <= coupling["coherence"] <= 1.0, f"{tool_name} coherence out of bounds"
+            assert "layers" in coupling and isinstance(coupling["layers"], dict), f"{tool_name} coupling layers missing"
+            assert set(coupling["layers"].keys()) == set(result["layer_attribution"].keys())
+            for layer_name, entry in coupling["layers"].items():
+                assert "agreement" in entry, f"{tool_name}.{layer_name} missing agreement"
+                assert 0.0 <= entry["agreement"] <= 1.0, f"{tool_name}.{layer_name} agreement out of bounds"
+                if "tension_with" in entry:
+                    for other_layer, agree in entry["tension_with"].items():
+                        assert agree < 0.5, f"{tool_name}.{layer_name} tension_with should be < 0.5"
 
 
 class TestBackwardCompatibility:

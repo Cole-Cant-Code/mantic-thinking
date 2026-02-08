@@ -42,7 +42,7 @@ from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit
+    clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
 from mantic.introspection import get_layer_visibility
 
@@ -247,6 +247,7 @@ def detect(technical, macro, flow, risk, f_time=1.0,
         "risk": float(I[3]),
     }
     layer_visibility = get_layer_visibility("finance_regime_conflict", WEIGHTS, layer_values_dict, layer_interactions)
+    layer_coupling = compute_layer_coupling(L_normalized, LAYER_NAMES)
     
     return {
         "alert": alert,
@@ -259,7 +260,8 @@ def detect(technical, macro, flow, risk, f_time=1.0,
         "threshold": threshold,
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
-        "layer_visibility": layer_visibility
+        "layer_visibility": layer_visibility,
+        "layer_coupling": layer_coupling
     }
 
 

@@ -476,3 +476,57 @@ def build_overrides_audit(threshold_overrides=None, temporal_config=None,
         }
     
     return audit
+
+
+# =============================================================================
+# Layer Coupling (Informational; Does Not Affect M-Score)
+# =============================================================================
+
+def compute_layer_coupling(L, layer_names):
+    """
+    Compute pairwise coupling between layers.
+
+    This is a read-only lens on the layer values. It does not modify the
+    M-score or any kernel inputs. It exists so consumers can see which layers
+    agree, which are in tension, and how coherent the overall signal is.
+
+    Args:
+        L: List of layer values (0-1, may contain NaN)
+        layer_names: List of layer name strings (same length/order as L)
+
+    Returns:
+        Dict with:
+        - coherence: float 0-1 (higher = more coherent)
+        - layers: per-layer detail:
+          - agreement: float 0-1 (mean agreement with other layers)
+          - tension_with: optional dict of {other_layer: agreement} for low-agreement pairs
+        Or None if fewer than 2 valid layers.
+    """
+    valid = [(i, float(l)) for i, l in enumerate(L) if not np.isnan(l)]
+    if len(valid) < 2:
+        return None
+
+    vals = [l for _, l in valid]
+    # Std is bounded by ~0.5 for values in [0,1]. Normalize by 0.5 into [0,1].
+    coherence = round(float(max(0.0, 1.0 - np.std(vals) / 0.5)), 2)
+
+    layers = {}
+    for i, li in valid:
+        distances = [abs(li - lj) for j, lj in valid if j != i]
+        agreement = round(1.0 - np.mean(distances), 2)
+
+        tensions = {}
+        for j, lj in valid:
+            if j == i:
+                continue
+            pair_agree = round(1.0 - abs(li - lj), 2)
+            # Only surface notable tension pairs.
+            if pair_agree < 0.5:
+                tensions[layer_names[j]] = pair_agree
+
+        entry = {"agreement": agreement}
+        if tensions:
+            entry["tension_with"] = tensions
+        layers[layer_names[i]] = entry
+
+    return {"coherence": coherence, "layers": layers}

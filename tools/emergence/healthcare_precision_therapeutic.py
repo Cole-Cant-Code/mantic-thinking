@@ -32,7 +32,7 @@ from core.mantic_kernel import compute_temporal_kernel
 from core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
-    clamp_f_time, build_overrides_audit
+    clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
 from mantic.introspection import get_layer_visibility
 
@@ -175,6 +175,7 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
         _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
         _layer_values_dict = dict(zip(LAYER_NAMES, L))
         layer_visibility = get_layer_visibility("healthcare_precision_therapeutic", _weights_dict, _layer_values_dict)
+        layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
         
         return {
             "window_detected": True,
@@ -195,7 +196,8 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
                 "phenotypic": float(L[2]),
                 "psychosocial": float(L[3])
             },
-            "layer_visibility": layer_visibility
+            "layer_visibility": layer_visibility,
+            "layer_coupling": layer_coupling
         }
     
     below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= alignment_threshold]
@@ -204,6 +206,7 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
     layer_visibility = get_layer_visibility("healthcare_precision_therapeutic", _weights_dict, _layer_values_dict)
+    layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     return {
         "window_detected": False,
@@ -215,7 +218,8 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
         "improvement_needed": below_threshold,
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
-        "layer_visibility": layer_visibility
+        "layer_visibility": layer_visibility,
+        "layer_coupling": layer_coupling
     }
 
 

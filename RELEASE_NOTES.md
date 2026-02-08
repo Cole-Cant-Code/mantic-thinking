@@ -1,3 +1,28 @@
+# Release Notes — 2026-02-08 (v1.2.3)
+
+## Summary
+
+This release adds `layer_coupling` to all 14 tools, providing a read-only view
+of inter-layer agreement (coherence, per-layer agreement, and tension pairs).
+No changes to the public tool set or immutable core formula.
+
+## Highlights
+
+- Added `compute_layer_coupling()` helper in `core/validators.py`.
+- All tools now include `layer_coupling` alongside `layer_visibility`.
+
+## Compatibility
+
+- Public adapters still expose **14 tools** (7 friction + 7 emergence).
+- Core formula unchanged.
+- Additive output only (new `layer_coupling` field).
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.2.2)
 
 ## Summary
