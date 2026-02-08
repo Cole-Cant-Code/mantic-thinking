@@ -319,7 +319,7 @@ def draw_kernel_comparison(
     """
     Compare all 7 kernel modes side by side.
     """
-    from core.mantic_kernel import compute_temporal_kernel
+    from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
     
     modes = [
         "exponential",
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     L = [0.8, 0.6, 0.4, 0.2]
     I = [1.0, 1.0, 1.0, 1.0]
     
-    from core.mantic_kernel import mantic_kernel
+    from mantic_thinking.core.mantic_kernel import mantic_kernel
     M, S, attr = mantic_kernel(W, L, I)
     
     print(draw_m_gauge(M, S))

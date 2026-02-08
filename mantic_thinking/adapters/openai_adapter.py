@@ -12,12 +12,13 @@ import os
 
 # Avoid mutating sys.path on import; only adjust for direct script execution.
 if __name__ == "__main__":
-    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # adapters/ -> mantic_thinking/ -> repo root
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
 
 # Friction tools (divergence detection)
-from tools import (
+from mantic_thinking.tools import (
     healthcare_phenotype_genotype,
     finance_regime_conflict,
     cyber_attribution_resolver,
@@ -28,7 +29,7 @@ from tools import (
 )
 
 # Emergence tools (confluence detection)
-from tools import (
+from mantic_thinking.tools import (
     healthcare_precision_therapeutic,
     finance_confluence_alpha,
     cyber_adversary_overreach,

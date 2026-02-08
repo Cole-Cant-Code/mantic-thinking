@@ -1,20 +1,20 @@
 """
-Military: Strategic Initiative Window
+Cybersecurity: Adversary Overreach Detector
 
-Identifies decisive action opportunities when intelligence ambiguity,
-positional advantage, logistic readiness, and political authorization synchronize.
+Identifies defensive advantage windows when attacker TTPs are stretched,
+geopolitically pressured, and operationally fatigued.
 
-Confluence Logic: Fog helps us + we're ready + authorized = initiative window
+Confluence Logic: Attacker strained + defender hardened = counter-attack window
 
 Optional Overrides (Bounded):
     threshold_override: Dict of threshold overrides
-        e.g., {"initiative": 0.75, "minimum_floor": 0.65}
+        e.g., {"overreach": 0.75, "hardening": 0.65}
     temporal_config: Dict for temporal kernel tuning (domain-restricted)
     
     NOTE: Domain weights (W) are IMMUTABLE.
 
 Output:
-    window_detected, maneuver_type, advantage, m_score, overrides_applied
+    window_detected, attacker_state, defender_advantage, m_score, overrides_applied
 """
 
 import sys
@@ -27,37 +27,37 @@ if __name__ == "__main__":
         sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.safe_kernel import safe_mantic_kernel as mantic_kernel
-from core.mantic_kernel import compute_temporal_kernel
-from core.validators import (
+from mantic_thinking.core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
-from mantic.introspection import get_layer_visibility
+from mantic_thinking.mantic.introspection import get_layer_visibility
 
 
-WEIGHTS = [0.25, 0.25, 0.25, 0.25]
-LAYER_NAMES = ['enemy_ambiguity', 'positional_advantage', 'logistic_readiness', 'authorization_clarity']
+WEIGHTS = [0.30, 0.20, 0.30, 0.20]
+LAYER_NAMES = ['threat_stretch', 'geopolitical_pressure', 'operational_hardening', 'tool_reuse_fatigue']
 
 DEFAULT_THRESHOLDS = {
-    'initiative': 0.70,     # Initiative window threshold
-    'minimum_floor': 0.60   # Minimum floor for all layers
+    'overreach': 0.70,  # Overreach detection threshold
+    'hardening': 0.60   # Defender hardening threshold
 }
 
-DOMAIN = "military"
+DOMAIN = "cyber"
 
 
-def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorization_clarity,
+def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, tool_reuse_fatigue,
            f_time=1.0, threshold_override=None, temporal_config=None):
-    """Identify decisive action windows (offensive leverage)."""
+    """Detect when attacker is vulnerable due to overextension."""
     
     # INPUT VALIDATION
     require_finite_inputs({
-        "enemy_ambiguity": enemy_ambiguity,
-        "positional_advantage": positional_advantage,
-        "logistic_readiness": logistic_readiness,
-        "authorization_clarity": authorization_clarity,
+        "threat_intel_stretch": threat_intel_stretch,
+        "geopolitical_pressure": geopolitical_pressure,
+        "operational_hardening": operational_hardening,
+        "tool_reuse_fatigue": tool_reuse_fatigue,
     })
 
     # OVERRIDES PROCESSING
@@ -102,52 +102,49 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
     
     # CORE DETECTION
     L = [
-        clamp_input(enemy_ambiguity, name="enemy_ambiguity"),
-        clamp_input(positional_advantage, name="positional_advantage"),
-        clamp_input(logistic_readiness, name="logistic_readiness"),
-        clamp_input(authorization_clarity, name="authorization_clarity")
+        clamp_input(threat_intel_stretch, name="threat_intel_stretch"),
+        clamp_input(geopolitical_pressure, name="geopolitical_pressure"),
+        clamp_input(operational_hardening, name="operational_hardening"),
+        clamp_input(tool_reuse_fatigue, name="tool_reuse_fatigue")
     ]
     
     I = [1.0, 1.0, 1.0, 1.0]
     
     M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    initiative_threshold = active_thresholds['initiative']
-    minimum_floor = active_thresholds['minimum_floor']
+    overreach_threshold = active_thresholds['overreach']
+    hardening_threshold = active_thresholds['hardening']
     
-    critical_factors = [L[0], L[2], L[3]]
-    initiative_floor = min(critical_factors)
-    initiative_score = initiative_floor * L[1]
+    attacker_strain = (L[0] + L[1] + L[3]) / 3
     
     window_detected = False
-    maneuver_type = None
-    advantage_description = None
-    recommended_action = None
-    execution_window = None
-    risk_assessment = None
+    attacker_state = "RESILIENT"
+    defender_advantage = "LOW"
+    recommended_action = "Continue monitoring"
+    duration_estimate = None
+    counter_attack_viability = None
     
-    if initiative_score > initiative_threshold and min(L) > minimum_floor:
+    if attacker_strain > overreach_threshold and L[2] > hardening_threshold:
         window_detected = True
         
-        if initiative_score > 0.85 and all(l > 0.75 for l in L):
-            maneuver_type = "DECISIVE_ACTION"
-            advantage_description = ("Synchronized ambiguity/readiness/authorization with "
-                                    "strong positional edge - rare convergence")
-            recommended_action = "Execute within 24-48 hours before fog lifts or enemy adapts"
-            execution_window = "24-48 hours (highly perishable)"
-            risk_assessment = "LOW - All factors favorable"
-        elif initiative_score > 0.75:
-            maneuver_type = "OFFENSIVE_OPERATION"
-            advantage_description = "Strong initiative conditions across multiple factors"
-            recommended_action = "Prepare for execution within 72 hours"
-            execution_window = "48-72 hours"
-            risk_assessment = "MODERATE - Monitor for enemy counter-moves"
+        if attacker_strain > 0.85 and L[2] > 0.75:
+            defender_advantage = "CRITICAL"
+            attacker_state = "SEVERELY_OVEREXTENDED"
+            recommended_action = "Deploy active defense / deception / takedown. Attacker TTPs are brittle and exposed."
+            duration_estimate = "24-48 hours before attacker rotates tools"
+            counter_attack_viability = "High - consider attribution publication or infrastructure seizure"
+        elif attacker_strain > 0.75:
+            defender_advantage = "HIGH"
+            attacker_state = "OVEREXTENDED"
+            recommended_action = "Deploy deception and enhanced monitoring. Prepare for rapid response."
+            duration_estimate = "48-72 hour window"
+            counter_attack_viability = "Moderate - gather intelligence before acting"
         else:
-            maneuver_type = "TACTICAL_INITIATIVE"
-            advantage_description = "Favorable but not exceptional initiative window"
-            recommended_action = "Develop courses of action, prepare for exploitation"
-            execution_window = "72-96 hours"
-            risk_assessment = "MODERATE-HIGH - Contingency plans required"
+            defender_advantage = "MODERATE"
+            attacker_state = "STRESSED"
+            recommended_action = "Increase monitoring. Prepare countermeasures."
+            duration_estimate = "72-96 hour window"
+            counter_attack_viability = "Low - maintain defensive posture"
     
     # Build audit
     threshold_clamped_any = any(
@@ -182,53 +179,50 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
     
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
-    layer_visibility = get_layer_visibility("military_strategic_initiative", _weights_dict, _layer_values_dict)
+    layer_visibility = get_layer_visibility("cyber_adversary_overreach", _weights_dict, _layer_values_dict)
     layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     if window_detected:
         return {
             "window_detected": True,
-            "maneuver_type": maneuver_type,
-            "initiative_score": float(initiative_score),
-            "advantage": advantage_description,
+            "attacker_state": attacker_state,
+            "defender_advantage": defender_advantage,
+            "attacker_strain_score": float(attacker_strain),
             "recommended_action": recommended_action,
-            "execution_window": execution_window,
-            "risk_assessment": risk_assessment,
+            "duration_estimate": duration_estimate,
+            "counter_attack_viability": counter_attack_viability,
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
             "thresholds": active_thresholds,
             "overrides_applied": overrides_applied,
-            "synchronization_status": {
-                "enemy_ambiguity": float(L[0]),
-                "positional_advantage": float(L[1]),
-                "logistic_readiness": float(L[2]),
-                "authorization_clarity": float(L[3])
+            "strain_indicators": {
+                "ttp_stretch": float(L[0]),
+                "geopolitical_pressure": float(L[1]),
+                "tool_fatigue": float(L[3])
             },
             "layer_visibility": layer_visibility,
             "layer_coupling": layer_coupling
         }
     
-    limiting_factors = []
-    if L[0] <= minimum_floor:
-        limiting_factors.append("insufficient enemy ambiguity (too clear)")
-    if L[1] <= minimum_floor:
-        limiting_factors.append("weak positional advantage")
-    if L[2] <= minimum_floor:
-        limiting_factors.append("logistics not ready")
-    if L[3] <= minimum_floor:
-        limiting_factors.append("authorization unclear")
+    if L[2] <= hardening_threshold:
+        limiting_factor = "Defender not sufficiently hardened"
+    elif attacker_strain <= overreach_threshold:
+        limiting_factor = "Attacker not showing strain indicators"
+    else:
+        limiting_factor = "Confluence not achieved"
     
     return {
         "window_detected": False,
-        "initiative_score": float(initiative_score),
-        "maneuver_type": "DEFENSIVE_POSTURE",
-        "limiting_factors": limiting_factors,
+        "attacker_state": attacker_state,
+        "defender_advantage": defender_advantage,
+        "attacker_strain_score": float(attacker_strain),
+        "defender_readiness": float(L[2]),
+        "limiting_factor": limiting_factor,
         "m_score": float(M),
         "spatial_component": float(S),
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
-        "status": f"Initiative window closed. {', '.join(limiting_factors) if limiting_factors else 'Conditions unfavorable'}.",
-        "recommendation": "Maintain readiness, seek to improve positional advantage or wait for authorization.",
+        "status": "Defensive window not yet open",
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
         "layer_visibility": layer_visibility,
@@ -237,34 +231,34 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
 
 
 if __name__ == "__main__":
-    print("=== Military Strategic Initiative Window ===\n")
+    print("=== Cyber Adversary Overreach Detector ===\n")
     
-    print("Test 1: Decisive action window")
+    print("Test 1: Critical overreach")
     result = detect(
-        enemy_ambiguity=0.85,
-        positional_advantage=0.88,
-        logistic_readiness=0.82,
-        authorization_clarity=0.90
+        threat_intel_stretch=0.90,
+        geopolitical_pressure=0.85,
+        operational_hardening=0.80,
+        tool_reuse_fatigue=0.88
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Maneuver Type: {result['maneuver_type']}\n")
+    print(f"  Attacker State: {result['attacker_state']}\n")
     
-    print("Test 2: Offensive operation")
+    print("Test 2: Moderate overreach")
     result = detect(
-        enemy_ambiguity=0.75,
-        positional_advantage=0.78,
-        logistic_readiness=0.72,
-        authorization_clarity=0.80
+        threat_intel_stretch=0.75,
+        geopolitical_pressure=0.70,
+        operational_hardening=0.75,
+        tool_reuse_fatigue=0.72
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Maneuver Type: {result['maneuver_type']}\n")
+    print(f"  Attacker State: {result['attacker_state']}\n")
     
     print("Test 3: No window")
     result = detect(
-        enemy_ambiguity=0.80,
-        positional_advantage=0.75,
-        logistic_readiness=0.45,
-        authorization_clarity=0.85
+        threat_intel_stretch=0.85,
+        geopolitical_pressure=0.80,
+        operational_hardening=0.45,
+        tool_reuse_fatigue=0.75
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Limiting Factors: {result['limiting_factors']}")
+    print(f"  Limiting Factor: {result['limiting_factor']}")

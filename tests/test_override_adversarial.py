@@ -14,9 +14,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from tools.friction.healthcare_phenotype_genotype import detect as healthcare_friction
-from tools.friction.climate_maladaptation import detect as climate_friction
-from tools.emergence.healthcare_precision_therapeutic import detect as healthcare_emergence
+from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect as healthcare_friction
+from mantic_thinking.tools.friction.climate_maladaptation import detect as climate_friction
+from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import detect as healthcare_emergence
 
 
 # =============================================================================

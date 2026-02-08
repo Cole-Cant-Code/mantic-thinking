@@ -1,20 +1,20 @@
 """
-Cybersecurity: Adversary Overreach Detector
+Climate: Resilience Multiplier
 
-Identifies defensive advantage windows when attacker TTPs are stretched,
-geopolitically pressured, and operationally fatigued.
+Surfaces interventions with positive cross-domain coupling
+solving multiple layer problems simultaneously.
 
-Confluence Logic: Attacker strained + defender hardened = counter-attack window
+Confluence Logic: Strong positive coupling across all 4 domains = multiplier effect
 
 Optional Overrides (Bounded):
     threshold_override: Dict of threshold overrides
-        e.g., {"overreach": 0.75, "hardening": 0.65}
+        e.g., {"coupling": 0.55, "min_layer": 0.55, "multiplier": 0.75}
     temporal_config: Dict for temporal kernel tuning (domain-restricted)
     
     NOTE: Domain weights (W) are IMMUTABLE.
 
 Output:
-    window_detected, attacker_state, defender_advantage, m_score, overrides_applied
+    window_detected, intervention_type, cross_domain_coupling, m_score, overrides_applied
 """
 
 import sys
@@ -27,37 +27,38 @@ if __name__ == "__main__":
         sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.safe_kernel import safe_mantic_kernel as mantic_kernel
-from core.mantic_kernel import compute_temporal_kernel
-from core.validators import (
+from mantic_thinking.core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
-from mantic.introspection import get_layer_visibility
+from mantic_thinking.mantic.introspection import get_layer_visibility
 
 
-WEIGHTS = [0.30, 0.20, 0.30, 0.20]
-LAYER_NAMES = ['threat_stretch', 'geopolitical_pressure', 'operational_hardening', 'tool_reuse_fatigue']
+WEIGHTS = [0.25, 0.25, 0.25, 0.25]
+LAYER_NAMES = ['atmospheric', 'ecological', 'infrastructure', 'policy']
 
 DEFAULT_THRESHOLDS = {
-    'overreach': 0.70,  # Overreach detection threshold
-    'hardening': 0.60   # Defender hardening threshold
+    'coupling': 0.50,      # Coupling threshold
+    'min_layer': 0.50,     # Minimum layer threshold
+    'multiplier': 0.70     # High multiplier threshold
 }
 
-DOMAIN = "cyber"
+DOMAIN = "climate"
 
 
-def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, tool_reuse_fatigue,
+def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, policy_alignment,
            f_time=1.0, threshold_override=None, temporal_config=None):
-    """Detect when attacker is vulnerable due to overextension."""
+    """Identify interventions that solve multiple layer problems simultaneously."""
     
     # INPUT VALIDATION
     require_finite_inputs({
-        "threat_intel_stretch": threat_intel_stretch,
-        "geopolitical_pressure": geopolitical_pressure,
-        "operational_hardening": operational_hardening,
-        "tool_reuse_fatigue": tool_reuse_fatigue,
+        "atmospheric_benefit": atmospheric_benefit,
+        "ecological_benefit": ecological_benefit,
+        "infrastructure_benefit": infrastructure_benefit,
+        "policy_alignment": policy_alignment,
     })
 
     # OVERRIDES PROCESSING
@@ -102,49 +103,52 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
     
     # CORE DETECTION
     L = [
-        clamp_input(threat_intel_stretch, name="threat_intel_stretch"),
-        clamp_input(geopolitical_pressure, name="geopolitical_pressure"),
-        clamp_input(operational_hardening, name="operational_hardening"),
-        clamp_input(tool_reuse_fatigue, name="tool_reuse_fatigue")
+        clamp_input(atmospheric_benefit, name="atmospheric_benefit"),
+        clamp_input(ecological_benefit, name="ecological_benefit"),
+        clamp_input(infrastructure_benefit, name="infrastructure_benefit"),
+        clamp_input(policy_alignment, name="policy_alignment")
     ]
     
     I = [1.0, 1.0, 1.0, 1.0]
     
     M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    overreach_threshold = active_thresholds['overreach']
-    hardening_threshold = active_thresholds['hardening']
+    coupling_threshold = active_thresholds['coupling']
+    min_layer_threshold = active_thresholds['min_layer']
+    multiplier_threshold = active_thresholds['multiplier']
     
-    attacker_strain = (L[0] + L[1] + L[3]) / 3
+    pairwise_products = [
+        L[0]*L[1], L[0]*L[2], L[0]*L[3],
+        L[1]*L[2], L[1]*L[3],
+        L[2]*L[3]
+    ]
+    coupling = sum(pairwise_products) / len(pairwise_products)
+    high_benefit_count = sum(1 for l in L if l > 0.7)
     
     window_detected = False
-    attacker_state = "RESILIENT"
-    defender_advantage = "LOW"
-    recommended_action = "Continue monitoring"
-    duration_estimate = None
-    counter_attack_viability = None
+    intervention_type = None
+    example_intervention = None
+    recommended_action = None
+    funding_priority = None
     
-    if attacker_strain > overreach_threshold and L[2] > hardening_threshold:
+    if coupling > coupling_threshold and min(L) > min_layer_threshold:
         window_detected = True
         
-        if attacker_strain > 0.85 and L[2] > 0.75:
-            defender_advantage = "CRITICAL"
-            attacker_state = "SEVERELY_OVEREXTENDED"
-            recommended_action = "Deploy active defense / deception / takedown. Attacker TTPs are brittle and exposed."
-            duration_estimate = "24-48 hours before attacker rotates tools"
-            counter_attack_viability = "High - consider attribution publication or infrastructure seizure"
-        elif attacker_strain > 0.75:
-            defender_advantage = "HIGH"
-            attacker_state = "OVEREXTENDED"
-            recommended_action = "Deploy deception and enhanced monitoring. Prepare for rapid response."
-            duration_estimate = "48-72 hour window"
-            counter_attack_viability = "Moderate - gather intelligence before acting"
+        if coupling > multiplier_threshold and high_benefit_count >= 3:
+            intervention_type = "HIGH_MULTIPLIER"
+            funding_priority = "URGENT - High leverage across 4 domain columns"
+            example_intervention = "Urban forestry with green infrastructure: heat reduction + biodiversity + stormwater + equity"
+            recommended_action = "Prioritize immediate funding. Every dollar creates compounding benefits across atmospheric, ecological, infrastructure, and policy domains."
+        elif coupling > 0.60 or high_benefit_count >= 3:
+            intervention_type = "MULTIPLIER"
+            funding_priority = "HIGH - Cross-domain benefits"
+            example_intervention = "Wetland restoration: carbon sequestration + flood control + habitat + recreation"
+            recommended_action = "Fast-track approval. Strong positive externalities across multiple systems."
         else:
-            defender_advantage = "MODERATE"
-            attacker_state = "STRESSED"
-            recommended_action = "Increase monitoring. Prepare countermeasures."
-            duration_estimate = "72-96 hour window"
-            counter_attack_viability = "Low - maintain defensive posture"
+            intervention_type = "MODERATE_MULTIPLIER"
+            funding_priority = "MODERATE - Dual benefits"
+            example_intervention = "Solar canopy parking: renewable energy + heat reduction"
+            recommended_action = "Include in funding round. Good but not exceptional cross-domain coupling."
     
     # Build audit
     threshold_clamped_any = any(
@@ -179,50 +183,45 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
     
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
-    layer_visibility = get_layer_visibility("cyber_adversary_overreach", _weights_dict, _layer_values_dict)
+    layer_visibility = get_layer_visibility("climate_resilience_multiplier", _weights_dict, _layer_values_dict)
     layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     if window_detected:
         return {
             "window_detected": True,
-            "attacker_state": attacker_state,
-            "defender_advantage": defender_advantage,
-            "attacker_strain_score": float(attacker_strain),
+            "intervention_type": intervention_type,
+            "cross_domain_coupling": float(coupling),
+            "benefit_layers_above_70": high_benefit_count,
+            "example_intervention": example_intervention,
             "recommended_action": recommended_action,
-            "duration_estimate": duration_estimate,
-            "counter_attack_viability": counter_attack_viability,
+            "funding_priority": funding_priority,
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
             "thresholds": active_thresholds,
             "overrides_applied": overrides_applied,
-            "strain_indicators": {
-                "ttp_stretch": float(L[0]),
-                "geopolitical_pressure": float(L[1]),
-                "tool_fatigue": float(L[3])
+            "benefit_profile": {
+                "atmospheric": float(L[0]),
+                "ecological": float(L[1]),
+                "infrastructure": float(L[2]),
+                "policy": float(L[3])
             },
             "layer_visibility": layer_visibility,
             "layer_coupling": layer_coupling
         }
     
-    if L[2] <= hardening_threshold:
-        limiting_factor = "Defender not sufficiently hardened"
-    elif attacker_strain <= overreach_threshold:
-        limiting_factor = "Attacker not showing strain indicators"
-    else:
-        limiting_factor = "Confluence not achieved"
+    below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= min_layer_threshold]
     
     return {
         "window_detected": False,
-        "attacker_state": attacker_state,
-        "defender_advantage": defender_advantage,
-        "attacker_strain_score": float(attacker_strain),
-        "defender_readiness": float(L[2]),
-        "limiting_factor": limiting_factor,
+        "cross_domain_coupling": float(coupling),
+        "coupling_status": "Insufficient coupling for multiplier effect",
+        "benefit_layers_above_70": high_benefit_count,
+        "limiting_factors": below_threshold,
         "m_score": float(M),
         "spatial_component": float(S),
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
-        "status": "Defensive window not yet open",
+        "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
         "layer_visibility": layer_visibility,
@@ -231,34 +230,34 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
 
 
 if __name__ == "__main__":
-    print("=== Cyber Adversary Overreach Detector ===\n")
+    print("=== Climate Resilience Multiplier ===\n")
     
-    print("Test 1: Critical overreach")
+    print("Test 1: High multiplier")
     result = detect(
-        threat_intel_stretch=0.90,
-        geopolitical_pressure=0.85,
-        operational_hardening=0.80,
-        tool_reuse_fatigue=0.88
+        atmospheric_benefit=0.75,
+        ecological_benefit=0.80,
+        infrastructure_benefit=0.78,
+        policy_alignment=0.82
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Attacker State: {result['attacker_state']}\n")
+    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
     
-    print("Test 2: Moderate overreach")
+    print("Test 2: Moderate multiplier")
     result = detect(
-        threat_intel_stretch=0.75,
-        geopolitical_pressure=0.70,
-        operational_hardening=0.75,
-        tool_reuse_fatigue=0.72
+        atmospheric_benefit=0.70,
+        ecological_benefit=0.72,
+        infrastructure_benefit=0.65,
+        policy_alignment=0.68
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Attacker State: {result['attacker_state']}\n")
+    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
     
-    print("Test 3: No window")
+    print("Test 3: No multiplier")
     result = detect(
-        threat_intel_stretch=0.85,
-        geopolitical_pressure=0.80,
-        operational_hardening=0.45,
-        tool_reuse_fatigue=0.75
+        atmospheric_benefit=0.30,
+        ecological_benefit=0.25,
+        infrastructure_benefit=0.85,
+        policy_alignment=0.40
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Limiting Factor: {result['limiting_factor']}")
+    print(f"  Status: {result['status']}")

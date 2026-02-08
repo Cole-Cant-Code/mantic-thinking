@@ -5,7 +5,7 @@ Converts Mantic tools to Google Gemini's native FunctionDeclaration format.
 Compatible with Gemini 1.5 Pro, Flash, and future versions.
 
 Usage:
-    from adapters.gemini_adapter import get_gemini_tools, execute_tool
+    from mantic_thinking.adapters.gemini_adapter import get_gemini_tools, execute_tool
     
     tools = get_gemini_tools()  # Returns Gemini-native format
     result = execute_tool("healthcare_phenotype_genotype", {...})
@@ -16,13 +16,14 @@ import os
 
 # Avoid mutating sys.path on import; only adjust for direct script execution.
 if __name__ == "__main__":
-    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # adapters/ -> mantic_thinking/ -> repo root
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
 
 import inspect
 
-from adapters.openai_adapter import TOOL_MAP, get_openai_tools
+from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools
 
 
 def get_gemini_tools():
@@ -284,9 +285,9 @@ if __name__ == "__main__":
     print(f"M-Score: {result['m_score']:.3f}")
     
     print("\n--- Cross-Model Parity Check ---")
-    from adapters.openai_adapter import execute_tool as openai_execute
-    from adapters.kimi_adapter import execute as kimi_execute
-    from adapters.claude_adapter import execute_tool as claude_execute
+    from mantic_thinking.adapters.openai_adapter import execute_tool as openai_execute
+    from mantic_thinking.adapters.kimi_adapter import execute as kimi_execute
+    from mantic_thinking.adapters.claude_adapter import execute_tool as claude_execute
     
     params = {"phenotypic": 0.3, "genomic": 0.9, "environmental": 0.4, "psychosocial": 0.8}
     

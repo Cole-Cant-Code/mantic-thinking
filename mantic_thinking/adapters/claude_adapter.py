@@ -12,13 +12,14 @@ import os
 
 # Avoid mutating sys.path on import; only adjust for direct script execution.
 if __name__ == "__main__":
-    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # adapters/ -> mantic_thinking/ -> repo root
+    _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
 
 import inspect
 
-from adapters.openai_adapter import TOOL_MAP, get_openai_tools, get_tools_by_type
+from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools, get_tools_by_type
 
 
 def get_claude_tools():

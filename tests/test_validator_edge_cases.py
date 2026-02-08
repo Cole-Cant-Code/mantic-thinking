@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.validators import (
+from mantic_thinking.core.validators import (
     clamp_input, normalize_weights, validate_layers, require_finite_inputs,
     check_mismatch, clamp_threshold_override, validate_temporal_config,
     clamp_f_time, DOMAIN_KERNEL_ALLOWLIST

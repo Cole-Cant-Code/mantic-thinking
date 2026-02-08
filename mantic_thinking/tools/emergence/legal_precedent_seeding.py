@@ -27,14 +27,14 @@ if __name__ == "__main__":
         sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.safe_kernel import safe_mantic_kernel as mantic_kernel
-from core.mantic_kernel import compute_temporal_kernel
-from core.validators import (
+from mantic_thinking.core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
-from mantic.introspection import get_layer_visibility
+from mantic_thinking.mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.30, 0.20, 0.30, 0.20]

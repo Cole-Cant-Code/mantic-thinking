@@ -17,13 +17,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.mantic_kernel import mantic_kernel, verify_kernel_integrity, compute_temporal_kernel
-from core.validators import clamp_input, normalize_weights, validate_layers
-from adapters.openai_adapter import get_openai_tools, execute_tool as execute_openai
-from adapters.kimi_adapter import get_kimi_tools, execute as execute_kimi
-from adapters.claude_adapter import get_claude_tools, execute_tool as execute_claude
+from mantic_thinking.core.mantic_kernel import mantic_kernel, verify_kernel_integrity, compute_temporal_kernel
+from mantic_thinking.core.validators import clamp_input, normalize_weights, validate_layers
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool as execute_openai
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute as execute_kimi
+from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool as execute_claude
 
-from tools import (
+from mantic_thinking.tools import (
     healthcare_phenotype_genotype,
     finance_regime_conflict,
     cyber_attribution_resolver,

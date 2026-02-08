@@ -109,7 +109,7 @@ Each layer adds capability:
 
 The rule is simple: upstream of the kernel, you can shape what goes in. Downstream, you can interpret what comes out. The kernel itself is a fixed point.
 
-For the full mathematical specification, including add-on guardrails, coupling matrices, and identifiability constraints, see [`configs/mantic_tech_spec.md`](configs/mantic_tech_spec.md). For the operational protocol (columnar architecture, cross-domain coupling rules), see [`configs/mantic_explicit_framework.md`](configs/mantic_explicit_framework.md).
+For the full mathematical specification, including add-on guardrails, coupling matrices, and identifiability constraints, see [`mantic_thinking/configs/mantic_tech_spec.md`](mantic_thinking/configs/mantic_tech_spec.md). For the operational protocol (columnar architecture, cross-domain coupling rules), see [`mantic_thinking/configs/mantic_explicit_framework.md`](mantic_thinking/configs/mantic_explicit_framework.md).
 
 ## Tool Suites
 
@@ -151,12 +151,12 @@ pip install mantic-thinking
 
 ```python
 # Friction tool (detect risk)
-from tools.friction.healthcare_phenotype_genotype import detect as detect_friction
+from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect as detect_friction
 result = detect_friction(phenotypic=0.3, genomic=0.9, environmental=0.4, psychosocial=0.8)
 print(f"Alert: {result['alert']}")  # Warning about mismatch
 
 # Emergence tool (detect opportunity)
-from tools.emergence.healthcare_precision_therapeutic import detect as detect_emergence
+from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import detect as detect_emergence
 result = detect_emergence(genomic_predisposition=0.85, environmental_readiness=0.82,
                           phenotypic_timing=0.88, psychosocial_engagement=0.90)
 print(f"Window: {result['window_detected']}")  # True - optimal timing
@@ -165,7 +165,7 @@ print(f"Window: {result['window_detected']}")  # True - optimal timing
 ### For Kimi Code CLI
 
 ```python
-from adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
 # Get all 14 tools
 tools = get_kimi_tools()
@@ -183,7 +183,7 @@ comparison = compare_friction_emergence(
 ### For Claude Code CLI
 
 ```python
-from adapters.claude_adapter import get_claude_tools, execute_tool, format_for_claude
+from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool, format_for_claude
 
 # Get 14 tools in Computer Use format
 tools = get_claude_tools()
@@ -199,13 +199,13 @@ print(format_for_claude(result, "finance_confluence_alpha"))
 ### For Gemini
 
 ```python
-from adapters.gemini_adapter import get_gemini_tools, execute_tool
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools, execute_tool
 
 # Get tools in Gemini FunctionDeclaration format
 tools = get_gemini_tools()
 
 # Or get flat list for simpler SDK usage
-from adapters.gemini_adapter import get_gemini_tools_flat
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools_flat
 declarations = get_gemini_tools_flat()
 
 result = execute_tool("climate_resilience_multiplier", {
@@ -217,7 +217,7 @@ result = execute_tool("climate_resilience_multiplier", {
 ### For Ollama (MiniMax, GPT-OSS, GLM, etc.)
 
 ```python
-from adapters.openai_adapter import get_openai_tools, execute_tool
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool
 import openai
 
 # Ollama's OpenAI-compatible endpoint
@@ -233,7 +233,7 @@ tools = get_openai_tools()
 ### For Codex / OpenAI
 
 ```python
-from adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
 # Get all 14 tools
 tools = get_openai_tools()
@@ -253,30 +253,33 @@ result = execute_tool("cyber_adversary_overreach", {
 ```
 mantic-thinking/
 ├── README.md                   # This file
-├── core/
-│   ├── mantic_kernel.py       # IMMUTABLE core formula
-│   ├── safe_kernel.py         # Guarded wrapper (k_n validation)
-│   └── validators.py          # Input validation and normalization
-├── tools/
-│   ├── friction/              # 7 divergence detection tools
-│   └── emergence/             # 7 confluence detection tools
-├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
-├── mantic/
-│   └── introspection/         # Layer visibility for reasoning (v1.2.0+)
-│       ├── __init__.py
-│       └── hierarchy.py
-├── configs/                   # Domain configurations & framework docs
-│   ├── mantic_tech_spec.md    # Full mathematical specification
-│   ├── mantic_explicit_framework.md  # Operational protocol & columnar architecture
-│   ├── mantic_reasoning_guidelines.md # LLM reasoning scaffold
-│   ├── mantic_health.md       # Healthcare domain config
-│   ├── mantic_finance.md      # Finance domain config
-│   └── ...                    # (8 domain configs total)
-├── schemas/
-│   ├── openapi.json           # OpenAPI spec
-│   └── kimi-tools.json        # Kimi native format
-└── visualization/
-    └── ascii_charts.py        # M-score gauges and attribution treemaps
+├── mantic_thinking/
+│   ├── __init__.py
+│   ├── core/
+│   │   ├── mantic_kernel.py       # IMMUTABLE core formula
+│   │   ├── safe_kernel.py         # Guarded wrapper (k_n validation)
+│   │   └── validators.py          # Input validation and normalization
+│   ├── tools/
+│   │   ├── friction/              # 7 divergence detection tools
+│   │   └── emergence/             # 7 confluence detection tools
+│   ├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
+│   ├── mantic/
+│   │   └── introspection/         # Layer visibility for reasoning (v1.2.0+)
+│   │       ├── __init__.py
+│   │       └── hierarchy.py
+│   ├── configs/                   # Domain configurations & framework docs
+│   │   ├── mantic_tech_spec.md    # Full mathematical specification
+│   │   ├── mantic_explicit_framework.md  # Operational protocol & columnar architecture
+│   │   ├── mantic_reasoning_guidelines.md # LLM reasoning scaffold
+│   │   ├── mantic_health.md       # Healthcare domain config
+│   │   ├── mantic_finance.md      # Finance domain config
+│   │   └── ...                    # (8 domain configs total)
+│   ├── schemas/
+│   │   ├── openapi.json           # OpenAPI spec
+│   │   └── kimi-tools.json        # Kimi native format
+│   └── visualization/
+│       └── ascii_charts.py        # M-score gauges and attribution treemaps
+└── tests/
 ```
 
 ## Key Principle: Same M-Score, Opposite Meaning
@@ -321,24 +324,24 @@ print({k: v["agreement"] for k, v in result["layer_coupling"]["layers"].items()}
 
 ## Configuration Files
 
-The `configs/` directory contains framework documentation and domain-specific configurations:
+The `mantic_thinking/configs/` directory contains framework documentation and domain-specific configurations:
 
-- **[`mantic_tech_spec.md`](configs/mantic_tech_spec.md)** — Full mathematical specification: core formula, add-on guardrails, layer definitions, coupling matrices, identifiability constraints, production guards
-- **[`mantic_explicit_framework.md`](configs/mantic_explicit_framework.md)** — Operational protocol: columnar architecture, cross-domain coupling rules, strict containment
-- **[`mantic_reasoning_guidelines.md`](configs/mantic_reasoning_guidelines.md)** — LLM reasoning scaffold: how to think in layers but speak in plain language
+- **[`mantic_tech_spec.md`](mantic_thinking/configs/mantic_tech_spec.md)** — Full mathematical specification: core formula, add-on guardrails, layer definitions, coupling matrices, identifiability constraints, production guards
+- **[`mantic_explicit_framework.md`](mantic_thinking/configs/mantic_explicit_framework.md)** — Operational protocol: columnar architecture, cross-domain coupling rules, strict containment
+- **[`mantic_reasoning_guidelines.md`](mantic_thinking/configs/mantic_reasoning_guidelines.md)** — LLM reasoning scaffold: how to think in layers but speak in plain language
 - **Domain configs**: Healthcare, Finance, Cybersecurity, Climate, Legal, Social, Command, Current Affairs
 
 ## Running Tests
 
 ```bash
 # Quick sanity check
-python3 -c "from adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools ready')"
+python3 -c "from mantic_thinking.adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools ready')"
 
 # Run all tests
 python3 -m pytest tests/test_cross_model.py -v
 
 # Test individual tool
-python3 tools/emergence/healthcare_precision_therapeutic.py
+python3 -m mantic_thinking.tools.emergence.healthcare_precision_therapeutic
 ```
 
 ## Design Principles

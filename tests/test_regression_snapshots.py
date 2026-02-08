@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from core.mantic_kernel import KERNEL_VERSION, KERNEL_HASH, mantic_kernel, verify_kernel_integrity
-import tools
+from mantic_thinking.core.mantic_kernel import KERNEL_VERSION, KERNEL_HASH, mantic_kernel, verify_kernel_integrity
+import mantic_thinking.tools as tools
 
 
 # =============================================================================
@@ -99,7 +99,7 @@ class TestGoldenOutputs:
 
     def test_healthcare_friction_golden(self):
         """Healthcare friction with known inputs produces known output."""
-        from tools.friction.healthcare_phenotype_genotype import detect
+        from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect
 
         result = detect(phenotypic=0.3, genomic=0.9, environmental=0.4, psychosocial=0.8)
 
@@ -111,7 +111,7 @@ class TestGoldenOutputs:
 
     def test_finance_emergence_golden(self):
         """Finance emergence with known inputs produces known output."""
-        from tools.emergence.finance_confluence_alpha import detect
+        from mantic_thinking.tools.emergence.finance_confluence_alpha import detect
 
         result = detect(
             technical_setup=0.85, macro_tailwind=0.80,
@@ -130,7 +130,7 @@ class TestGoldenOutputs:
     ])
     def test_neutral_inputs_no_alert(self, tool_name, inputs):
         """Neutral (0.5) inputs should generally not trigger alerts."""
-        from adapters.openai_adapter import TOOL_MAP
+        from mantic_thinking.adapters.openai_adapter import TOOL_MAP
         result = TOOL_MAP[tool_name](**inputs)
         # For balanced inputs, most tools should not alert
         # (finance_regime_conflict WILL alert because flow=0 is not aligned)

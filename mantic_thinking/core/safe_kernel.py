@@ -4,7 +4,7 @@ Safe wrapper for the immutable Mantic kernel.
 Adds guardrails without modifying core/mantic_kernel.py.
 """
 
-from core.mantic_kernel import mantic_kernel
+from mantic_thinking.core.mantic_kernel import mantic_kernel
 
 
 def safe_mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):

@@ -14,18 +14,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from tools.friction.healthcare_phenotype_genotype import detect as healthcare_friction
-from tools.friction.finance_regime_conflict import detect as finance_friction
-from tools.friction.climate_maladaptation import detect as climate_friction
-from tools.friction.legal_precedent_drift import detect as legal_friction
-from tools.friction.cyber_attribution_resolver import detect as cyber_friction
-from tools.friction.military_friction_forecast import detect as military_friction
-from tools.friction.social_narrative_rupture import detect as social_friction
+from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect as healthcare_friction
+from mantic_thinking.tools.friction.finance_regime_conflict import detect as finance_friction
+from mantic_thinking.tools.friction.climate_maladaptation import detect as climate_friction
+from mantic_thinking.tools.friction.legal_precedent_drift import detect as legal_friction
+from mantic_thinking.tools.friction.cyber_attribution_resolver import detect as cyber_friction
+from mantic_thinking.tools.friction.military_friction_forecast import detect as military_friction
+from mantic_thinking.tools.friction.social_narrative_rupture import detect as social_friction
 
-from tools.emergence.healthcare_precision_therapeutic import detect as healthcare_emergence
-from tools.emergence.finance_confluence_alpha import detect as finance_emergence
-from tools.emergence.climate_resilience_multiplier import detect as climate_emergence
-from tools.emergence.social_catalytic_alignment import detect as social_emergence
+from mantic_thinking.tools.emergence.healthcare_precision_therapeutic import detect as healthcare_emergence
+from mantic_thinking.tools.emergence.finance_confluence_alpha import detect as finance_emergence
+from mantic_thinking.tools.emergence.climate_resilience_multiplier import detect as climate_emergence
+from mantic_thinking.tools.emergence.social_catalytic_alignment import detect as social_emergence
 
 
 # =============================================================================

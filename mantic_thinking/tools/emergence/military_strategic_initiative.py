@@ -1,20 +1,20 @@
 """
-Climate: Resilience Multiplier
+Military: Strategic Initiative Window
 
-Surfaces interventions with positive cross-domain coupling
-solving multiple layer problems simultaneously.
+Identifies decisive action opportunities when intelligence ambiguity,
+positional advantage, logistic readiness, and political authorization synchronize.
 
-Confluence Logic: Strong positive coupling across all 4 domains = multiplier effect
+Confluence Logic: Fog helps us + we're ready + authorized = initiative window
 
 Optional Overrides (Bounded):
     threshold_override: Dict of threshold overrides
-        e.g., {"coupling": 0.55, "min_layer": 0.55, "multiplier": 0.75}
+        e.g., {"initiative": 0.75, "minimum_floor": 0.65}
     temporal_config: Dict for temporal kernel tuning (domain-restricted)
     
     NOTE: Domain weights (W) are IMMUTABLE.
 
 Output:
-    window_detected, intervention_type, cross_domain_coupling, m_score, overrides_applied
+    window_detected, maneuver_type, advantage, m_score, overrides_applied
 """
 
 import sys
@@ -27,38 +27,37 @@ if __name__ == "__main__":
         sys.path.insert(0, _repo_root)
 
 import numpy as np
-from core.safe_kernel import safe_mantic_kernel as mantic_kernel
-from core.mantic_kernel import compute_temporal_kernel
-from core.validators import (
+from mantic_thinking.core.safe_kernel import safe_mantic_kernel as mantic_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.validators import (
     clamp_input, require_finite_inputs, format_attribution,
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit, compute_layer_coupling
 )
-from mantic.introspection import get_layer_visibility
+from mantic_thinking.mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
-LAYER_NAMES = ['atmospheric', 'ecological', 'infrastructure', 'policy']
+LAYER_NAMES = ['enemy_ambiguity', 'positional_advantage', 'logistic_readiness', 'authorization_clarity']
 
 DEFAULT_THRESHOLDS = {
-    'coupling': 0.50,      # Coupling threshold
-    'min_layer': 0.50,     # Minimum layer threshold
-    'multiplier': 0.70     # High multiplier threshold
+    'initiative': 0.70,     # Initiative window threshold
+    'minimum_floor': 0.60   # Minimum floor for all layers
 }
 
-DOMAIN = "climate"
+DOMAIN = "military"
 
 
-def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, policy_alignment,
+def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorization_clarity,
            f_time=1.0, threshold_override=None, temporal_config=None):
-    """Identify interventions that solve multiple layer problems simultaneously."""
+    """Identify decisive action windows (offensive leverage)."""
     
     # INPUT VALIDATION
     require_finite_inputs({
-        "atmospheric_benefit": atmospheric_benefit,
-        "ecological_benefit": ecological_benefit,
-        "infrastructure_benefit": infrastructure_benefit,
-        "policy_alignment": policy_alignment,
+        "enemy_ambiguity": enemy_ambiguity,
+        "positional_advantage": positional_advantage,
+        "logistic_readiness": logistic_readiness,
+        "authorization_clarity": authorization_clarity,
     })
 
     # OVERRIDES PROCESSING
@@ -103,52 +102,52 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
     
     # CORE DETECTION
     L = [
-        clamp_input(atmospheric_benefit, name="atmospheric_benefit"),
-        clamp_input(ecological_benefit, name="ecological_benefit"),
-        clamp_input(infrastructure_benefit, name="infrastructure_benefit"),
-        clamp_input(policy_alignment, name="policy_alignment")
+        clamp_input(enemy_ambiguity, name="enemy_ambiguity"),
+        clamp_input(positional_advantage, name="positional_advantage"),
+        clamp_input(logistic_readiness, name="logistic_readiness"),
+        clamp_input(authorization_clarity, name="authorization_clarity")
     ]
     
     I = [1.0, 1.0, 1.0, 1.0]
     
     M, S, attr = mantic_kernel(WEIGHTS, L, I, f_time_clamped)
     
-    coupling_threshold = active_thresholds['coupling']
-    min_layer_threshold = active_thresholds['min_layer']
-    multiplier_threshold = active_thresholds['multiplier']
+    initiative_threshold = active_thresholds['initiative']
+    minimum_floor = active_thresholds['minimum_floor']
     
-    pairwise_products = [
-        L[0]*L[1], L[0]*L[2], L[0]*L[3],
-        L[1]*L[2], L[1]*L[3],
-        L[2]*L[3]
-    ]
-    coupling = sum(pairwise_products) / len(pairwise_products)
-    high_benefit_count = sum(1 for l in L if l > 0.7)
+    critical_factors = [L[0], L[2], L[3]]
+    initiative_floor = min(critical_factors)
+    initiative_score = initiative_floor * L[1]
     
     window_detected = False
-    intervention_type = None
-    example_intervention = None
+    maneuver_type = None
+    advantage_description = None
     recommended_action = None
-    funding_priority = None
+    execution_window = None
+    risk_assessment = None
     
-    if coupling > coupling_threshold and min(L) > min_layer_threshold:
+    if initiative_score > initiative_threshold and min(L) > minimum_floor:
         window_detected = True
         
-        if coupling > multiplier_threshold and high_benefit_count >= 3:
-            intervention_type = "HIGH_MULTIPLIER"
-            funding_priority = "URGENT - High leverage across 4 domain columns"
-            example_intervention = "Urban forestry with green infrastructure: heat reduction + biodiversity + stormwater + equity"
-            recommended_action = "Prioritize immediate funding. Every dollar creates compounding benefits across atmospheric, ecological, infrastructure, and policy domains."
-        elif coupling > 0.60 or high_benefit_count >= 3:
-            intervention_type = "MULTIPLIER"
-            funding_priority = "HIGH - Cross-domain benefits"
-            example_intervention = "Wetland restoration: carbon sequestration + flood control + habitat + recreation"
-            recommended_action = "Fast-track approval. Strong positive externalities across multiple systems."
+        if initiative_score > 0.85 and all(l > 0.75 for l in L):
+            maneuver_type = "DECISIVE_ACTION"
+            advantage_description = ("Synchronized ambiguity/readiness/authorization with "
+                                    "strong positional edge - rare convergence")
+            recommended_action = "Execute within 24-48 hours before fog lifts or enemy adapts"
+            execution_window = "24-48 hours (highly perishable)"
+            risk_assessment = "LOW - All factors favorable"
+        elif initiative_score > 0.75:
+            maneuver_type = "OFFENSIVE_OPERATION"
+            advantage_description = "Strong initiative conditions across multiple factors"
+            recommended_action = "Prepare for execution within 72 hours"
+            execution_window = "48-72 hours"
+            risk_assessment = "MODERATE - Monitor for enemy counter-moves"
         else:
-            intervention_type = "MODERATE_MULTIPLIER"
-            funding_priority = "MODERATE - Dual benefits"
-            example_intervention = "Solar canopy parking: renewable energy + heat reduction"
-            recommended_action = "Include in funding round. Good but not exceptional cross-domain coupling."
+            maneuver_type = "TACTICAL_INITIATIVE"
+            advantage_description = "Favorable but not exceptional initiative window"
+            recommended_action = "Develop courses of action, prepare for exploitation"
+            execution_window = "72-96 hours"
+            risk_assessment = "MODERATE-HIGH - Contingency plans required"
     
     # Build audit
     threshold_clamped_any = any(
@@ -183,45 +182,53 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
     
     _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
     _layer_values_dict = dict(zip(LAYER_NAMES, L))
-    layer_visibility = get_layer_visibility("climate_resilience_multiplier", _weights_dict, _layer_values_dict)
+    layer_visibility = get_layer_visibility("military_strategic_initiative", _weights_dict, _layer_values_dict)
     layer_coupling = compute_layer_coupling(L, LAYER_NAMES)
     
     if window_detected:
         return {
             "window_detected": True,
-            "intervention_type": intervention_type,
-            "cross_domain_coupling": float(coupling),
-            "benefit_layers_above_70": high_benefit_count,
-            "example_intervention": example_intervention,
+            "maneuver_type": maneuver_type,
+            "initiative_score": float(initiative_score),
+            "advantage": advantage_description,
             "recommended_action": recommended_action,
-            "funding_priority": funding_priority,
+            "execution_window": execution_window,
+            "risk_assessment": risk_assessment,
             "m_score": float(M),
             "spatial_component": float(S),
             "layer_attribution": format_attribution(attr, LAYER_NAMES),
             "thresholds": active_thresholds,
             "overrides_applied": overrides_applied,
-            "benefit_profile": {
-                "atmospheric": float(L[0]),
-                "ecological": float(L[1]),
-                "infrastructure": float(L[2]),
-                "policy": float(L[3])
+            "synchronization_status": {
+                "enemy_ambiguity": float(L[0]),
+                "positional_advantage": float(L[1]),
+                "logistic_readiness": float(L[2]),
+                "authorization_clarity": float(L[3])
             },
             "layer_visibility": layer_visibility,
             "layer_coupling": layer_coupling
         }
     
-    below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= min_layer_threshold]
+    limiting_factors = []
+    if L[0] <= minimum_floor:
+        limiting_factors.append("insufficient enemy ambiguity (too clear)")
+    if L[1] <= minimum_floor:
+        limiting_factors.append("weak positional advantage")
+    if L[2] <= minimum_floor:
+        limiting_factors.append("logistics not ready")
+    if L[3] <= minimum_floor:
+        limiting_factors.append("authorization unclear")
     
     return {
         "window_detected": False,
-        "cross_domain_coupling": float(coupling),
-        "coupling_status": "Insufficient coupling for multiplier effect",
-        "benefit_layers_above_70": high_benefit_count,
-        "limiting_factors": below_threshold,
+        "initiative_score": float(initiative_score),
+        "maneuver_type": "DEFENSIVE_POSTURE",
+        "limiting_factors": limiting_factors,
         "m_score": float(M),
         "spatial_component": float(S),
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
-        "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
+        "status": f"Initiative window closed. {', '.join(limiting_factors) if limiting_factors else 'Conditions unfavorable'}.",
+        "recommendation": "Maintain readiness, seek to improve positional advantage or wait for authorization.",
         "thresholds": active_thresholds,
         "overrides_applied": overrides_applied,
         "layer_visibility": layer_visibility,
@@ -230,34 +237,34 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
 
 
 if __name__ == "__main__":
-    print("=== Climate Resilience Multiplier ===\n")
+    print("=== Military Strategic Initiative Window ===\n")
     
-    print("Test 1: High multiplier")
+    print("Test 1: Decisive action window")
     result = detect(
-        atmospheric_benefit=0.75,
-        ecological_benefit=0.80,
-        infrastructure_benefit=0.78,
-        policy_alignment=0.82
+        enemy_ambiguity=0.85,
+        positional_advantage=0.88,
+        logistic_readiness=0.82,
+        authorization_clarity=0.90
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
+    print(f"  Maneuver Type: {result['maneuver_type']}\n")
     
-    print("Test 2: Moderate multiplier")
+    print("Test 2: Offensive operation")
     result = detect(
-        atmospheric_benefit=0.70,
-        ecological_benefit=0.72,
-        infrastructure_benefit=0.65,
-        policy_alignment=0.68
+        enemy_ambiguity=0.75,
+        positional_advantage=0.78,
+        logistic_readiness=0.72,
+        authorization_clarity=0.80
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Intervention Type: {result.get('intervention_type', 'N/A')}\n")
+    print(f"  Maneuver Type: {result['maneuver_type']}\n")
     
-    print("Test 3: No multiplier")
+    print("Test 3: No window")
     result = detect(
-        atmospheric_benefit=0.30,
-        ecological_benefit=0.25,
-        infrastructure_benefit=0.85,
-        policy_alignment=0.40
+        enemy_ambiguity=0.80,
+        positional_advantage=0.75,
+        logistic_readiness=0.45,
+        authorization_clarity=0.85
     )
     print(f"  Window Detected: {result['window_detected']}")
-    print(f"  Status: {result['status']}")
+    print(f"  Limiting Factors: {result['limiting_factors']}")

@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
 
-from adapters.openai_adapter import TOOL_MAP
+from mantic_thinking.adapters.openai_adapter import TOOL_MAP
 
 
 # =============================================================================

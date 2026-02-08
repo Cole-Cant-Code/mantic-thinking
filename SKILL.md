@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.2.5
+**version:** 1.3.0
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
@@ -35,7 +35,7 @@ This allows time-aware scoring — signals decay, grow, saturate, or oscillate d
 ### Usage
 
 ```python
-from core.mantic_kernel import compute_temporal_kernel
+from mantic_thinking.core.mantic_kernel import compute_temporal_kernel
 
 # Compute temporal modifier, then pass to any tool
 f_time = compute_temporal_kernel(t=5, n=1.0, alpha=0.1, kernel_type="exponential")
@@ -478,7 +478,7 @@ The Mantic Framework provides **14 tools** across 7 domains, with two complement
 ## Execution Model
 
 **Type:** Python function call  
-**Entry Point:** `tools/{suite}/{tool_id}.py::detect`  
+**Entry Point:** `mantic_thinking/tools/{suite}/{tool_id}.py::detect`  
 **Language:** Python 3.8+  
 **Dependencies:** numpy
 
@@ -505,8 +505,8 @@ def detect(layer1, layer2, layer3, layer4, f_time=1.0) -> dict:
 ### For Claude (Computer Use)
 ```python
 # Read SKILL.md to discover tools
-# Import via adapters/claude_adapter.py
-from adapters.claude_adapter import get_claude_tools, execute_tool
+# Import via mantic_thinking/adapters/claude_adapter.py
+from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool
 
 tools = get_claude_tools()  # Returns 14 tools in Computer Use format
 
@@ -524,8 +524,8 @@ result = execute_tool("healthcare_precision_therapeutic", {
 
 ### For Kimi (Native Tools)
 ```python
-# Import via adapters/kimi_adapter.py
-from adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
+# Import via mantic_thinking/adapters/kimi_adapter.py
+from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
 tools = get_kimi_tools()  # Returns 14 tools in Kimi native format
 
@@ -541,14 +541,14 @@ comparison = compare_friction_emergence(
 
 ### For Gemini (Function Declaration)
 ```python
-# Import via adapters/gemini_adapter.py
-from adapters.gemini_adapter import get_gemini_tools, execute_tool
+# Import via mantic_thinking/adapters/gemini_adapter.py
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools, execute_tool
 
 # Get tools in Gemini FunctionDeclaration format
 tools = get_gemini_tools()  # Returns [{"function_declarations": [...]}]
 
 # Or get flat list
-from adapters.gemini_adapter import get_gemini_tools_flat
+from mantic_thinking.adapters.gemini_adapter import get_gemini_tools_flat
 declarations = get_gemini_tools_flat()
 
 # Execute tool
@@ -560,8 +560,8 @@ result = execute_tool("climate_resilience_multiplier", {
 
 ### For Codex/OpenAI (Function Calling)
 ```python
-# Import via adapters/openai_adapter.py
-from adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
+# Import via mantic_thinking/adapters/openai_adapter.py
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
 # Get all 14 tools
 all_tools = get_openai_tools()
@@ -576,8 +576,8 @@ result = execute_tool("cyber_adversary_overreach", {...})   # Emergence
 
 ### For Ollama (Local/Cloud Models)
 ```python
-# Import via adapters/openai_adapter.py (Ollama is OpenAI-compatible)
-from adapters.openai_adapter import get_openai_tools, execute_tool
+# Import via mantic_thinking/adapters/openai_adapter.py (Ollama is OpenAI-compatible)
+from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool
 import openai
 
 # Point at Ollama's OpenAI-compatible endpoint
@@ -671,7 +671,7 @@ All tools now include layer visibility to aid reasoning:
 
 Get explanations via adapters:
 ```python
-from adapters.kimi_adapter import explain_result
+from mantic_thinking.adapters.kimi_adapter import explain_result
 
 result = execute("healthcare_phenotype_genotype", {...})
 explanation = explain_result("healthcare_phenotype_genotype", result)
@@ -737,5 +737,5 @@ Expected: All 14 tools pass with 3 test cases each.
 
 Quick sanity check:
 ```bash
-python -c "from adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools available')"
+python -c "from mantic_thinking.adapters.openai_adapter import get_openai_tools; print(len(get_openai_tools()), 'tools available')"
 ```
