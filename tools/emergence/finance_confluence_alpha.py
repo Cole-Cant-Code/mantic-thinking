@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.30, 0.30, 0.20, 0.20]
@@ -194,6 +195,10 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L_normalized))
+    layer_visibility = get_layer_visibility("finance_confluence_alpha", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -210,7 +215,8 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
             "overrides_applied": overrides_applied,
             "flow_raw": float(L_raw[2]),
             "technical_macro_gap": float(technical_macro_gap),
-            "position_direction": flow_direction
+            "position_direction": flow_direction,
+            "layer_visibility": layer_visibility
         }
     
     missing = []
@@ -232,7 +238,8 @@ def detect(technical_setup, macro_tailwind, flow_positioning, risk_compression,
         "overrides_applied": overrides_applied,
         "technical_macro_aligned": technical_macro_aligned,
         "flow_favorable": flow_favorable,
-        "risk_ok": risk_ok
+        "risk_ok": risk_ok,
+        "layer_visibility": layer_visibility
     }
 
 

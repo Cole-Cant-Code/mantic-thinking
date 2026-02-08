@@ -44,6 +44,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 # Domain weights (IMMUTABLE)
@@ -221,6 +222,15 @@ def detect(technical, threat_intel, operational_impact, geopolitical, f_time=1.0
         f_time_info=f_time_info
     )
     
+    layer_values_dict = {"technical": float(L[0]), "threat_intel": float(L[1]), "operational_impact": float(L[2]), "geopolitical": float(L[3])}
+    layer_interactions = {
+        "technical": float(I[0]),
+        "threat_intel": float(I[1]),
+        "operational_impact": float(I[2]),
+        "geopolitical": float(I[3]),
+    }
+    layer_visibility = get_layer_visibility("cyber_attribution_resolver", WEIGHTS, layer_values_dict, layer_interactions)
+    
     return {
         "alert": alert,
         "confidence": confidence,
@@ -231,7 +241,8 @@ def detect(technical, threat_intel, operational_impact, geopolitical, f_time=1.0
         "tech_intel_gap": float(tech_intel_gap),
         "threshold": active_thresholds["attribution_gap"],
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

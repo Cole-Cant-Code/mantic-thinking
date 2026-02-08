@@ -644,6 +644,40 @@ All tools return a standardized response:
 }
 ```
 
+### Layer Visibility (v1.2.0+)
+All tools now include layer visibility to aid reasoning:
+
+```json
+{
+  "layer_visibility": {
+    "dominant": "Micro|Meso|Macro|Meta",
+    "weights_by_layer": {
+      "Micro": "float - aggregated weight",
+      "Meso": "float - aggregated weight",
+      "Macro": "float - aggregated weight", 
+      "Meta": "float - aggregated weight"
+    },
+    "rationale": "string - why this layer dominates",
+    "_note": "Interpretive aid; does not affect M-score"
+  }
+}
+```
+
+**Using Layer Visibility:**
+- **Micro-dominant**: Trust immediate signals, check for noise/outliers
+- **Meso-dominant**: Verify local context and environmental factors
+- **Macro-dominant**: Systemic trend; slower but persistent
+- **Meta-dominant**: Long-term adaptation; check baseline drift
+
+Get explanations via adapters:
+```python
+from adapters.kimi_adapter import explain_result
+
+result = execute("healthcare_phenotype_genotype", {...})
+explanation = explain_result("healthcare_phenotype_genotype", result)
+# Returns reasoning hints based on dominant layer
+```
+
 ---
 
 ## Interpretation Guide

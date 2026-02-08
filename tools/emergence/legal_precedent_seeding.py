@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.30, 0.20, 0.30, 0.20]
@@ -181,6 +182,10 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("legal_precedent_seeding", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -200,7 +205,8 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
                 "statutory_ambiguity": float(L[2]),
                 "institutional_capacity": float(L[1]),
                 "circuit_split_strength": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     if L[3] <= split_threshold:
@@ -224,7 +230,8 @@ def detect(socio_political_climate, institutional_capacity, statutory_ambiguity,
         "status": f"Precedent window not yet ripe. {limiting_factor}.",
         "recommendation": "Monitor for circuit split development or socio-political shift.",
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

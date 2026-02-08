@@ -201,6 +201,60 @@ Use function calling to invoke tools. All parameters are 0-1 floats (some suppor
 """
 
 
+def explain_result(tool_name, result):
+    """
+    [v1.2.0] Get human-friendly explanation of tool result.
+    
+    Returns reasoning guidance based on layer visibility, helping LLMs
+    and humans understand which hierarchical layer drove the detection.
+    
+    Args:
+        tool_name: Name of the tool
+        result: Tool result dict (must include 'layer_visibility')
+    
+    Returns:
+        Dict with explanation or None if layer_visibility not available
+    """
+    layer_vis = result.get("layer_visibility")
+    if not layer_vis:
+        return None
+    
+    dominant = layer_vis.get("dominant")
+    rationale = layer_vis.get("rationale")
+    
+    hints = {
+        "Micro": [
+            "Trust immediate signals but check for noise/outliers",
+            "Individual-level factors are primary driver",
+            "Short-term volatility expected"
+        ],
+        "Meso": [
+            "Local context matters most - verify environmental factors",
+            "Pattern is contextual/domain-specific",
+            "Medium-term patterns dominant"
+        ],
+        "Macro": [
+            "Systemic trend; slower to change but more persistent",
+            "Check institutional/contextual constraints",
+            "Structural level pattern"
+        ],
+        "Meta": [
+            "Long-term adaptation signal",
+            "Consider if baseline has shifted",
+            "May indicate regime change"
+        ]
+    }
+    
+    return {
+        "tool": tool_name,
+        "m_score": result.get("m_score"),
+        "dominant_layer": dominant,
+        "layer_rationale": rationale,
+        "reasoning_hints": hints.get(dominant, []),
+        "_api_version": "1.2.0"
+    }
+
+
 if __name__ == "__main__":
     # Test the adapter
     print("=== Gemini Adapter Test (14 Tools) ===\n")

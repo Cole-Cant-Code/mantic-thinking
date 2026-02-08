@@ -37,6 +37,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = {
@@ -185,6 +186,15 @@ def detect(maneuver, intelligence, sustainment, political, f_time=1.0,
         f_time_info=f_time_info
     )
     
+    layer_values_dict = {"maneuver": float(L[0]), "intelligence": float(L[1]), "sustainment": float(L[2]), "political": float(L[3])}
+    layer_interactions = {
+        "maneuver": float(I[0]),
+        "intelligence": float(I[1]),
+        "sustainment": float(I[2]),
+        "political": float(I[3]),
+    }
+    layer_visibility = get_layer_visibility("military_friction_forecast", WEIGHTS, layer_values_dict, layer_interactions)
+    
     return {
         "alert": alert,
         "bottleneck": bottleneck,
@@ -196,7 +206,8 @@ def detect(maneuver, intelligence, sustainment, political, f_time=1.0,
         "support_capability": float(support_avg),
         "friction_gap": float(friction_gap),
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

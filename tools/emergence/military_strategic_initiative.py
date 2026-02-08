@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
@@ -179,6 +180,10 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("military_strategic_initiative", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -198,7 +203,8 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
                 "positional_advantage": float(L[1]),
                 "logistic_readiness": float(L[2]),
                 "authorization_clarity": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     limiting_factors = []
@@ -222,7 +228,8 @@ def detect(enemy_ambiguity, positional_advantage, logistic_readiness, authorizat
         "status": f"Initiative window closed. {', '.join(limiting_factors) if limiting_factors else 'Conditions unfavorable'}.",
         "recommendation": "Maintain readiness, seek to improve positional advantage or wait for authorization.",
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

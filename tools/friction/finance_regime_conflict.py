@@ -44,6 +44,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 # Domain weights (IMMUTABLE - encode finance domain theory)
@@ -238,6 +239,15 @@ def detect(technical, macro, flow, risk, f_time=1.0,
         f_time_info=f_time_info
     )
     
+    layer_values_dict = {"technical": float(L[0]), "macro": float(L[1]), "flow": float(L[2]), "risk": float(L[3])}
+    layer_interactions = {
+        "technical": float(I[0]),
+        "macro": float(I[1]),
+        "flow": float(I[2]),
+        "risk": float(I[3]),
+    }
+    layer_visibility = get_layer_visibility("finance_regime_conflict", WEIGHTS, layer_values_dict, layer_interactions)
+    
     return {
         "alert": alert,
         "conflict_type": conflict_type,
@@ -248,7 +258,8 @@ def detect(technical, macro, flow, risk, f_time=1.0,
         "flow_raw": float(L[2]),
         "threshold": threshold,
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

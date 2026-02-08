@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.20, 0.30, 0.30, 0.20]
@@ -181,6 +182,10 @@ def detect(individual_readiness, network_bridges, policy_window, paradigm_moment
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("social_catalytic_alignment", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -201,7 +206,8 @@ def detect(individual_readiness, network_bridges, policy_window, paradigm_moment
                 "network_bridges": float(L[1]),
                 "policy_window": float(L[2]),
                 "paradigm_momentum": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= catalyst_threshold]
@@ -217,7 +223,8 @@ def detect(individual_readiness, network_bridges, policy_window, paradigm_moment
         "status": f"Catalytic alignment not achieved. {', '.join(below_threshold)} below threshold.",
         "recommendation": "Continue base-building. Focus on strengthening network bridges and individual readiness.",
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

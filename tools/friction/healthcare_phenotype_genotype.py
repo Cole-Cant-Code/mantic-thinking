@@ -45,6 +45,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 # Domain weights (IMMUTABLE - encode healthcare domain theory)
@@ -239,6 +240,21 @@ def detect(phenotypic, genomic, environmental, psychosocial, f_time=1.0,
         f_time_info=f_time_info
     )
     
+    # Layer visibility for reasoning (v1.2.0+) - input-driven
+    layer_values_dict = {
+        "phenotypic": float(L[0]),
+        "genomic": float(L[1]),
+        "environmental": float(L[2]),
+        "psychosocial": float(L[3])
+    }
+    layer_interactions = {
+        "phenotypic": float(I[0]),
+        "genomic": float(I[1]),
+        "environmental": float(I[2]),
+        "psychosocial": float(I[3]),
+    }
+    layer_visibility = get_layer_visibility("healthcare_phenotype_genotype", WEIGHTS, layer_values_dict, layer_interactions)
+    
     return {
         "alert": alert,
         "severity": float(severity),
@@ -248,7 +264,8 @@ def detect(phenotypic, genomic, environmental, psychosocial, f_time=1.0,
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
         "threshold": threshold,
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

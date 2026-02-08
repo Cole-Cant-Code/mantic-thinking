@@ -37,6 +37,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = {
@@ -214,6 +215,15 @@ def detect(black_letter, precedent, operational, socio_political, f_time=1.0,
         f_time_info=f_time_info
     )
     
+    layer_values_dict = {"black_letter": float(L[0]), "precedent": float(L[1]), "operational": float(L[2]), "socio_political": float(L[3])}
+    layer_interactions = {
+        "black_letter": float(I[0]),
+        "precedent": float(I[1]),
+        "operational": float(I[2]),
+        "socio_political": float(I[3]),
+    }
+    layer_visibility = get_layer_visibility("legal_precedent_drift", WEIGHTS, layer_values_dict, layer_interactions)
+    
     return {
         "alert": alert,
         "drift_direction": drift_direction,
@@ -224,7 +234,8 @@ def detect(black_letter, precedent, operational, socio_political, f_time=1.0,
         "socio_political_raw": float(L[3]),
         "precedent_strength": float(L[1]),
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

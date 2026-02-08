@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
@@ -170,6 +171,11 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
         weakest_idx = int(np.argmin(L))
         limiting_factor = LAYER_NAMES[weakest_idx]
         
+        # Layer visibility for reasoning (v1.2.0+) - input-driven
+        _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+        _layer_values_dict = dict(zip(LAYER_NAMES, L))
+        layer_visibility = get_layer_visibility("healthcare_precision_therapeutic", _weights_dict, _layer_values_dict)
+        
         return {
             "window_detected": True,
             "window_type": window_type,
@@ -188,10 +194,16 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
                 "environmental": float(L[1]),
                 "phenotypic": float(L[2]),
                 "psychosocial": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= alignment_threshold]
+    
+    # Layer visibility for reasoning (v1.2.0+) - input-driven
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("healthcare_precision_therapeutic", _weights_dict, _layer_values_dict)
     
     return {
         "window_detected": False,
@@ -202,7 +214,8 @@ def detect(genomic_predisposition, environmental_readiness, phenotypic_timing, p
         "status": f"Layers not aligned. {', '.join(below_threshold)} below threshold.",
         "improvement_needed": below_threshold,
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

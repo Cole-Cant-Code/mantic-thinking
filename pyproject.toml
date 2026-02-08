@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mantic-thinking"
-version = "1.1.6"
+version = "1.2.0"
 description = "Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis"
 readme = "README.md"
 license = {text = "Elastic License 2.0"}
@@ -56,13 +56,14 @@ Issues = "https://github.com/Cole-Cant-Code/mantic-thinking/issues"
 "Commercial License" = "https://github.com/Cole-Cant-Code/mantic-thinking/blob/main/COMMERCIAL_LICENSE"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+packages = ["core", "tools", "adapters", "mantic", "mantic.introspection", "configs", "schemas", "visualization"]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/core",
     "/tools",
     "/adapters",
+    "/mantic",
     "/configs",
     "/schemas",
     "/tests",

@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.25, 0.25, 0.25, 0.25]
@@ -180,6 +181,10 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("climate_resilience_multiplier", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -199,7 +204,8 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
                 "ecological": float(L[1]),
                 "infrastructure": float(L[2]),
                 "policy": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     below_threshold = [LAYER_NAMES[i] for i, l in enumerate(L) if l <= min_layer_threshold]
@@ -215,7 +221,8 @@ def detect(atmospheric_benefit, ecological_benefit, infrastructure_benefit, poli
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
         "status": f"Intervention benefits limited to {high_benefit_count} domains. Seek solutions with broader coupling.",
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 

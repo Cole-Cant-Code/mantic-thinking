@@ -164,6 +164,8 @@ mantic-thinking/
 │   ├── friction/              # 7 divergence detection tools
 │   └── emergence/             # 7 confluence detection tools
 ├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
+├── mantic/
+│   └── introspection.py       # Layer visibility for reasoning (v1.2.0+)
 ├── configs/                   # Domain configurations & framework docs
 │   ├── mantic_tech_spec.md    # Technical specification
 │   ├── mantic_explicit_framework.md  # Framework protocol
@@ -195,6 +197,27 @@ python3 tools/emergence/healthcare_precision_therapeutic.py
 | 0.7-0.9 | High risk | Optimal window |
 
 The M-score measures **intensity**. Friction tools interpret high intensity as danger. Emergence tools interpret high intensity as opportunity.
+
+## Layer Visibility (v1.2.0+)
+
+All tools now expose which hierarchical layer drives detection:
+
+```python
+result = detect(phenotypic=0.3, genomic=0.9, environmental=0.4, psychosocial=0.8)
+print(result["layer_visibility"]["dominant"])  # "Micro"
+print(result["layer_visibility"]["rationale"])  # Why Micro dominates
+
+# Get reasoning hints via adapters
+from adapters.kimi_adapter import explain_result
+explanation = explain_result("healthcare_phenotype_genotype", result)
+print(explanation["reasoning_hints"])  # Context-appropriate guidance
+```
+
+**Layer guidance:**
+- **Micro-dominant**: Check immediate signals for noise
+- **Meso-dominant**: Verify local context factors  
+- **Macro-dominant**: Systemic trend; slower but persistent
+- **Meta-dominant**: Long-term adaptation; check baseline
 
 ## Configuration Files
 
@@ -251,6 +274,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.2.0 - Layer visibility for architectural reasoning (all tools include `layer_visibility` field)
 1.1.6 - Safe kernel wrapper + adapter/tool fixes
 1.1.5 - Ignore pytest cache in git
 1.1.4 - Adapter import hygiene (no sys.path mutation)

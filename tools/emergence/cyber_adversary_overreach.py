@@ -34,6 +34,7 @@ from core.validators import (
     clamp_threshold_override, validate_temporal_config,
     clamp_f_time, build_overrides_audit
 )
+from mantic.introspection import get_layer_visibility
 
 
 WEIGHTS = [0.30, 0.20, 0.30, 0.20]
@@ -176,6 +177,10 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         f_time_info=f_time_info
     )
     
+    _weights_dict = dict(zip(LAYER_NAMES, WEIGHTS))
+    _layer_values_dict = dict(zip(LAYER_NAMES, L))
+    layer_visibility = get_layer_visibility("cyber_adversary_overreach", _weights_dict, _layer_values_dict)
+    
     if window_detected:
         return {
             "window_detected": True,
@@ -194,7 +199,8 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
                 "ttp_stretch": float(L[0]),
                 "geopolitical_pressure": float(L[1]),
                 "tool_fatigue": float(L[3])
-            }
+            },
+            "layer_visibility": layer_visibility
         }
     
     if L[2] <= hardening_threshold:
@@ -216,7 +222,8 @@ def detect(threat_intel_stretch, geopolitical_pressure, operational_hardening, t
         "layer_attribution": format_attribution(attr, LAYER_NAMES),
         "status": "Defensive window not yet open",
         "thresholds": active_thresholds,
-        "overrides_applied": overrides_applied
+        "overrides_applied": overrides_applied,
+        "layer_visibility": layer_visibility
     }
 
 
