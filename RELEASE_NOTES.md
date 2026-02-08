@@ -1,3 +1,32 @@
+# Release Notes — 2026-02-08 (v1.2.2)
+
+## Summary
+
+This release removes non-public internal tools and self-analysis artifacts that
+were never part of the documented 14-tool surface area. No changes to the
+public tool set or immutable core formula.
+
+## Highlights
+
+- Removed internal/unwired modules:
+  - `tools/friction/codebase_layer_conflict.py`
+  - `tools/emergence/codebase_alignment_window.py`
+  - `tools/emergence/plan_alignment_window.py`
+- Removed internal self-analysis docs/scripts:
+  - `configs/mantic_codebase.md`
+  - `configs/mantic_self_analysis_results.md`
+
+## Compatibility
+
+- Public adapters still expose **14 tools** (7 friction + 7 emergence).
+- Core formula unchanged.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.2.1)
 
 ## Summary

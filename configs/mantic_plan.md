@@ -111,7 +111,7 @@ Activate all columns with Meta emphasis.
 
 ## PLAN READINESS TIERS
 
-These tiers map to the executable `plan_alignment_window` tool:
+These tiers provide a readiness rubric:
 
 | Tier | Condition | Meaning |
 |------|-----------|---------|

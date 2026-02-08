@@ -60,7 +60,3 @@ __all__ = [
     "military_strategic_initiative",
     "social_catalytic_alignment",
 ]
-
-# NOTE: Internal tools (codebase analysis) exist in subpackages but are NOT exported here.
-# Import directly if needed: from tools.friction.codebase_layer_conflict import detect
-# These are for self-analysis only and not part of the public API.
