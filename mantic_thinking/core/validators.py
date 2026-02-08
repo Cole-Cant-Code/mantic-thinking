@@ -522,7 +522,7 @@ def resolve_interaction_coefficients(layer_names, I_base, I_dynamic,
     engaged = (
         interaction_override is not None or
         mode != "dynamic" or
-        (interaction_override_mode not in (None, "scale"))
+        (interaction_override is not None and interaction_override_mode not in (None, "scale"))
     )
 
     if interaction_override is not None:
