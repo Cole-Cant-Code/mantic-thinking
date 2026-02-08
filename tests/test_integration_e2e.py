@@ -155,7 +155,7 @@ class TestVisualizationEdgeCases:
 
     def test_gauge_extreme_values(self):
         """draw_m_gauge should handle M=0, M=1, M>1."""
-        from visualization.ascii_charts import draw_m_gauge
+        from mantic_thinking.visualization.ascii_charts import draw_m_gauge
         # Normal case
         output = draw_m_gauge(0.5, 0.5)
         assert isinstance(output, str)
@@ -171,7 +171,7 @@ class TestVisualizationEdgeCases:
 
     def test_attribution_treemap_empty(self):
         """draw_attribution_treemap with zero attributions."""
-        from visualization.ascii_charts import draw_attribution_treemap
+        from mantic_thinking.visualization.ascii_charts import draw_attribution_treemap
         output = draw_attribution_treemap([0.0, 0.0, 0.0, 0.0],
                                            ["A", "B", "C", "D"])
         assert isinstance(output, str)
