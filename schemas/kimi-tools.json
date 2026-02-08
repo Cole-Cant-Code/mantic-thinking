@@ -83,7 +83,23 @@
       "domain": "healthcare",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -170,7 +186,23 @@
       "domain": "finance",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -257,7 +289,23 @@
       "domain": "cyber",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -344,7 +392,23 @@
       "domain": "climate",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -431,7 +495,23 @@
       "domain": "legal",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -518,7 +598,23 @@
       "domain": "military",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -605,7 +701,23 @@
       "domain": "social",
       "tool_type": "friction",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -692,7 +804,23 @@
       "domain": "healthcare",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -779,7 +907,23 @@
       "domain": "finance",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -866,7 +1010,23 @@
       "domain": "cyber",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -953,7 +1113,23 @@
       "domain": "climate",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -1040,7 +1216,23 @@
       "domain": "legal",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -1127,7 +1319,23 @@
       "domain": "military",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   },
   {
@@ -1214,7 +1422,23 @@
       "domain": "social",
       "tool_type": "emergence",
       "requires_clamping": true,
-      "deterministic": true
+      "deterministic": true,
+      "response_includes": {
+        "layer_visibility": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Which hierarchical layer drives detection (Micro/Meso/Macro/Meta). Does not affect M-score."
+        },
+        "layer_coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Pairwise coupling between layers. coherence (0-1), per-layer agreement, optional tension_with when agreement < 0.5. Does not affect M-score."
+        }
+      }
     }
   }
 ]

@@ -20,6 +20,7 @@ You describe a situation. The LLM maps it to four layer values (0–1 each), cal
 - **Alert/window**: Did it cross a threshold?
 - **Layer attribution**: Which input drove the score?
 - **Layer visibility**: Which hierarchical level (Micro/Meso/Macro/Meta) is dominant, and why?
+- **Layer coupling**: Do the layers agree or are they in tension?
 
 The LLM doesn't replace the math — the math is what keeps reasoning from drifting and what makes predictive work possible. But the LLM is what translates the situation into inputs, then interprets the structured output as a reasoning scaffold. The same friction score of 0.58 means "these signals disagree with each other" — the LLM's job is to explain *which* signals, *why* that matters, and *what to do about it* in context.
 
@@ -113,7 +114,7 @@ For the full mathematical specification, including add-on guardrails, coupling m
 ## Tool Suites
 
 ### Friction Tools (Divergence Detection)
-Detects when layers diverge: `if abs(L1 - L2) > 0.5: alert()`
+Detects when layers diverge (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 
 | Tool | Domain | Description |
 |------|--------|-------------|
@@ -126,7 +127,7 @@ Detects when layers diverge: `if abs(L1 - L2) > 0.5: alert()`
 | `social_narrative_rupture` | Social | Narrative rupture detection |
 
 ### Emergence Tools (Confluence Detection)
-Detects when layers align: `if min(L) > 0.6: window_detected()`
+Detects when layers align (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 
 | Tool | Domain | Description |
 |------|--------|-------------|
@@ -350,6 +351,10 @@ python3 tools/emergence/healthcare_precision_therapeutic.py
 6. **Complementary Suites**: Friction for risks, Emergence for opportunities
 7. **Simple Logic**: Each tool <100 lines, threshold-based
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## License
 
 ### Source-Available License (Default)
@@ -382,6 +387,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.2.4 - Aligned docs/schemas with `layer_coupling` and `layer_visibility`
 1.2.3 - Added `layer_coupling` (coherence/agreement/tension) to all 14 tools
 1.2.2 - Removed orphaned internal tools, cleaned configs
 1.2.1 - README: clearer purpose and value

@@ -107,8 +107,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -217,8 +288,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -327,8 +469,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -437,8 +650,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -547,8 +831,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -657,8 +1012,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -767,8 +1193,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -877,8 +1374,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -987,8 +1555,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -1097,8 +1736,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -1207,8 +1917,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -1317,8 +2098,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -1427,8 +2279,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -1537,8 +2460,79 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "layer_visibility": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Interpretive aid showing which hierarchical layer drives detection. Does not affect M-score.",
+                      "properties": {
+                        "dominant": {
+                          "type": "string",
+                          "enum": [
+                            "Micro",
+                            "Meso",
+                            "Macro",
+                            "Meta"
+                          ]
+                        },
+                        "weights_by_layer": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "input_driven": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "layer_coupling": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Read-only pairwise coupling between layers. Does not affect M-score.",
+                      "properties": {
+                        "coherence": {
+                          "type": "number",
+                          "description": "Overall coherence (0 = total disagreement, 1 = perfect alignment)"
+                        },
+                        "layers": {
+                          "type": "object",
+                          "description": "Per-layer coupling detail. Keys are layer names.",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "agreement": {
+                                "type": "number",
+                                "description": "Mean agreement with other layers (0-1)"
+                              },
+                              "tension_with": {
+                                "type": "object",
+                                "description": "Present when pairwise agreement < 0.5. Keys: conflicting layer names, values: agreement scores.",
+                                "additionalProperties": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "required": [
+                              "agreement"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "coherence",
+                        "layers"
+                      ]
                     }
-                  }
+                  },
+                  "additionalProperties": true
                 }
               }
             }

@@ -1,3 +1,31 @@
+# Release Notes — 2026-02-08 (v1.2.4)
+
+## Summary
+
+Documentation and schema alignment for `layer_coupling` (v1.2.3) and
+`layer_visibility` (v1.2.0). No functional code changes.
+
+## Highlights
+
+- **SKILL.md**: Added `layer_coupling` section with reasoning guidance.
+- **schemas/openapi.json**: Added `layer_visibility` and `layer_coupling` to
+  all 14 response schemas; set `additionalProperties: true`.
+- **schemas/kimi-tools.json**: Added `response_includes` under `_mantic_meta`
+  for all 14 tools.
+- **README.md**: Fixed misleading threshold pseudocode, added `layer_coupling`
+  to "How It Works" overview, restored Contributing link.
+
+## Compatibility
+
+- No runtime changes. Documentation only.
+- Core formula unchanged.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.2.3)
 
 ## Summary

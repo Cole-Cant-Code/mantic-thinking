@@ -1,7 +1,7 @@
 # Mantic Early Warning System - Universal Manifest
 
 **name:** mantic-early-warning  
-**version:** 1.1.2  
+**version:** 1.2.4
 **description:** Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis  
 **author:** Mantic Framework  
 **license:** Elastic License 2.0 (Source-Available) / Commercial licenses available  
@@ -80,12 +80,12 @@ result = detect(..., f_time=f_time)
 The Mantic Framework provides **14 tools** across 7 domains, with two complementary detection modes:
 
 ### Friction Suite (7 tools)
-**Logic:** `if abs(L1 - L2) > 0.5: alert()` — Detects divergences and risks  
+**Logic:** Detects divergences and risks (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 **Use:** Risk assessment, anomaly detection, bottleneck identification  
 **Output:** Alerts, warnings, risk ratings
 
 ### Emergence Suite (7 tools)
-**Logic:** `if min(L1, L2, L3, L4) > 0.6: window_detected()` — Detects alignments and opportunities  
+**Logic:** Detects alignments and opportunities (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 **Use:** Optimal timing, high-leverage interventions, window detection  
 **Output:** Window detected, recommendations, timing guidance
 
@@ -677,6 +677,35 @@ result = execute("healthcare_phenotype_genotype", {...})
 explanation = explain_result("healthcare_phenotype_genotype", result)
 # Returns reasoning hints based on dominant layer
 ```
+
+### Layer Coupling (v1.2.3+)
+All tools now include layer coupling to reveal agreement and tension between layers:
+
+```json
+{
+  "layer_coupling": {
+    "coherence": 0.43,
+    "layers": {
+      "technical": {"agreement": 0.5, "tension_with": {"macro": 0.3, "risk": 0.4}},
+      "macro": {"agreement": 0.57, "tension_with": {"technical": 0.3}},
+      "flow": {"agreement": 0.63},
+      "risk": {"agreement": 0.63, "tension_with": {"technical": 0.4}}
+    }
+  }
+}
+```
+
+**Fields:**
+- `coherence` (0-1): Overall agreement. 1 = all layers agree, 0 = total disagreement.
+- `layers.<name>.agreement` (0-1): How much this layer agrees with all other layers.
+- `layers.<name>.tension_with`: Only present when pairwise agreement < 0.5. Names the conflicting layer and its agreement score.
+
+**Using Layer Coupling for Reasoning:**
+- High coherence on an emergence window = the window is real (all layers confirm)
+- Low coherence on a friction alert + tension pairs = identifies exactly where the conflict is
+- No `tension_with` for a layer = that layer agrees with all others
+
+**Note:** `layer_coupling` does not affect the M-score. Like `layer_visibility`, it is a read-only reasoning hint.
 
 ---
 
