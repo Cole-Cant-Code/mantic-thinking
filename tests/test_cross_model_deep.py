@@ -36,6 +36,7 @@ TOOL_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.7, "institutional_capacity": 0.8, "statutory_ambiguity": 0.75, "circuit_split": 0.85},
     "military_strategic_initiative": {"enemy_ambiguity": 0.7, "positional_advantage": 0.8, "logistic_readiness": 0.85, "authorization_clarity": 0.9},
     "social_catalytic_alignment": {"individual_readiness": 0.75, "network_bridges": 0.8, "policy_window": 0.7, "paradigm_momentum": 0.85},
+    "generic_detect": {"domain_name": "test_cross", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.7, 0.6, 0.8, 0.5], "mode": "friction"},
 }
 
 
@@ -50,12 +51,12 @@ class TestGeminiAdapter:
         """Gemini adapter should expose exactly 14 tools."""
         tools = get_gemini_tools()
         declarations = tools[0]["function_declarations"]
-        assert len(declarations) == 14
+        assert len(declarations) == 15
 
     def test_gemini_flat_tool_count(self):
         """Flat format should also have 14 tools."""
         tools = get_gemini_tools_flat()
-        assert len(tools) == 14
+        assert len(tools) == 15
 
     @pytest.mark.parametrize("tool_name", list(TOOL_MAP.keys()))
     def test_gemini_execute_all_tools(self, tool_name):
@@ -114,16 +115,16 @@ class TestAdapterToolCounts:
     """All adapters should expose exactly 14 tools."""
 
     def test_openai_14_tools(self):
-        assert len(get_openai_tools()) == 14
+        assert len(get_openai_tools()) == 15
 
     def test_kimi_14_tools(self):
-        assert len(get_kimi_tools()) == 14
+        assert len(get_kimi_tools()) == 15
 
     def test_claude_14_tools(self):
-        assert len(get_claude_tools()) == 14
+        assert len(get_claude_tools()) == 15
 
     def test_gemini_14_tools(self):
-        assert len(get_gemini_tools_flat()) == 14
+        assert len(get_gemini_tools_flat()) == 15
 
 
 # =============================================================================

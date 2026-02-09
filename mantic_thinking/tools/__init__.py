@@ -1,9 +1,10 @@
 """
 Mantic Early Warning System - Domain Tools
 
-Two complementary suites:
+Two complementary suites plus a generic endpoint:
 - Friction Tools (7): Detect cross-layer conflicts and mismatches
 - Emergence Tools (7): Detect alignment windows and opportunities
+- Generic Tool (1): Caller-defined domains with full governance
 
 Friction Tools:
 - healthcare_phenotype_genotype: Phenotype-Genotype Mismatch Detector
@@ -43,6 +44,8 @@ _TOOL_MODULES = {
     "legal_precedent_seeding": "mantic_thinking.tools.emergence.legal_precedent_seeding",
     "military_strategic_initiative": "mantic_thinking.tools.emergence.military_strategic_initiative",
     "social_catalytic_alignment": "mantic_thinking.tools.emergence.social_catalytic_alignment",
+    # Generic (caller-defined domains)
+    "generic_detect": "mantic_thinking.tools.generic_detect",
 }
 
 
@@ -82,4 +85,6 @@ __all__ = [
     "legal_precedent_seeding",
     "military_strategic_initiative",
     "social_catalytic_alignment",
+    # Generic
+    "generic_detect",
 ]

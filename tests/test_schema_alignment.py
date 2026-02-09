@@ -2,7 +2,7 @@
 Schema alignment tests for Mantic public tools.
 
 These tests ensure OpenAPI/Kimi schemas match the adapter tool definitions
-and only expose the public 14-tool surface.
+and only expose the public 15-tool surface.
 """
 
 import json

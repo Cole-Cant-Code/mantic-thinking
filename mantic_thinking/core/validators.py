@@ -209,6 +209,7 @@ DOMAIN_KERNEL_ALLOWLIST = {
     "military": ["memory", "exponential", "linear"],
     "social": ["exponential", "oscillatory", "s_curve", "linear"],
     "planning": ["logistic", "s_curve", "linear", "memory"],
+    "generic": ["exponential", "s_curve", "linear", "memory", "oscillatory", "power_law", "logistic"],
 }
 
 # Global hard bounds for any threshold override
@@ -521,8 +522,7 @@ def resolve_interaction_coefficients(layer_names, I_base, I_dynamic,
 
     engaged = (
         interaction_override is not None or
-        mode != "dynamic" or
-        (interaction_override is not None and interaction_override_mode not in (None, "scale"))
+        mode != "dynamic"
     )
 
     if interaction_override is not None:

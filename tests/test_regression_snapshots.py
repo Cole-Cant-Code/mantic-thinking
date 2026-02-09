@@ -60,14 +60,15 @@ class TestPublicAPISurface:
         "legal_precedent_seeding",
         "military_strategic_initiative",
         "social_catalytic_alignment",
+        "generic_detect",
     ])
 
-    def test_all_has_14_tools(self):
-        """tools.__all__ has exactly 14 entries."""
-        assert len(tools.__all__) == 14
+    def test_all_has_15_tools(self):
+        """tools.__all__ has exactly 15 entries."""
+        assert len(tools.__all__) == 15
 
     def test_all_matches_expected(self):
-        """tools.__all__ contains exactly the expected 14 names."""
+        """tools.__all__ contains exactly the expected 15 names."""
         assert sorted(tools.__all__) == self.EXPECTED_TOOLS
 
     def test_no_internal_tools_exported(self):

@@ -212,9 +212,15 @@ class TestToolResponses:
             "social_catalytic_alignment": {
                 "individual_readiness": 0.82, "network_bridges": 0.85,
                 "policy_window": 0.80, "paradigm_momentum": 0.88
+            },
+            "generic_detect": {
+                "domain_name": "vis_test", "layer_names": ["a", "b", "c", "d"],
+                "weights": [0.25, 0.25, 0.25, 0.25],
+                "layer_values": [0.7, 0.6, 0.8, 0.5], "mode": "friction",
+                "layer_hierarchy": {"a": "Micro", "b": "Meso", "c": "Macro", "d": "Meta"}
             }
         }
-        
+
         for tool_name, func in TOOL_MAP.items():
             params = test_params[tool_name]
             result = func(**params)

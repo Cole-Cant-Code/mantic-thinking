@@ -37,6 +37,7 @@ HIGH_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.85, "institutional_capacity": 0.80, "statutory_ambiguity": 0.85, "circuit_split": 0.90},
     "military_strategic_initiative": {"enemy_ambiguity": 0.90, "positional_advantage": 0.90, "logistic_readiness": 0.90, "authorization_clarity": 0.90},
     "social_catalytic_alignment": {"individual_readiness": 0.85, "network_bridges": 0.80, "policy_window": 0.85, "paradigm_momentum": 0.90},
+    "generic_detect": {"domain_name": "test_high", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.9, 0.3, 0.6, 0.7], "mode": "friction"},
 }
 
 # Inputs designed to NOT trigger alerts/windows (low-activation)
@@ -55,6 +56,7 @@ LOW_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.3, "institutional_capacity": 0.3, "statutory_ambiguity": 0.3, "circuit_split": 0.3},
     "military_strategic_initiative": {"enemy_ambiguity": 0.3, "positional_advantage": 0.3, "logistic_readiness": 0.3, "authorization_clarity": 0.3},
     "social_catalytic_alignment": {"individual_readiness": 0.3, "network_bridges": 0.3, "policy_window": 0.3, "paradigm_momentum": 0.3},
+    "generic_detect": {"domain_name": "test_low", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.5, 0.5, 0.5, 0.5], "mode": "friction"},
 }
 
 FRICTION_TOOLS = [

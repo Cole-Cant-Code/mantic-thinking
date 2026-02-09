@@ -4,7 +4,7 @@ OpenAI/Codex Adapter for Mantic Tools
 Converts Mantic tools to OpenAI function calling format.
 Compatible with GPT-4, GPT-4o, and Codex.
 
-Includes both Friction tools (7) and Emergence tools (7) = 14 total.
+Includes Friction tools (7), Emergence tools (7), and Generic (1) = 15 total.
 """
 
 import sys
@@ -38,6 +38,9 @@ from mantic_thinking.tools import (
     military_strategic_initiative,
     social_catalytic_alignment,
 )
+
+# Generic tool (caller-defined domains)
+from mantic_thinking.tools import generic_detect
 
 # Optional override inputs (bounded internally by tools)
 OVERRIDE_PROPERTIES = {
@@ -82,7 +85,7 @@ OVERRIDE_PROPERTIES = {
 }
 
 
-# Map tool IDs to detection functions (14 tools total)
+# Map tool IDs to detection functions (15 tools total)
 TOOL_MAP = {
     # Friction tools (7)
     "healthcare_phenotype_genotype": healthcare_phenotype_genotype.detect,
@@ -100,6 +103,8 @@ TOOL_MAP = {
     "legal_precedent_seeding": legal_precedent_seeding.detect,
     "military_strategic_initiative": military_strategic_initiative.detect,
     "social_catalytic_alignment": social_catalytic_alignment.detect,
+    # Generic (caller-defined domains)
+    "generic_detect": generic_detect.detect,
 }
 
 
@@ -108,7 +113,7 @@ def get_openai_tools():
     Return OpenAI function calling schema for all Mantic tools.
 
     Returns:
-        list: OpenAI function definitions (14 tools)
+        list: OpenAI function definitions (15 tools)
     """
     friction_tools = [
         {
@@ -368,11 +373,65 @@ def get_openai_tools():
         }
     ]
 
+    generic_tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "generic_detect",
+                "description": "GENERIC: Run Mantic detection on a caller-defined domain. Supports 3-6 layers with caller-specified weights and layer names. Same kernel and governance as built-in tools.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "domain_name": {"type": "string", "description": "Unique domain label (cannot shadow built-in domains)"},
+                        "layer_names": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "minItems": 3, "maxItems": 6,
+                            "description": "Layer name strings (3-6)"
+                        },
+                        "weights": {
+                            "type": "array",
+                            "items": {"type": "number", "minimum": 0, "maximum": 1},
+                            "minItems": 3, "maxItems": 6,
+                            "description": "Layer weights summing to 1.0"
+                        },
+                        "layer_values": {
+                            "type": "array",
+                            "items": {"type": "number", "minimum": 0, "maximum": 1},
+                            "minItems": 3, "maxItems": 6,
+                            "description": "Layer input values (0-1)"
+                        },
+                        "mode": {
+                            "type": "string",
+                            "enum": ["friction", "emergence"],
+                            "description": "Detection mode: friction (divergence) or emergence (alignment)"
+                        },
+                        "detection_threshold": {
+                            "type": "number",
+                            "default": 0.4,
+                            "description": "Threshold for friction range / emergence alignment floor"
+                        },
+                        "layer_hierarchy": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string",
+                                "enum": ["Micro", "Meso", "Macro", "Meta"]
+                            },
+                            "description": "Optional mapping of layer names to hierarchy levels for layer visibility"
+                        },
+                        "f_time": {"type": "number", "default": 1.0}
+                    },
+                    "required": ["domain_name", "layer_names", "weights", "layer_values", "mode"]
+                }
+            }
+        }
+    ]
+
     # Add bounded override params to all tools (optional)
-    for tool in friction_tools + emergence_tools:
+    for tool in friction_tools + emergence_tools + generic_tools:
         tool["function"]["parameters"]["properties"].update(OVERRIDE_PROPERTIES)
 
-    return friction_tools + emergence_tools
+    return friction_tools + emergence_tools + generic_tools
 
 
 def execute_tool(tool_name, arguments):

@@ -578,7 +578,7 @@ class TestOpenAIAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_openai_tools()
-        assert len(tools) == 14
+        assert len(tools) == 15
     
     def test_tool_schema(self):
         """Test tool schema format."""
@@ -681,7 +681,7 @@ class TestKimiAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_kimi_tools()
-        assert len(tools) == 14
+        assert len(tools) == 15
     
     def test_kimi_meta(self):
         """Test Kimi-specific metadata."""
@@ -714,7 +714,7 @@ class TestClaudeAdapter:
     def test_tools_count(self):
         """Test that all 14 tools are available."""
         tools = get_claude_tools()
-        assert len(tools) == 14
+        assert len(tools) == 15
     
     def test_claude_meta(self):
         """Test Claude-specific metadata."""
