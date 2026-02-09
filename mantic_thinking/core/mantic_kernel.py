@@ -10,7 +10,7 @@ Where:
     M: Final mantic score (anomaly intensity)
     W: Array of weights (must sum to 1)
     L: Array of layer values (0-1 range)
-    I: Array of interaction coefficients (0-1)
+    I: Array of interaction coefficients (0-2, see INTERACTION_BOUNDS)
     f_time: Temporal kernel value (default 1.0)
     k_n: Normalization constant (default 1.0)
 """
@@ -28,7 +28,7 @@ def mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):
     Args:
         W: array of 4 weights (must sum to 1, each 0-1)
         L: array of 4 layer values (0-1, NaN allowed for missing data)
-        I: array of 4 interaction coefficients (0-1)
+        I: array of 4 interaction coefficients (0-2; >1 amplifies layer)
         f_time: temporal kernel value (default 1.0)
         k_n: normalization constant (default 1.0)
     
@@ -79,8 +79,8 @@ def mantic_kernel(W, L, I, f_time=1.0, k_n=1.0):
         raise ValueError("Layer values (L) must be in range [0, 1]")
     if np.any((W < 0) | (W > 1)):
         raise ValueError("Weights (W) must be in range [0, 1]")
-    if np.any((I < 0) | (I > 1)):
-        raise ValueError("Interaction coefficients (I) must be in range [0, 1]")
+    if np.any((I < 0) | (I > 2)):
+        raise ValueError("Interaction coefficients (I) must be in range [0, 2]")
     
     # Core formula calculation
     S = np.sum(W * L * I)  # Spatial component

@@ -218,7 +218,7 @@ class TestArrayLengthValidation:
                           [1.0, 1.0, 1.0, 1.0])
 
     def test_interaction_out_of_range_raises(self):
-        """Interaction coefficients outside [0,1] should raise."""
+        """Interaction coefficients outside [0,2] should raise."""
         with pytest.raises(ValueError, match="Interaction coefficients"):
             mantic_kernel([0.25, 0.25, 0.25, 0.25], [0.5, 0.5, 0.5, 0.5],
-                          [1.5, 1.0, 1.0, 1.0])
+                          [2.5, 1.0, 1.0, 1.0])

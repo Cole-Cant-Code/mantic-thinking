@@ -82,6 +82,32 @@ def test_tool_interaction_override_changes_score_and_audit():
     assert audit["used"][0] == pytest.approx(0.7)
 
 
+def test_tool_interaction_override_amplification_above_one():
+    """Regression: interaction_override > 1.0 must not crash the kernel.
+
+    Before the fix, INTERACTION_BOUNDS allowed up to 2.0 but
+    mantic_kernel hard-rejected I > 1.0 with a ValueError.
+    """
+    from mantic_thinking.tools.friction.healthcare_phenotype_genotype import detect
+
+    base = detect(phenotypic=0.3, genomic=0.9, environmental=0.4, psychosocial=0.8)
+    amplified = detect(
+        phenotypic=0.3,
+        genomic=0.9,
+        environmental=0.4,
+        psychosocial=0.8,
+        interaction_override={"psychosocial": 1.2},
+        interaction_override_mode="scale",
+    )
+
+    # Amplifying a layer should increase the score
+    assert amplified["m_score"] > base["m_score"]
+
+    audit = amplified["overrides_applied"].get("interaction")
+    assert audit is not None
+    assert audit["used"][3] == pytest.approx(1.2)
+
+
 def test_interaction_mode_base_is_audited_and_differs_when_dynamic_exists():
     from mantic_thinking.tools.emergence.finance_confluence_alpha import detect
 
