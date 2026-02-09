@@ -24,23 +24,46 @@ Emergence (Confluence) Tools:
 - social_catalytic_alignment: Catalytic Alignment Detector
 """
 
-# Friction tools
-from .friction import healthcare_phenotype_genotype
-from .friction import finance_regime_conflict
-from .friction import cyber_attribution_resolver
-from .friction import climate_maladaptation
-from .friction import legal_precedent_drift
-from .friction import military_friction_forecast
-from .friction import social_narrative_rupture
+import importlib
 
-# Emergence tools
-from .emergence import healthcare_precision_therapeutic
-from .emergence import finance_confluence_alpha
-from .emergence import cyber_adversary_overreach
-from .emergence import climate_resilience_multiplier
-from .emergence import legal_precedent_seeding
-from .emergence import military_strategic_initiative
-from .emergence import social_catalytic_alignment
+_TOOL_MODULES = {
+    # Friction
+    "healthcare_phenotype_genotype": "mantic_thinking.tools.friction.healthcare_phenotype_genotype",
+    "finance_regime_conflict": "mantic_thinking.tools.friction.finance_regime_conflict",
+    "cyber_attribution_resolver": "mantic_thinking.tools.friction.cyber_attribution_resolver",
+    "climate_maladaptation": "mantic_thinking.tools.friction.climate_maladaptation",
+    "legal_precedent_drift": "mantic_thinking.tools.friction.legal_precedent_drift",
+    "military_friction_forecast": "mantic_thinking.tools.friction.military_friction_forecast",
+    "social_narrative_rupture": "mantic_thinking.tools.friction.social_narrative_rupture",
+    # Emergence
+    "healthcare_precision_therapeutic": "mantic_thinking.tools.emergence.healthcare_precision_therapeutic",
+    "finance_confluence_alpha": "mantic_thinking.tools.emergence.finance_confluence_alpha",
+    "cyber_adversary_overreach": "mantic_thinking.tools.emergence.cyber_adversary_overreach",
+    "climate_resilience_multiplier": "mantic_thinking.tools.emergence.climate_resilience_multiplier",
+    "legal_precedent_seeding": "mantic_thinking.tools.emergence.legal_precedent_seeding",
+    "military_strategic_initiative": "mantic_thinking.tools.emergence.military_strategic_initiative",
+    "social_catalytic_alignment": "mantic_thinking.tools.emergence.social_catalytic_alignment",
+}
+
+
+def __getattr__(name):
+    """
+    Lazy-load tool modules on first access.
+
+    This keeps `import mantic_thinking.tools` lightweight while still supporting:
+      - `from mantic_thinking.tools import healthcare_phenotype_genotype`
+      - `mantic_thinking.tools.healthcare_phenotype_genotype.detect(...)`
+    """
+    if name in _TOOL_MODULES:
+        module = importlib.import_module(_TOOL_MODULES[name])
+        globals()[name] = module
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(list(globals().keys()) + list(_TOOL_MODULES.keys())))
+
 
 __all__ = [
     # Friction

@@ -1,3 +1,30 @@
+# Release Notes — 2026-02-09 (v1.4.1)
+
+## Summary
+
+This patch release tightens the runtime contract for interaction coefficients (I) so v1.4.0 amplification behavior works end-to-end and aligns with governance bounds. Documentation is updated for accuracy and a "Test Drive" section is added for immediate hands-on use.
+
+## Highlights
+
+- Kernel validation aligns with interaction governance bounds:
+  - `mantic_thinking/core/mantic_kernel.py` now accepts I in `[0.1, 2.0]` (previously rejected values > 1.0).
+  - Core formula unchanged.
+- Import hygiene:
+  - Tools are lazy-loaded under `mantic_thinking/tools/__init__.py` to avoid noisy runtime warnings when executing modules directly.
+- Documentation improvements:
+  - README audit-trail example updated to match actual `overrides_applied` structure.
+  - Added `Test Drive` prompts section.
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-08 (v1.4.0)
 
 ## Summary

@@ -35,7 +35,8 @@ class TestAttributionInvariant:
         W_sum = sum(W_raw)
         W = [w / W_sum for w in W_raw]
         L = [rng.random() for _ in range(4)]
-        I = [rng.random() for _ in range(4)]
+        # v1.4.0+: interaction coefficients are bounded to [0.1, 2.0]
+        I = [0.1 + rng.random() * (2.0 - 0.1) for _ in range(4)]
 
         M, S, attr = mantic_kernel(W, L, I)
 
@@ -218,7 +219,7 @@ class TestArrayLengthValidation:
                           [1.0, 1.0, 1.0, 1.0])
 
     def test_interaction_out_of_range_raises(self):
-        """Interaction coefficients outside [0,1] should raise."""
+        """Interaction coefficients outside [0.1,2.0] should raise."""
         with pytest.raises(ValueError, match="Interaction coefficients"):
             mantic_kernel([0.25, 0.25, 0.25, 0.25], [0.5, 0.5, 0.5, 0.5],
-                          [1.5, 1.0, 1.0, 1.0])
+                          [2.5, 1.0, 1.0, 1.0])
