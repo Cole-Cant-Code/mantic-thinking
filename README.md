@@ -103,6 +103,22 @@ interaction_override = {"psychosocial": 1.2}
 
 This is how the LLM says "in this specific case, I trust this signal more than that one" without breaking the mathematical core.
 
+### "But What If the Weights Are Wrong?" (Regime Changes)
+
+The weights (W) are fixed. That's intentional. But it raises a fair question: what happens when the rules change — a market crash where risk dominates, a pandemic where psychosocial factors eclipse genomics?
+
+The framework has four responses, in escalating order:
+
+1. **Layer visibility already tells you.** Even with risk weighted at 0.15, if risk input is 0.95 and everything else is low, `layer_visibility.dominant` flags risk as the driver. The LLM reads attribution, not just the score. A moderate M-score with risk-dominant attribution *is* the regime change signal.
+
+2. **Interaction coefficients reweight in practice.** `interaction_override = {"risk": 1.8, "technical": 0.3}` shifts effective contribution from `W` alone to `W * I`. Risk goes from 0.15 to 0.27 effective; technical drops from 0.35 to 0.105. The LLM is doing regime-aware reweighting — bounded and audited.
+
+3. **Layer coupling exposes the tension.** When risk screams but technical says everything's fine, `layer_coupling.coherence` drops and `tension_with` names the disagreement. The LLM doesn't need reweighted scores to see the conflict — the conflict *is* the insight.
+
+4. **Generic detect allows full reweighting.** If the regime is truly unprecedented, `generic_detect` lets the LLM call the same kernel with `weights=[0.10, 0.15, 0.15, 0.60]` — risk at 60%. Same governance, same audit trail, caller-defined weights.
+
+Why not just let the LLM modify W directly? Because then cross-domain M-scores become incomparable, the audit trail is meaningless, and the LLM can rationalize extreme weight shifts to confirm its priors. Fixed W is the anti-hallucination mechanism. I is the regime-adjustment dial. Generic detect is the escape valve.
+
 ### What It Does
 
 - Flags risk when signals diverge (Friction tools)
@@ -892,6 +908,7 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.5.3 - Added regime change documentation (why fixed W works, four escalation paths)
 1.5.2 - README aligned with codebase: 15-tool count, generic_detect docs, context loading section, architecture tree, version history
 1.5.1 - Context assembly system (get_full_context); hardening: alias scoping, UTF-8, YAML error handling, path traversal filtering
 1.5.0 - Generic detection tool (caller-defined domains); P0 crash path fixes
