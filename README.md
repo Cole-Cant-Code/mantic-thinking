@@ -8,7 +8,7 @@ Cross-domain anomaly and opportunity detection using deterministic 4-layer hiera
 
 Compatible with Claude, Kimi, Gemini, OpenAI, and Ollama.
 
-**14 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection)
+**15 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection) + 1 Generic (caller-defined domains)
 
 ## Why Mantic
 
@@ -247,6 +247,13 @@ Detects when layers align (per-tool thresholds; see each tool's DEFAULT_THRESHOL
 | `military_strategic_initiative` | Military | Decisive action windows |
 | `social_catalytic_alignment` | Social | Movement-building windows |
 
+### Generic Tool (Caller-Defined Domains)
+Run Mantic detection on any domain — you define the layers, weights, and mode.
+
+| Tool | Domain | Description |
+|------|--------|-------------|
+| `generic_detect` | Caller-defined | 3-6 layers, caller-specified weights, same kernel and governance as built-in tools |
+
 ## Installation
 
 ```bash
@@ -270,12 +277,29 @@ result = detect_emergence(genomic_predisposition=0.85, environmental_readiness=0
 print(f"Window: {result['window_detected']}")  # True - optimal timing
 ```
 
+### Generic Detection (Any Domain)
+
+```python
+from mantic_thinking.tools.generic_detect import detect
+
+# Define your own domain — same kernel, same governance
+result = detect(
+    domain_name="supply_chain",
+    layer_names=["supplier_health", "logistics_flow", "demand_signal", "regulatory"],
+    weights=[0.30, 0.25, 0.25, 0.20],
+    layer_values=[0.4, 0.8, 0.3, 0.7],
+    mode="friction"
+)
+print(f"Alert: {result['alert']}")
+print(f"M-Score: {result['m_score']:.3f}")
+```
+
 ### For Kimi Code CLI
 
 ```python
 from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
-# Get all 14 tools
+# Get all 15 tools
 tools = get_kimi_tools()
 
 # Compare friction vs emergence for same domain
@@ -293,7 +317,7 @@ comparison = compare_friction_emergence(
 ```python
 from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool, format_for_claude
 
-# Get 14 tools in Computer Use format
+# Get 15 tools in Computer Use format
 tools = get_claude_tools()
 
 # Execute and format for Claude
@@ -344,7 +368,7 @@ tools = get_openai_tools()
 ```python
 from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
-# Get all 14 tools
+# Get all 15 tools
 tools = get_openai_tools()
 
 # Or filter by type
@@ -658,14 +682,16 @@ mantic-thinking/
 │   │   ├── safe_kernel.py         # Guarded wrapper (k_n validation)
 │   │   └── validators.py          # Input validation and normalization
 │   ├── tools/
-│   │   ├── friction/              # 7 divergence detection tools
-│   │   └── emergence/             # 7 confluence detection tools
+│   │   ├── friction/              # 7 divergence detection tools + YAML guidance per tool
+│   │   ├── emergence/             # 7 confluence detection tools + YAML guidance per tool
+│   │   └── generic_detect.py      # Caller-defined domains (3-6 layers)
 │   ├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
 │   ├── mantic/
 │   │   └── introspection/         # Layer visibility for reasoning (v1.2.0+)
 │   │       ├── __init__.py
 │   │       └── hierarchy.py
 │   ├── configs/                   # Domain configurations & framework docs
+│   │   ├── mantic_scaffold.md     # Universal reasoning scaffold (v1.5.1+)
 │   │   ├── mantic_tech_spec.md    # Full mathematical specification
 │   │   ├── mantic_explicit_framework.md  # Operational protocol & columnar architecture
 │   │   ├── mantic_reasoning_guidelines.md # LLM reasoning scaffold
@@ -771,7 +797,41 @@ The `mantic_thinking/configs/` directory contains framework documentation and do
 - **[`mantic_tech_spec.md`](mantic_thinking/configs/mantic_tech_spec.md)** — Full mathematical specification: core formula, add-on guardrails, layer definitions, coupling matrices, identifiability constraints, production guards
 - **[`mantic_explicit_framework.md`](mantic_thinking/configs/mantic_explicit_framework.md)** — Operational protocol: columnar architecture, cross-domain coupling rules, strict containment
 - **[`mantic_reasoning_guidelines.md`](mantic_thinking/configs/mantic_reasoning_guidelines.md)** — LLM reasoning scaffold: how to think in layers but speak in plain language
+- **[`mantic_scaffold.md`](mantic_thinking/configs/mantic_scaffold.md)** — Universal reasoning scaffold: formula, layer hierarchy, design philosophy, translation rules
 - **Domain configs**: Healthcare, Finance, Cybersecurity, Climate, Legal, Social, Command, Current Affairs
+
+## Context Loading (v1.5.1+)
+
+Adapters can load the complete reasoning context for system prompt injection. The load order is: **Scaffold** (universal framework) → **Domain Config** (domain-specific reasoning) → **Tool Guidance** (per-tool calibration from YAML files).
+
+```python
+from mantic_thinking.adapters.openai_adapter import get_full_context
+
+# Full context, all tools (~2,200 tokens for tool guidance alone)
+context = get_full_context()
+
+# Domain-scoped: includes domain config + only that domain's tools
+context = get_full_context("healthcare")
+
+# Aliases work: "cybersecurity" → cyber, "health" → healthcare, etc.
+context = get_full_context("cybersecurity")
+```
+
+Individual stages are also available:
+
+```python
+from mantic_thinking.adapters.openai_adapter import (
+    get_scaffold,        # Stage 1: universal framework
+    get_domain_config,   # Stage 2: domain-specific config
+    get_tool_guidance,   # Stage 3: per-tool YAML calibration
+)
+
+scaffold = get_scaffold()                         # Always the same
+config = get_domain_config("finance")             # Domain-specific
+guidance = get_tool_guidance(["finance_regime_conflict"])  # Subset of tools
+```
+
+All adapters expose wrappers: `get_claude_context()`, `get_gemini_context()`, `get_kimi_context()`.
 
 ## Running Tests
 
@@ -791,7 +851,7 @@ python3 -m mantic_thinking.tools.emergence.healthcare_precision_therapeutic
 1. **Immutable Core**: The kernel cannot be modified — see [Why Immutability Matters](#why-immutability-matters)
 2. **Build On Top**: Extensions shape inputs and interpret outputs — see [Building on Top](#building-on-top-not-modifying)
 3. **Deterministic**: Same inputs always return same outputs
-4. **No Required External APIs**: Pure Python + NumPy only (adapters format tool schemas; bring your own LLM client)
+4. **No Required External APIs**: Pure Python + NumPy + PyYAML (adapters format tool schemas; bring your own LLM client)
 5. **Cross-Model Compatible**: Works with Claude, Kimi, Gemini, OpenAI, and OpenAI-compatible endpoints (Ollama)
 6. **Complementary Suites**: Friction for risks, Emergence for opportunities
 7. **Simple Logic**: Each tool is self-contained, threshold-based, and intentionally readable
@@ -832,6 +892,9 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.5.2 - README aligned with codebase: 15-tool count, generic_detect docs, context loading section, architecture tree, version history
+1.5.1 - Context assembly system (get_full_context); hardening: alias scoping, UTF-8, YAML error handling, path traversal filtering
+1.5.0 - Generic detection tool (caller-defined domains); P0 crash path fixes
 1.4.1 - Kernel interaction validation aligns with governance bounds; docs + Test Drive prompts
 1.4.0 - Interaction coefficients: per-layer confidence tuning with full audit trail
 1.2.5 - SKILL guidance: clarified temporal scaling; added deep regression tests (CI-safe)
