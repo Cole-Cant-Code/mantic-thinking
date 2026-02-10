@@ -9,6 +9,9 @@ Includes Friction tools (7), Emergence tools (7), and Generic (1) = 15 total.
 
 import sys
 import os
+from pathlib import Path
+
+import yaml
 
 # Avoid mutating sys.path on import; only adjust for direct script execution.
 if __name__ == "__main__":
@@ -16,6 +19,9 @@ if __name__ == "__main__":
     _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
+
+_TOOLS_DIR = Path(__file__).parent.parent / "tools"
+_CONFIGS_DIR = Path(__file__).parent.parent / "configs"
 
 # Friction tools (divergence detection)
 from mantic_thinking.tools import (
@@ -548,6 +554,194 @@ def explain_result(tool_name, result):
         "reasoning_hints": hints.get(dominant, []),
         "_api_version": "1.2.0"
     }
+
+
+def _load_tool_yaml(tool_name):
+    """Load YAML guidance for a tool. Returns dict or None."""
+    for suite in ("friction", "emergence"):
+        path = _TOOLS_DIR / suite / f"{tool_name}.yaml"
+        if path.exists():
+            try:
+                with open(path, encoding="utf-8") as f:
+                    return yaml.safe_load(f)
+            except yaml.YAMLError:
+                return None
+    return None
+
+
+def get_tool_guidance(tool_names=None):
+    """
+    Load YAML calibration guidance for tools, formatted for system prompt.
+
+    Reads the per-tool YAML files at runtime so edits to YAML are
+    immediately reflected without code changes.
+
+    Args:
+        tool_names: List of tool names, or None for all tools.
+
+    Returns:
+        str: Formatted guidance text for system prompt injection.
+    """
+    if tool_names is None:
+        tool_names = list(TOOL_MAP.keys())
+    else:
+        # Filter to known tools only (prevents path traversal)
+        tool_names = [n for n in tool_names if n in TOOL_MAP]
+
+    sections = []
+    for name in tool_names:
+        data = _load_tool_yaml(name)
+        if not data:
+            continue
+
+        lines = [f"### {name} ({data.get('type', '?')} | {data.get('domain', '?')})"]
+
+        # Selection criteria
+        sel = data.get("selection", {})
+        if sel.get("use_when"):
+            lines.append("**Use when:**")
+            for item in sel["use_when"]:
+                lines.append(f"  - {item}")
+        if sel.get("not_for"):
+            lines.append("**Not for:**")
+            for item in sel["not_for"]:
+                lines.append(f"  - {item}")
+
+        # Parameters with calibration anchors
+        params = data.get("parameters", {})
+        if params:
+            lines.append("**Parameters:**")
+            for pname, pdata in params.items():
+                layer = pdata.get("layer", "?")
+                low = pdata.get("low", "")
+                high = pdata.get("high", "")
+                lines.append(f"  - `{pname}` ({layer}): {low} \u2192 {high}")
+
+        # Interaction guidance (condensed)
+        ig = data.get("interaction_guidance", {})
+        dampen = ig.get("dampen_when", {})
+        amplify = ig.get("amplify_when", {})
+        if dampen or amplify:
+            lines.append("**Tuning:**")
+            for p, reason in dampen.items():
+                lines.append(f"  - Dampen `{p}`: {reason}")
+            for p, reason in amplify.items():
+                lines.append(f"  - Amplify `{p}`: {reason}")
+
+        # Interpretation
+        interp = data.get("interpretation", {})
+        if interp:
+            lines.append(f"**High M:** {interp.get('high_m', '')}")
+            lines.append(f"**Low M:** {interp.get('low_m', '')}")
+
+        sections.append("\n".join(lines))
+
+    header = "## Tool Calibration Guidance\n"
+    return header + "\n\n".join(sections)
+
+
+# Domain name → tool name mapping for context loading
+_DOMAIN_TOOLS = {
+    "healthcare": ["healthcare_phenotype_genotype", "healthcare_precision_therapeutic"],
+    "finance": ["finance_regime_conflict", "finance_confluence_alpha"],
+    "cyber": ["cyber_attribution_resolver", "cyber_adversary_overreach"],
+    "climate": ["climate_maladaptation", "climate_resilience_multiplier"],
+    "legal": ["legal_precedent_drift", "legal_precedent_seeding"],
+    "military": ["military_friction_forecast", "military_strategic_initiative"],
+    "social": ["social_narrative_rupture", "social_catalytic_alignment"],
+}
+
+# Aliases for domain names → canonical _DOMAIN_TOOLS key
+_DOMAIN_ALIASES = {
+    "cybersecurity": "cyber",
+    "security": "cyber",
+    "health": "healthcare",
+    "command": "military",
+}
+
+
+def get_scaffold():
+    """
+    Load the universal reasoning scaffold.
+
+    This is Stage 1 of the load order: the domain-agnostic framework
+    that teaches an LLM how to think with Mantic (formula, layer
+    hierarchy, design philosophy, translation rules).
+
+    Returns:
+        str: Scaffold content, or empty string if file not found.
+    """
+    path = _CONFIGS_DIR / "mantic_scaffold.md"
+    if path.exists():
+        return path.read_text(encoding="utf-8")
+    return ""
+
+
+def get_domain_config(domain):
+    """
+    Load a domain-specific config file.
+
+    This is Stage 2 of the load order: the domain-specific layer
+    mappings, multi-column architecture, and reasoning protocols.
+
+    Args:
+        domain: Domain name (healthcare, finance, cyber, climate,
+                legal, military, social, plan, current).
+
+    Returns:
+        str: Domain config content, or empty string if not found.
+    """
+    # Map domain names to config filenames
+    # Files are named mantic_{name}.md in configs/
+    aliases = {
+        "healthcare": "health",
+        "cybersecurity": "security",
+        "cyber": "security",
+        "military": "command",
+    }
+    config_name = aliases.get(domain, domain)
+    path = _CONFIGS_DIR / f"mantic_{config_name}.md"
+    if path.exists():
+        return path.read_text(encoding="utf-8")
+    return ""
+
+
+def get_full_context(domain=None):
+    """
+    Load the complete LLM context in the correct order.
+
+    Chains: Scaffold → Domain Config (optional) → Tool Guidance.
+
+    Args:
+        domain: Optional domain name. If provided, includes the
+                domain-specific config and only that domain's tool
+                guidance. If None, includes all tool guidance.
+
+    Returns:
+        str: Complete context string for system prompt injection.
+    """
+    parts = []
+
+    # Stage 1: Scaffold (always)
+    scaffold = get_scaffold()
+    if scaffold:
+        parts.append(scaffold)
+
+    # Stage 2: Domain config (if domain specified)
+    if domain:
+        config = get_domain_config(domain)
+        if config:
+            parts.append(config)
+
+    # Stage 3: Tool guidance (normalize aliases before lookup)
+    canonical = _DOMAIN_ALIASES.get(domain, domain) if domain else None
+    if canonical and canonical in _DOMAIN_TOOLS:
+        guidance = get_tool_guidance(_DOMAIN_TOOLS[canonical])
+    else:
+        guidance = get_tool_guidance()
+    parts.append(guidance)
+
+    return "\n\n---\n\n".join(parts)
 
 
 if __name__ == "__main__":

@@ -19,7 +19,10 @@ if __name__ == "__main__":
 
 import inspect
 
-from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools, get_tools_by_type
+from mantic_thinking.adapters.openai_adapter import (
+    TOOL_MAP, get_openai_tools, get_tools_by_type,
+    get_tool_guidance, get_scaffold, get_domain_config, get_full_context,
+)
 
 
 def get_claude_tools():
@@ -357,6 +360,38 @@ def explain_result(tool_name, result):
         "reasoning_hints": hints.get(dominant, []),
         "_api_version": "1.2.0"
     }
+
+
+def get_claude_tool_guidance(tool_names=None):
+    """
+    Get tool calibration guidance formatted for Claude system prompt.
+
+    Loads per-tool YAML guidance (selection criteria, parameter calibration,
+    interaction tuning, interpretation) for system prompt injection.
+
+    Args:
+        tool_names: List of tool names, or None for all tools.
+
+    Returns:
+        str: Formatted guidance text.
+    """
+    return get_tool_guidance(tool_names)
+
+
+def get_claude_context(domain=None):
+    """
+    Get complete LLM context for Claude in correct load order.
+
+    Chains: Scaffold → Domain Config (optional) → Tool Guidance.
+
+    Args:
+        domain: Optional domain name (healthcare, finance, cyber, etc.).
+                If provided, includes domain config and scoped tool guidance.
+
+    Returns:
+        str: Complete context for system prompt injection.
+    """
+    return get_full_context(domain)
 
 
 if __name__ == "__main__":

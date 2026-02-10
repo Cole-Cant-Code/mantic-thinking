@@ -23,7 +23,10 @@ if __name__ == "__main__":
 
 import inspect
 
-from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools
+from mantic_thinking.adapters.openai_adapter import (
+    TOOL_MAP, get_openai_tools,
+    get_tool_guidance, get_scaffold, get_domain_config, get_full_context,
+)
 
 
 def get_gemini_tools():
@@ -256,10 +259,41 @@ def explain_result(tool_name, result):
     }
 
 
+def get_gemini_tool_guidance(tool_names=None):
+    """
+    Get tool calibration guidance formatted for Gemini system prompt.
+
+    Loads per-tool YAML guidance (selection criteria, parameter calibration,
+    interaction tuning, interpretation) for system prompt injection.
+
+    Args:
+        tool_names: List of tool names, or None for all tools.
+
+    Returns:
+        str: Formatted guidance text.
+    """
+    return get_tool_guidance(tool_names)
+
+
+def get_gemini_context(domain=None):
+    """
+    Get complete LLM context for Gemini in correct load order.
+
+    Chains: Scaffold → Domain Config (optional) → Tool Guidance.
+
+    Args:
+        domain: Optional domain name (healthcare, finance, cyber, etc.).
+
+    Returns:
+        str: Complete context for system prompt injection.
+    """
+    return get_full_context(domain)
+
+
 if __name__ == "__main__":
     # Test the adapter
     print("=== Gemini Adapter Test (14 Tools) ===\n")
-    
+
     tools = get_gemini_tools()
     declarations = tools[0]["function_declarations"]
     print(f"Total function declarations: {len(declarations)}")
