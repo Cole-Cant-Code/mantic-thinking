@@ -136,7 +136,7 @@ class TestClaudeFormatting:
         )
         formatted = format_for_claude(result, "healthcare_precision_therapeutic")
         assert isinstance(formatted, str)
-        assert "CONFLUENCE" in formatted
+        assert "EMERGENCE" in formatted
 
     def test_format_no_alert_result(self):
         """Results without alert/window format cleanly."""

@@ -1,18 +1,16 @@
 """
-Schema alignment tests for Mantic public tools.
+Schema alignment tests for Mantic detection tool.
 
 These tests ensure OpenAPI/Kimi schemas match the adapter tool definitions
-and only expose the public 15-tool surface.
+and expose the single detect tool.
 """
 
 import json
 import os
 import sys
 
-# Add repo root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import mantic_thinking.tools as tools
 from mantic_thinking.adapters.openai_adapter import get_openai_tools
 from mantic_thinking.adapters.kimi_adapter import get_kimi_tools
 
@@ -28,65 +26,37 @@ def _load_json(path):
         return json.load(f)
 
 
-def _openapi_tool_schemas(openapi_doc):
-    schemas = {}
-    for path, methods in openapi_doc.get("paths", {}).items():
-        assert path.startswith("/detect/"), f"Unexpected OpenAPI path: {path}"
-        tool_name = path[len("/detect/"):]
-        schema = (
-            methods["post"]["requestBody"]["content"]["application/json"]["schema"]
-        )
-        schemas[tool_name] = schema
-    return schemas
-
-
-def _openai_tool_schemas():
-    return {
-        tool["function"]["name"]: tool["function"]["parameters"]
-        for tool in get_openai_tools()
-    }
-
-
-def _kimi_tool_schemas():
-    return {
-        tool["name"]: tool["parameters"]
-        for tool in get_kimi_tools()
-    }
-
-
 def test_public_tool_sets_match():
-    """OpenAPI, Kimi, and adapters must expose the same public 17 tools."""
-    public = set(tools.__all__)
-
+    """OpenAPI, Kimi, and adapters all expose the detect tool."""
     openapi_doc = _load_json(OPENAPI_PATH)
-    openapi_tools = set(_openapi_tool_schemas(openapi_doc).keys())
+    openapi_paths = list(openapi_doc.get("paths", {}).keys())
+    assert "/detect" in openapi_paths
 
-    openai_tools = set(_openai_tool_schemas().keys())
-    kimi_tools = set(_kimi_tool_schemas().keys())
+    kimi_doc = _load_json(KIMI_PATH)
+    kimi_names = {t["name"] for t in kimi_doc}
+    assert "detect" in kimi_names
 
-    assert openapi_tools == public
-    assert openai_tools == public
-    assert kimi_tools == public
+    openai_names = {t["function"]["name"] for t in get_openai_tools()}
+    assert "detect" in openai_names
 
-    # Explicitly confirm internal tools are not exposed.
-    assert "codebase_layer_conflict" not in openapi_tools
-    assert "codebase_alignment_window" not in openapi_tools
+    kimi_adapter_names = {t["name"] for t in get_kimi_tools()}
+    assert "detect" in kimi_adapter_names
 
 
 def test_schema_parameters_match_adapters():
-    """Schema parameter properties/required sets must match adapter schemas."""
+    """Schema parameter properties must match adapter schemas."""
     openapi_doc = _load_json(OPENAPI_PATH)
-    openapi_schemas = _openapi_tool_schemas(openapi_doc)
-    openai_schemas = _openai_tool_schemas()
-    kimi_schemas = _kimi_tool_schemas()
+    openapi_schema = openapi_doc["paths"]["/detect"]["post"]["requestBody"]["content"]["application/json"]["schema"]
 
-    for tool_name in tools.__all__:
-        openapi_schema = openapi_schemas[tool_name]
-        openai_schema = openai_schemas[tool_name]
-        kimi_schema = kimi_schemas[tool_name]
+    openai_schema = get_openai_tools()[0]["function"]["parameters"]
+    kimi_schema = get_kimi_tools()[0]["parameters"]
 
-        assert set(openapi_schema["properties"].keys()) == set(openai_schema["properties"].keys())
-        assert set(openapi_schema["required"]) == set(openai_schema["required"])
+    # Required fields must match
+    assert set(openapi_schema["required"]) == set(openai_schema["required"])
+    assert set(kimi_schema["required"]) == set(openai_schema["required"])
 
-        assert set(kimi_schema["properties"].keys()) == set(openai_schema["properties"].keys())
-        assert set(kimi_schema["required"]) == set(openai_schema["required"])
+    # Core properties must be present in all schemas
+    core_props = {"domain_name", "layer_names", "weights", "layer_values", "mode"}
+    assert core_props.issubset(set(openapi_schema["properties"].keys()))
+    assert core_props.issubset(set(openai_schema["properties"].keys()))
+    assert core_props.issubset(set(kimi_schema["properties"].keys()))

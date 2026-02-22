@@ -576,10 +576,11 @@ class TestOpenAIAdapter:
     """Test OpenAI/Codex adapter."""
     
     def test_tools_count(self):
-        """Test that all 17 tools are available."""
+        """Test that detect tool is available."""
         tools = get_openai_tools()
-        assert len(tools) == 17
-    
+        assert len(tools) == 1
+        assert tools[0]["function"]["name"] == "detect"
+
     def test_tool_schema(self):
         """Test tool schema format."""
         tools = get_openai_tools()
@@ -589,9 +590,9 @@ class TestOpenAIAdapter:
             assert "name" in tool["function"]
             assert "description" in tool["function"]
             assert "parameters" in tool["function"]
-    
+
     def test_execute_healthcare(self):
-        """Test healthcare tool execution."""
+        """Test healthcare tool execution via legacy dispatch."""
         result = execute_openai("healthcare_phenotype_genotype", {
             "phenotypic": 0.3,
             "genomic": 0.9,
@@ -691,9 +692,9 @@ class TestKimiAdapter:
     """Test Kimi native adapter."""
     
     def test_tools_count(self):
-        """Test that all 17 tools are available."""
+        """Test that detect tool is available."""
         tools = get_kimi_tools()
-        assert len(tools) == 17
+        assert len(tools) == 1
     
     def test_kimi_meta(self):
         """Test Kimi-specific metadata."""
@@ -724,9 +725,9 @@ class TestClaudeAdapter:
     """Test Claude Computer Use adapter."""
     
     def test_tools_count(self):
-        """Test that all 17 tools are available."""
+        """Test that detect tool is available."""
         tools = get_claude_tools()
-        assert len(tools) == 17
+        assert len(tools) == 1
     
     def test_claude_meta(self):
         """Test Claude-specific metadata."""

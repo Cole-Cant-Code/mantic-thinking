@@ -392,15 +392,14 @@ class TestAdapterIntegration:
 
     def test_tool_count(self):
         from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools
-        assert len(TOOL_MAP) == 17
-        assert len(get_openai_tools()) == 17
+        assert len(TOOL_MAP) == 17  # Internal registry still has all 17
+        assert len(get_openai_tools()) == 1  # LLM sees 1 detect tool
 
-    def test_claude_adapter_includes_generic(self):
+    def test_claude_adapter_has_detect(self):
         from mantic_thinking.adapters.claude_adapter import get_claude_tools
         tools = get_claude_tools()
-        assert len(tools) == 17
-        names = [t["name"] for t in tools]
-        assert "generic_detect" in names
+        assert len(tools) == 1
+        assert tools[0]["name"] == "detect"
 
 
 # =============================================================================

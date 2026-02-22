@@ -1,15 +1,17 @@
 """
 OpenAI/Codex Adapter for Mantic Tools
 
-Converts Mantic tools to OpenAI function calling format.
-Compatible with GPT-4, GPT-4o, and Codex.
+Exposes ONE detection tool where the LLM supplies layer names, weights,
+and values. The 16 built-in domain tools are available as presets (data),
+not locked functions.
 
-Includes Friction tools (8), Emergence tools (8), and Generic (1) = 17 total.
+Compatible with GPT-4, GPT-4o, Codex, and any OpenAI-compatible endpoint.
 """
 
 import sys
 import os
 from pathlib import Path
+import inspect
 
 import yaml
 
@@ -47,53 +49,11 @@ from mantic_thinking.tools import (
     system_lock_dissolution_window,
 )
 
-# Generic tool (caller-defined domains)
+# Generic tool (caller-defined domains) — this IS the product
 from mantic_thinking.tools import generic_detect
 
-# Optional override inputs (bounded internally by tools)
-OVERRIDE_PROPERTIES = {
-    "threshold_override": {
-        "type": "object",
-        "description": "Optional per-threshold overrides (bounded internally). Keys vary by tool.",
-        "additionalProperties": {"type": "number"}
-    },
-    "temporal_config": {
-        "type": "object",
-        "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
-        "properties": {
-            "kernel_type": {"type": "string", "description": "Temporal kernel type (domain-allowed)"},
-            "alpha": {"type": "number", "description": "Sensitivity (bounded)"},
-            "n": {"type": "number", "description": "Novelty (bounded)"},
-            "t": {"type": "number", "description": "Time delta"},
-            "t0": {"type": "number", "description": "S-curve inflection point"},
-            "exponent": {"type": "number", "description": "Power-law exponent"},
-            "frequency": {"type": "number", "description": "Oscillation frequency"},
-            "memory_strength": {"type": "number", "description": "Memory strength"}
-        }
-    },
-    "interaction_mode": {
-        "type": "string",
-        "description": "Which interaction coefficients (I) to start from: tool base or tool dynamic.",
-        "enum": ["dynamic", "base"],
-        "default": "dynamic"
-    },
-    "interaction_override": {
-        "description": "Optional interaction coefficient overrides (per-layer I). Either a list of 4 floats (tool layer order) or a dict keyed by layer name. Values are bounded internally to [0.1, 2.0].",
-        "anyOf": [
-            {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
-            {"type": "object", "additionalProperties": {"type": "number"}}
-        ]
-    },
-    "interaction_override_mode": {
-        "type": "string",
-        "description": "How to apply interaction_override: scale (elementwise multiply) or replace (use override as-is).",
-        "enum": ["scale", "replace"],
-        "default": "scale"
-    }
-}
 
-
-# Map tool IDs to detection functions (17 tools total)
+# Internal registry — used for preset extraction and backward-compatible dispatch
 TOOL_MAP = {
     # Friction tools (8)
     "healthcare_phenotype_genotype": healthcare_phenotype_genotype.detect,
@@ -118,400 +78,198 @@ TOOL_MAP = {
 }
 
 
-def get_openai_tools():
+# ---- Presets ---------------------------------------------------------------
+
+def get_presets():
     """
-    Return OpenAI function calling schema for all Mantic tools.
+    Return the 16 built-in domain tools as preset data.
+
+    These are reference starting points — the LLM can use them as-is,
+    modify them, or ignore them and define its own layers and weights.
 
     Returns:
-        list: OpenAI function definitions (17 tools)
+        dict: {preset_name: {layer_names, weights, default_thresholds}}
     """
-    friction_tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "healthcare_phenotype_genotype",
-                "description": "FRICTION: Detects when genomic risk doesn't match phenotypic presentation, indicating environmental buffering or psychosocial resilience.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "phenotypic": {"type": "number", "description": "Current symptoms/vitals (0-1)"},
-                        "genomic": {"type": "number", "description": "Genetic risk score (0-1)"},
-                        "environmental": {"type": "number", "description": "Exposure load (0-1)"},
-                        "psychosocial": {"type": "number", "description": "Stress/resilience (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["phenotypic", "genomic", "environmental", "psychosocial"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "finance_regime_conflict",
-                "description": "FRICTION: Spots when technical price action contradicts fundamentals, flow, or risk signals.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "technical": {"type": "number", "description": "Price action signals (0-1)"},
-                        "macro": {"type": "number", "description": "Fundamental indicators (0-1)"},
-                        "flow": {"type": "number", "description": "Capital flow direction (-1 to 1)"},
-                        "risk": {"type": "number", "description": "Risk appetite metrics (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["technical", "macro", "flow", "risk"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "cyber_attribution_resolver",
-                "description": "FRICTION: Scores confidence when technical sophistication doesn't align with geopolitical context.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "technical": {"type": "number", "description": "Technical sophistication (0-1)"},
-                        "threat_intel": {"type": "number", "description": "Threat intel confidence (0-1)"},
-                        "operational_impact": {"type": "number", "description": "Operational impact severity (0-1)"},
-                        "geopolitical": {"type": "number", "description": "Geopolitical context alignment (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["technical", "threat_intel", "operational_impact", "geopolitical"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "climate_maladaptation",
-                "description": "FRICTION: Blocks solutions that solve immediate micro problems but create macro/meta harms.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "atmospheric": {"type": "number", "description": "Atmospheric metrics (0-1)"},
-                        "ecological": {"type": "number", "description": "Ecosystem health (0-1)"},
-                        "infrastructure": {"type": "number", "description": "Infrastructure resilience (0-1)"},
-                        "policy": {"type": "number", "description": "Policy coherence (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["atmospheric", "ecological", "infrastructure", "policy"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "legal_precedent_drift",
-                "description": "FRICTION: Warns when judicial philosophy shifts threaten current precedent-based strategies.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "black_letter": {"type": "number", "description": "Statutory text alignment (0-1)"},
-                        "precedent": {"type": "number", "description": "Precedent consistency (0-1)"},
-                        "operational": {"type": "number", "description": "Implementation feasibility (0-1)"},
-                        "socio_political": {"type": "number", "description": "Social/political context (-1 to 1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["black_letter", "precedent", "operational", "socio_political"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "military_friction_forecast",
-                "description": "FRICTION: Identifies where tactical plans hit logistics or political constraints.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "maneuver": {"type": "number", "description": "Tactical maneuver feasibility (0-1)"},
-                        "intelligence": {"type": "number", "description": "Intelligence confidence (0-1)"},
-                        "sustainment": {"type": "number", "description": "Logistics sustainability (0-1)"},
-                        "political": {"type": "number", "description": "Political authorization (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["maneuver", "intelligence", "sustainment", "political"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "social_narrative_rupture",
-                "description": "FRICTION: Catches virality that outpaces institutional sense-making capacity.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "individual": {"type": "number", "description": "Sentiment velocity (0-1)"},
-                        "network": {"type": "number", "description": "Propagation speed (0-1)"},
-                        "institutional": {"type": "number", "description": "Response lag (0-1)"},
-                        "cultural": {"type": "number", "description": "Archetype alignment (-1 to 1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["individual", "network", "institutional", "cultural"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "system_lock_recursive_control",
-                "description": "FRICTION: Detects recursive control patterns where concentration and recursion outpace individual and collective agency.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "agent_autonomy": {"type": "number", "description": "Individual agency and choice diversity (0-1)"},
-                        "collective_capacity": {"type": "number", "description": "Alternative system viability (0-1)"},
-                        "concentration_control": {"type": "number", "description": "Concentration and platform control pressure (0-1)"},
-                        "recursive_depth": {"type": "number", "description": "Intervention absorption / recursion depth (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["agent_autonomy", "collective_capacity", "concentration_control", "recursive_depth"]
-                }
-            }
-        }
-    ]
+    import importlib
+    presets = {}
+    for tool_name, func in TOOL_MAP.items():
+        if tool_name == "generic_detect":
+            continue
+        module = importlib.import_module(func.__module__)
+        raw_weights = getattr(module, "WEIGHTS", {})
+        layer_names = list(getattr(module, "LAYER_NAMES", []))
+        default_thresholds = getattr(module, "DEFAULT_THRESHOLDS", {})
 
-    emergence_tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "healthcare_precision_therapeutic",
-                "description": "CONFLUENCE: Identifies rare alignment of genomic predisposition, environmental readiness, phenotypic timing, and psychosocial engagement for maximum treatment efficacy.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "genomic_predisposition": {"type": "number", "description": "Genetic readiness for treatment (0-1)"},
-                        "environmental_readiness": {"type": "number", "description": "Exposure/toxin levels favorable (0-1)"},
-                        "phenotypic_timing": {"type": "number", "description": "Disease progression stage optimal (0-1)"},
-                        "psychosocial_engagement": {"type": "number", "description": "Patient motivation/support high (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["genomic_predisposition", "environmental_readiness", "phenotypic_timing", "psychosocial_engagement"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "finance_confluence_alpha",
-                "description": "CONFLUENCE: Detects asymmetric opportunity when technical setup, macro tailwind, flow positioning, and risk compression achieve directional harmony.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "technical_setup": {"type": "number", "description": "Technical indicators favorable (0-1)"},
-                        "macro_tailwind": {"type": "number", "description": "Fundamental/macro support (0-1)"},
-                        "flow_positioning": {"type": "number", "description": "Crowd positioning (-1 to 1, extreme = contrarian signal)"},
-                        "risk_compression": {"type": "number", "description": "Risk appetite favorable (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["technical_setup", "macro_tailwind", "flow_positioning", "risk_compression"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "cyber_adversary_overreach",
-                "description": "CONFLUENCE: Identifies defensive advantage windows when attacker TTPs are stretched, geopolitically pressured, and operationally fatigued.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "threat_intel_stretch": {"type": "number", "description": "Attacker TTPs overextended/visible (0-1)"},
-                        "geopolitical_pressure": {"type": "number", "description": "External pressure on attacker (0-1)"},
-                        "operational_hardening": {"type": "number", "description": "Defender readiness/hardening (0-1)"},
-                        "tool_reuse_fatigue": {"type": "number", "description": "Attacker tool reuse/indicators (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["threat_intel_stretch", "geopolitical_pressure", "operational_hardening", "tool_reuse_fatigue"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "climate_resilience_multiplier",
-                "description": "CONFLUENCE: Surfaces interventions with positive cross-domain coupling solving multiple layer problems simultaneously.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "atmospheric_benefit": {"type": "number", "description": "Atmospheric/climate benefit (0-1)"},
-                        "ecological_benefit": {"type": "number", "description": "Ecosystem benefit (0-1)"},
-                        "infrastructure_benefit": {"type": "number", "description": "Infrastructure resilience benefit (0-1)"},
-                        "policy_alignment": {"type": "number", "description": "Policy coherence/support (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["atmospheric_benefit", "ecological_benefit", "infrastructure_benefit", "policy_alignment"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "legal_precedent_seeding",
-                "description": "CONFLUENCE: Spots windows when socio-political climate, institutional capacity, statutory ambiguity, and circuit splits align for favorable case law establishment.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "socio_political_climate": {"type": "number", "description": "Receptiveness to legal change (0-1)"},
-                        "institutional_capacity": {"type": "number", "description": "Courts/resources to handle case (0-1)"},
-                        "statutory_ambiguity": {"type": "number", "description": "Statutory text ambiguity/openness (0-1)"},
-                        "circuit_split": {"type": "number", "description": "Degree of circuit split (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["socio_political_climate", "institutional_capacity", "statutory_ambiguity", "circuit_split"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "military_strategic_initiative",
-                "description": "CONFLUENCE: Identifies decisive action opportunities when intelligence ambiguity, positional advantage, logistic readiness, and political authorization synchronize.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "enemy_ambiguity": {"type": "number", "description": "Intelligence gaps favoring surprise (0-1)"},
-                        "positional_advantage": {"type": "number", "description": "Geographical/tactical position (0-1)"},
-                        "logistic_readiness": {"type": "number", "description": "Sustainment capability ready (0-1)"},
-                        "authorization_clarity": {"type": "number", "description": "Political authority clear (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["enemy_ambiguity", "positional_advantage", "logistic_readiness", "authorization_clarity"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "social_catalytic_alignment",
-                "description": "CONFLUENCE: Spots transformative potential when individual readiness, network bridges, policy windows, and paradigm momentum converge.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "individual_readiness": {"type": "number", "description": "Population psychological readiness (0-1)"},
-                        "network_bridges": {"type": "number", "description": "Cross-cutting network connections (0-1)"},
-                        "policy_window": {"type": "number", "description": "Policy opportunity open (0-1)"},
-                        "paradigm_momentum": {"type": "number", "description": "Cultural paradigm shift underway (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["individual_readiness", "network_bridges", "policy_window", "paradigm_momentum"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "system_lock_dissolution_window",
-                "description": "CONFLUENCE: Detects dissolution windows where autonomy momentum, alternative readiness, and control vulnerability converge.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "autonomy_momentum": {"type": "number", "description": "Individual agency growth momentum (0-1)"},
-                        "alternative_readiness": {"type": "number", "description": "Decentralized alternative readiness (0-1)"},
-                        "control_vulnerability": {"type": "number", "description": "Incumbent control vulnerability (0-1)"},
-                        "pattern_flexibility": {"type": "number", "description": "Structural flexibility against re-locking (0-1)"},
-                        "f_time": {"type": "number", "default": 1.0}
-                    },
-                    "required": ["autonomy_momentum", "alternative_readiness", "control_vulnerability", "pattern_flexibility"]
-                }
-            }
-        }
-    ]
+        # Friction tools store WEIGHTS as dict, emergence tools as list
+        if isinstance(raw_weights, dict):
+            weights_dict = dict(raw_weights)
+        else:
+            weights_dict = dict(zip(layer_names, raw_weights))
 
-    generic_tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "generic_detect",
-                "description": "GENERIC: Run Mantic detection on a caller-defined domain. Supports 3-6 layers with caller-specified weights and layer names. Same kernel and governance as built-in tools.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "domain_name": {"type": "string", "description": "Unique domain label (cannot shadow built-in domains)"},
-                        "layer_names": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "minItems": 3, "maxItems": 6,
-                            "description": "Layer name strings (3-6)"
-                        },
-                        "weights": {
-                            "type": "array",
-                            "items": {"type": "number", "minimum": 0, "maximum": 1},
-                            "minItems": 3, "maxItems": 6,
-                            "description": "Layer weights summing to 1.0"
-                        },
-                        "layer_values": {
-                            "type": "array",
-                            "items": {"type": "number", "minimum": 0, "maximum": 1},
-                            "minItems": 3, "maxItems": 6,
-                            "description": "Layer input values (0-1)"
-                        },
-                        "mode": {
+        presets[tool_name] = {
+            "layer_names": layer_names,
+            "weights": weights_dict,
+            "default_thresholds": dict(default_thresholds) if isinstance(default_thresholds, dict) else {},
+        }
+    return presets
+
+
+# ---- Override schema (shared) ----------------------------------------------
+
+OVERRIDE_PROPERTIES = {
+    "threshold_override": {
+        "type": "object",
+        "description": "Optional per-threshold overrides (bounded +/-20% internally).",
+        "additionalProperties": {"type": "number"}
+    },
+    "temporal_config": {
+        "type": "object",
+        "description": "Optional temporal kernel config (bounded internally). Requires kernel_type and t.",
+        "properties": {
+            "kernel_type": {"type": "string", "description": "Temporal kernel type"},
+            "alpha": {"type": "number", "description": "Sensitivity (bounded)"},
+            "n": {"type": "number", "description": "Novelty (bounded)"},
+            "t": {"type": "number", "description": "Time delta"},
+            "t0": {"type": "number", "description": "S-curve inflection point"},
+            "exponent": {"type": "number", "description": "Power-law exponent"},
+            "frequency": {"type": "number", "description": "Oscillation frequency"},
+            "memory_strength": {"type": "number", "description": "Memory strength"}
+        }
+    },
+    "interaction_mode": {
+        "type": "string",
+        "description": "Which interaction coefficients (I) to start from.",
+        "enum": ["dynamic", "base"],
+        "default": "dynamic"
+    },
+    "interaction_override": {
+        "description": "Optional interaction coefficient overrides (per-layer I). Either a list of floats or a dict keyed by layer name. Values bounded to [0.1, 2.0].",
+        "anyOf": [
+            {"type": "array", "items": {"type": "number"}},
+            {"type": "object", "additionalProperties": {"type": "number"}}
+        ]
+    },
+    "interaction_override_mode": {
+        "type": "string",
+        "description": "How to apply interaction_override: scale (multiply) or replace (use as-is).",
+        "enum": ["scale", "replace"],
+        "default": "scale"
+    }
+}
+
+
+# ---- Tool schema -----------------------------------------------------------
+
+def get_openai_tools():
+    """
+    Return OpenAI function calling schema for Mantic detection.
+
+    Returns a single detect tool where the LLM defines layer names,
+    weights, and values. The 16 built-in domains are reference presets,
+    not locked functions.
+
+    Returns:
+        list: OpenAI function definitions (1 tool)
+    """
+    detect_tool = {
+        "type": "function",
+        "function": {
+            "name": "detect",
+            "description": (
+                "Run Mantic detection on any domain. You define the layers, weights, "
+                "and values. The kernel provides the math: M = (sum(W * L * I)) * f(t) / k_n. "
+                "Use mode='friction' for risk/divergence or mode='emergence' for opportunity/alignment."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "domain_name": {
+                        "type": "string",
+                        "description": "Label for the domain you're analyzing"
+                    },
+                    "layer_names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "minItems": 3, "maxItems": 6,
+                        "description": "3-6 layer name strings you define"
+                    },
+                    "weights": {
+                        "type": "array",
+                        "items": {"type": "number", "minimum": 0, "maximum": 1},
+                        "minItems": 3, "maxItems": 6,
+                        "description": "Layer weights summing to 1.0. You decide importance."
+                    },
+                    "layer_values": {
+                        "type": "array",
+                        "items": {"type": "number", "minimum": 0, "maximum": 1},
+                        "minItems": 3, "maxItems": 6,
+                        "description": "Layer input values (0-1). Your situational assessment."
+                    },
+                    "mode": {
+                        "type": "string",
+                        "enum": ["friction", "emergence"],
+                        "description": "Detection mode: friction (divergence/risk) or emergence (alignment/opportunity)"
+                    },
+                    "detection_threshold": {
+                        "type": "number",
+                        "default": 0.4,
+                        "description": "Threshold for detection (default 0.4)"
+                    },
+                    "layer_hierarchy": {
+                        "type": "object",
+                        "additionalProperties": {
                             "type": "string",
-                            "enum": ["friction", "emergence"],
-                            "description": "Detection mode: friction (divergence) or emergence (alignment)"
+                            "enum": ["Micro", "Meso", "Macro", "Meta"]
                         },
-                        "detection_threshold": {
-                            "type": "number",
-                            "default": 0.4,
-                            "description": "Threshold for friction range / emergence alignment floor"
-                        },
-                        "layer_hierarchy": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string",
-                                "enum": ["Micro", "Meso", "Macro", "Meta"]
-                            },
-                            "description": "Optional mapping of layer names to hierarchy levels for layer visibility"
-                        },
-                        "f_time": {"type": "number", "default": 1.0}
+                        "description": "Optional mapping of layer names to hierarchy levels"
                     },
-                    "required": ["domain_name", "layer_names", "weights", "layer_values", "mode"]
-                }
+                    "f_time": {"type": "number", "default": 1.0},
+                    **OVERRIDE_PROPERTIES,
+                },
+                "required": ["domain_name", "layer_names", "weights", "layer_values", "mode"]
             }
         }
-    ]
+    }
 
-    # Add bounded override params to all tools (optional)
-    for tool in friction_tools + emergence_tools + generic_tools:
-        tool["function"]["parameters"]["properties"].update(OVERRIDE_PROPERTIES)
-
-    return friction_tools + emergence_tools + generic_tools
+    return [detect_tool]
 
 
 def execute_tool(tool_name, arguments):
     """
     Execute a Mantic tool by name with given arguments.
-    
+
+    For 'detect', routes to generic_detect with caller-supplied parameters.
+    Legacy tool names (e.g. 'healthcare_phenotype_genotype') still work
+    for backward compatibility.
+
     Args:
         tool_name: Name of the tool to execute
         arguments: Dict of arguments to pass to the tool
-    
+
     Returns:
         dict: Tool execution result
-    
+
     Raises:
         ValueError: If tool_name is not recognized
     """
+    if tool_name == "detect":
+        return generic_detect.detect(**arguments)
+
     if tool_name not in TOOL_MAP:
-        raise ValueError(f"Unknown tool: {tool_name}. Available: {list(TOOL_MAP.keys())}")
-    
-    # Filter arguments to only those expected by the function
+        raise ValueError(f"Unknown tool: {tool_name}. Use 'detect' with your own layers and weights.")
+
+    # Legacy dispatch — filter arguments to function signature
     func = TOOL_MAP[tool_name]
-    import inspect
     sig = inspect.signature(func)
     valid_params = set(sig.parameters.keys())
-    
     filtered_args = {k: v for k, v in arguments.items() if k in valid_params}
-    
     return func(**filtered_args)
 
 
 def get_tool_descriptions():
     """
-    Get human-readable descriptions of all tools.
-    
+    Get human-readable descriptions of available tools.
+
     Returns:
         dict: {tool_name: description}
     """
@@ -525,44 +283,39 @@ def get_tool_descriptions():
 def get_tools_by_type(tool_type="all"):
     """
     Get tools filtered by type.
-    
+
+    With the single-detect architecture, this always returns
+    the detect tool. Kept for backward compatibility.
+
     Args:
         tool_type: "friction", "emergence", or "all"
-    
+
     Returns:
-        list: Filtered tool definitions
+        list: Tool definitions
     """
-    all_tools = get_openai_tools()
-    
-    if tool_type == "friction":
-        return [t for t in all_tools if t["function"]["description"].startswith("FRICTION:")]
-    elif tool_type == "emergence":
-        return [t for t in all_tools if t["function"]["description"].startswith("CONFLUENCE:")]
-    else:
-        return all_tools
+    return get_openai_tools()
 
 
 def explain_result(tool_name, result):
     """
-    [v1.2.0] Get human-friendly explanation of tool result.
-    
-    Returns reasoning guidance based on layer visibility, helping LLMs
-    and humans understand which hierarchical layer drove the detection.
-    
+    Get human-friendly explanation of tool result.
+
+    Returns reasoning guidance based on layer visibility.
+
     Args:
         tool_name: Name of the tool
         result: Tool result dict (must include 'layer_visibility')
-    
+
     Returns:
         Dict with explanation or None if layer_visibility not available
     """
     layer_vis = result.get("layer_visibility")
     if not layer_vis:
         return None
-    
+
     dominant = layer_vis.get("dominant")
     rationale = layer_vis.get("rationale")
-    
+
     hints = {
         "Micro": [
             "Trust immediate signals but check for noise/outliers",
@@ -585,16 +338,17 @@ def explain_result(tool_name, result):
             "May indicate regime change"
         ]
     }
-    
+
     return {
         "tool": tool_name,
         "m_score": result.get("m_score"),
         "dominant_layer": dominant,
         "layer_rationale": rationale,
         "reasoning_hints": hints.get(dominant, []),
-        "_api_version": "1.2.0"
     }
 
+
+# ---- YAML guidance loading -------------------------------------------------
 
 def _load_tool_yaml(tool_name):
     """Load YAML guidance for a tool. Returns dict or None."""
@@ -613,9 +367,6 @@ def get_tool_guidance(tool_names=None):
     """
     Load YAML calibration guidance for tools, formatted for system prompt.
 
-    Reads the per-tool YAML files at runtime so edits to YAML are
-    immediately reflected without code changes.
-
     Args:
         tool_names: List of tool names, or None for all tools.
 
@@ -623,9 +374,8 @@ def get_tool_guidance(tool_names=None):
         str: Formatted guidance text for system prompt injection.
     """
     if tool_names is None:
-        tool_names = list(TOOL_MAP.keys())
+        tool_names = [n for n in TOOL_MAP.keys() if n != "generic_detect"]
     else:
-        # Filter to known tools only (prevents path traversal)
         tool_names = [n for n in tool_names if n in TOOL_MAP]
 
     sections = []
@@ -636,7 +386,6 @@ def get_tool_guidance(tool_names=None):
 
         lines = [f"### {name} ({data.get('type', '?')} | {data.get('domain', '?')})"]
 
-        # Selection criteria
         sel = data.get("selection", {})
         if sel.get("use_when"):
             lines.append("**Use when:**")
@@ -647,7 +396,6 @@ def get_tool_guidance(tool_names=None):
             for item in sel["not_for"]:
                 lines.append(f"  - {item}")
 
-        # Parameters with calibration anchors
         params = data.get("parameters", {})
         if params:
             lines.append("**Parameters:**")
@@ -657,7 +405,6 @@ def get_tool_guidance(tool_names=None):
                 high = pdata.get("high", "")
                 lines.append(f"  - `{pname}` ({layer}): {low} \u2192 {high}")
 
-        # Interaction guidance (condensed)
         ig = data.get("interaction_guidance", {})
         dampen = ig.get("dampen_when", {})
         amplify = ig.get("amplify_when", {})
@@ -668,7 +415,6 @@ def get_tool_guidance(tool_names=None):
             for p, reason in amplify.items():
                 lines.append(f"  - Amplify `{p}`: {reason}")
 
-        # Interpretation
         interp = data.get("interpretation", {})
         if interp:
             lines.append(f"**High M:** {interp.get('high_m', '')}")
@@ -680,7 +426,9 @@ def get_tool_guidance(tool_names=None):
     return header + "\n\n".join(sections)
 
 
-# Domain name → tool name mapping for context loading
+# ---- Context loading -------------------------------------------------------
+
+# Domain name -> tool name mapping for context loading
 _DOMAIN_TOOLS = {
     "healthcare": ["healthcare_phenotype_genotype", "healthcare_precision_therapeutic"],
     "finance": ["finance_regime_conflict", "finance_confluence_alpha"],
@@ -692,7 +440,7 @@ _DOMAIN_TOOLS = {
     "system_lock": ["system_lock_recursive_control", "system_lock_dissolution_window"],
 }
 
-# Aliases for domain names → canonical _DOMAIN_TOOLS key
+# Aliases for domain names
 _DOMAIN_ALIASES = {
     "cybersecurity": "cyber",
     "security": "cyber",
@@ -704,10 +452,6 @@ _DOMAIN_ALIASES = {
 def get_scaffold():
     """
     Load the universal reasoning scaffold.
-
-    This is Stage 1 of the load order: the domain-agnostic framework
-    that teaches an LLM how to think with Mantic (formula, layer
-    hierarchy, design philosophy, translation rules).
 
     Returns:
         str: Scaffold content, or empty string if file not found.
@@ -722,9 +466,6 @@ def get_domain_config(domain):
     """
     Load a domain-specific config file.
 
-    This is Stage 2 of the load order: the domain-specific layer
-    mappings, multi-column architecture, and reasoning protocols.
-
     Args:
         domain: Domain name (healthcare, finance, cyber, climate,
                 legal, military, social, system_lock, plan, current).
@@ -732,8 +473,6 @@ def get_domain_config(domain):
     Returns:
         str: Domain config content, or empty string if not found.
     """
-    # Map domain names to config filenames
-    # Files are named mantic_{name}.md in configs/
     aliases = {
         "healthcare": "health",
         "cybersecurity": "security",
@@ -751,30 +490,25 @@ def get_full_context(domain=None):
     """
     Load the complete LLM context in the correct order.
 
-    Chains: Scaffold → Domain Config (optional) → Tool Guidance.
+    Chains: Scaffold -> Domain Config (optional) -> Tool Guidance.
 
     Args:
-        domain: Optional domain name. If provided, includes the
-                domain-specific config and only that domain's tool
-                guidance. If None, includes all tool guidance.
+        domain: Optional domain name.
 
     Returns:
         str: Complete context string for system prompt injection.
     """
     parts = []
 
-    # Stage 1: Scaffold (always)
     scaffold = get_scaffold()
     if scaffold:
         parts.append(scaffold)
 
-    # Stage 2: Domain config (if domain specified)
     if domain:
         config = get_domain_config(domain)
         if config:
             parts.append(config)
 
-    # Stage 3: Tool guidance (normalize aliases before lookup)
     canonical = _DOMAIN_ALIASES.get(domain, domain) if domain else None
     if canonical and canonical in _DOMAIN_TOOLS:
         guidance = get_tool_guidance(_DOMAIN_TOOLS[canonical])
@@ -786,29 +520,25 @@ def get_full_context(domain=None):
 
 
 if __name__ == "__main__":
-    # Test the adapter
-    print("=== OpenAI Adapter Test (17 Tools) ===\n")
-    
+    print("=== OpenAI Adapter ===\n")
+
     tools = get_openai_tools()
-    print(f"Total available tools: {len(tools)}")
-    
-    friction = get_tools_by_type("friction")
-    emergence = get_tools_by_type("emergence")
-    print(f"  Friction tools: {len(friction)}")
-    print(f"  Emergence tools: {len(emergence)}")
-    
-    print("\n--- Testing Friction Tool ---")
-    result = execute_tool("healthcare_phenotype_genotype", {
-        "phenotypic": 0.3, "genomic": 0.9, "environmental": 0.4, "psychosocial": 0.8
+    print(f"Tools exposed to LLM: {len(tools)}")
+    for t in tools:
+        print(f"  - {t['function']['name']}: {t['function']['description'][:80]}...")
+
+    presets = get_presets()
+    print(f"\nPresets available: {len(presets)}")
+    for name in presets:
+        print(f"  - {name}")
+
+    print("\n--- Testing detect ---")
+    result = execute_tool("detect", {
+        "domain_name": "test_healthcare",
+        "layer_names": ["phenotypic", "genomic", "environmental", "psychosocial"],
+        "weights": [0.35, 0.30, 0.20, 0.15],
+        "layer_values": [0.3, 0.9, 0.4, 0.8],
+        "mode": "friction"
     })
-    print(f"Alert: {result['alert']}")
-    print(f"M-Score: {result['m_score']:.3f}")
-    
-    print("\n--- Testing Emergence Tool ---")
-    result = execute_tool("healthcare_precision_therapeutic", {
-        "genomic_predisposition": 0.85, "environmental_readiness": 0.82,
-        "phenotypic_timing": 0.88, "psychosocial_engagement": 0.90
-    })
-    print(f"Window Detected: {result['window_detected']}")
-    print(f"Window Type: {result.get('window_type', 'N/A')}")
+    print(f"Alert: {result.get('alert')}")
     print(f"M-Score: {result['m_score']:.3f}")

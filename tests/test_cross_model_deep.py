@@ -50,15 +50,15 @@ class TestGeminiAdapter:
     """Gemini adapter has zero existing test coverage."""
 
     def test_gemini_tool_count(self):
-        """Gemini adapter should expose exactly 17 tools."""
+        """Gemini adapter should expose the detect tool."""
         tools = get_gemini_tools()
         declarations = tools[0]["function_declarations"]
-        assert len(declarations) == 17
+        assert len(declarations) == 1
 
     def test_gemini_flat_tool_count(self):
-        """Flat format should also have 17 tools."""
+        """Flat format should have the detect tool."""
         tools = get_gemini_tools_flat()
-        assert len(tools) == 17
+        assert len(tools) == 1
 
     @pytest.mark.parametrize("tool_name", list(TOOL_MAP.keys()))
     def test_gemini_execute_all_tools(self, tool_name):
@@ -114,19 +114,19 @@ class TestCrossAdapterParity:
 # =============================================================================
 
 class TestAdapterToolCounts:
-    """All adapters should expose exactly 17 tools."""
+    """All adapters should expose the single detect tool."""
 
-    def test_openai_17_tools(self):
-        assert len(get_openai_tools()) == 17
+    def test_openai_1_tool(self):
+        assert len(get_openai_tools()) == 1
 
-    def test_kimi_17_tools(self):
-        assert len(get_kimi_tools()) == 17
+    def test_kimi_1_tool(self):
+        assert len(get_kimi_tools()) == 1
 
-    def test_claude_17_tools(self):
-        assert len(get_claude_tools()) == 17
+    def test_claude_1_tool(self):
+        assert len(get_claude_tools()) == 1
 
-    def test_gemini_17_tools(self):
-        assert len(get_gemini_tools_flat()) == 17
+    def test_gemini_1_tool(self):
+        assert len(get_gemini_tools_flat()) == 1
 
 
 # =============================================================================

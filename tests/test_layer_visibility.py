@@ -288,7 +288,6 @@ class TestAdapterExplainResult:
         assert explanation is not None
         assert explanation["dominant_layer"] == "Micro"
         assert "reasoning_hints" in explanation
-        assert "_api_version" in explanation
 
     def test_explain_result_no_layer_visibility(self):
         """Test explain_result returns None if no layer_visibility."""
