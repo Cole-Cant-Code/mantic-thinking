@@ -785,6 +785,7 @@ See [RELEASE_NOTES.md](RELEASE_NOTES.md) for full changelog.
 
 | Version | Highlights |
 |---------|-----------|
+| **2.0.1** | PyPI README sync |
 | **2.0.0** | README overhaul, 17-tool stable surface, v2 milestone |
 | 1.6.0 | System lock domain (friction + emergence), 17 tools |
 | 1.5.x | Context assembly, MCP bootstrap, generic detect, PyPI alignment |

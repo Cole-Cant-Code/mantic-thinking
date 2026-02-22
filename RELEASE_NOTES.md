@@ -1,3 +1,15 @@
+# Release Notes — 2026-02-22 (v2.0.1)
+
+## Summary
+
+Patch to sync PyPI README with the full v2.0.0 content. No code changes.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-22 (v2.0.0)
 
 ## Summary
