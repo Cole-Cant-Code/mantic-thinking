@@ -73,7 +73,7 @@ Do NOT use midpoint, steepness, or decay. These are not recognized and will be s
 
 Temporal config overrides raw f_time. Requires both kernel_type AND t.
 
-Not all kernels are valid for every profile. Each profile declares a temporal allowlist. Using an unlisted kernel will be rejected -- the kernel_type moves to the rejected block in overrides_applied, and f(t) falls back to the raw f_time value. Check the allowlist via list_domain_profiles before choosing a kernel.
+Not all kernels are valid for every profile. Each profile declares a temporal allowlist. Using an unlisted kernel returns a hard error with no detection result. Check the allowlist via list_domain_profiles before choosing a kernel.
 
 
 --- MCP TOOLS ---
