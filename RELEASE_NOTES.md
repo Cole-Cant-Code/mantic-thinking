@@ -1,3 +1,26 @@
+# Release Notes — 2026-02-22 (v1.5.5)
+
+## Summary
+
+This release synchronizes PyPI with the latest repository state after MCP bootstrap documentation corrections.
+
+## Highlights
+
+- `mantic_thinking/configs/mantic_mcp_bootstrap.md`: corrected temporal allowlist behavior in MCP mode
+  - Unlisted kernels are documented as hard runtime errors (no detection payload), matching actual MCP behavior.
+- Version metadata and docs updated for release alignment.
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- No runtime code changes; documentation and packaging sync only.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-09 (v1.4.1)
 
 ## Summary

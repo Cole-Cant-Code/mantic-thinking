@@ -908,6 +908,8 @@ Want to build a SaaS on top of Mantic? Embed it in your product? Redistribute?
 
 ## Version
 
+1.5.5 - Synced PyPI with latest MCP bootstrap corrections and repository documentation
+1.5.4 - Added MCP bootstrap guide for tool-based onboarding
 1.5.3 - Added regime change documentation (why fixed W works, four escalation paths)
 1.5.2 - README aligned with codebase: 15-tool count, generic_detect docs, context loading section, architecture tree, version history
 1.5.1 - Context assembly system (get_full_context); hardening: alias scoping, UTF-8, YAML error handling, path traversal filtering
