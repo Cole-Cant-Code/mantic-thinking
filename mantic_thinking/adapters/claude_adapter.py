@@ -4,7 +4,7 @@ Claude Adapter for Mantic Tools
 Converts Mantic tools to Claude Computer Use format.
 Optimized for Claude Code CLI integration.
 
-Includes both Friction tools (7) and Emergence tools (7) = 14 total.
+Includes Friction tools (8), Emergence tools (8), and Generic (1) = 17 total.
 """
 
 import sys
@@ -27,7 +27,7 @@ from mantic_thinking.adapters.openai_adapter import (
 
 def get_claude_tools():
     """
-    Return Claude Computer Use format for all 14 Mantic tools.
+    Return Claude Computer Use format for all 17 Mantic tools.
     
     Returns:
         list: Claude tool definitions
@@ -37,7 +37,12 @@ def get_claude_tools():
     claude_tools = []
     for tool in openai_tools:
         func = tool["function"]
-        tool_type = "friction" if func["description"].startswith("FRICTION:") else "emergence"
+        if func["description"].startswith("FRICTION:"):
+            tool_type = "friction"
+        elif func["description"].startswith("CONFLUENCE:"):
+            tool_type = "emergence"
+        else:
+            tool_type = "generic"
         
         claude_tool = {
             "name": func["name"],
@@ -213,20 +218,20 @@ def get_claude_prompt_addon():
         str: Prompt addon explaining how to use Mantic tools
     """
     return """
-## Using Mantic Early Warning Tools (14 Total)
+## Using Mantic Early Warning Tools (17 Total)
 
-You have access to 14 cross-domain detection tools based on the Mantic Framework:
+You have access to 17 cross-domain detection tools based on the Mantic Framework:
 
 **Core Formula**: M = (sum(W * L * I)) * f(t) / k_n
 
 ### Tool Types
 
-**FRICTION Tools (7)**: Detect cross-layer conflicts and mismatches
+**FRICTION Tools (8)**: Detect cross-layer conflicts and mismatches
 - Use when: Assessing risks, detecting anomalies, finding bottlenecks
 - High M-score indicates: Problems, divergences, risks
 - Output: Alerts, warnings, risk ratings
 
-**CONFLUENCE Tools (7)**: Detect alignment windows and opportunities
+**CONFLUENCE Tools (8)**: Detect alignment windows and opportunities
 - Use when: Seeking optimal timing, alignment windows, high-leverage interventions
 - High M-score indicates: Opportunities, favorable alignments, windows
 - Output: Window detected, recommendations, timing guidance
@@ -260,6 +265,13 @@ You have access to 14 cross-domain detection tools based on the Mantic Framework
 **Social**:
 - friction: social_narrative_rupture (detect narrative ruptures)
 - emergence: social_catalytic_alignment (find movement-building windows)
+
+**System Lock**:
+- friction: system_lock_recursive_control (detect recursive lock-in and value asymmetry)
+- emergence: system_lock_dissolution_window (detect transition and dissolution windows)
+
+**Generic**:
+- generic_detect (caller-defined domain, 3-6 layers, same governance bounds)
 
 ### Interpretation Guide
 
@@ -396,7 +408,7 @@ def get_claude_context(domain=None):
 
 if __name__ == "__main__":
     # Test the adapter
-    print("=== Claude Adapter Test (14 Tools) ===\n")
+    print("=== Claude Adapter Test (17 Tools) ===\n")
     
     print(get_summary_by_type("all"))
     

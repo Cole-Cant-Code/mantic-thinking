@@ -1,0 +1,50 @@
+tool: system_lock_recursive_control
+type: friction
+domain: system_lock
+
+selection:
+  use_when:
+    - "Platform lock-in is suspected and control may be outpacing user agency."
+    - "Interventions appear to be absorbed into system-preserving behavior."
+    - "You need a structured read on value asymmetry and recursive control depth."
+  not_for:
+    - "Simple competition analysis without recursive lock dynamics."
+    - "Short-lived spikes in dominance that do not indicate structural lock."
+
+parameters:
+  agent_autonomy:
+    layer: Micro
+    low: "Users constrained to low-agency, algorithm-shaped defaults"
+    mid: "Moderate awareness with partial choice diversity"
+    high: "Strong user agency and meaningful choice control"
+  collective_capacity:
+    layer: Meso
+    low: "Alternatives fragmented and non-viable"
+    mid: "Alternatives emerging with uneven traction"
+    high: "Alternatives coordinated, viable, and scaling"
+  concentration_control:
+    layer: Macro
+    low: "Low concentration and distributed value capture"
+    mid: "Moderate concentration with growing control leverage"
+    high: "High concentration with structural control power"
+  recursive_depth:
+    layer: Meta
+    low: "Shallow patterns; interventions can hold"
+    mid: "Recursive reinforcement present; interventions partially absorbed"
+    high: "Deep recursion; interventions systematically absorbed"
+
+interaction_guidance:
+  modes:
+    base: "Use fixed I for baseline comparability."
+    dynamic: "Default; recursive_depth is amplified when concentration_control exceeds agent_autonomy."
+    override: "Use for scenario stress tests and confidence tuning."
+  key_dynamic: "Lock amplification captures the concentration-over-agency feedback loop."
+
+interpretation:
+  high_m: "Friction: lock dynamics are active; asymmetry and recursion are reinforcing each other."
+  low_m: "Lower lock tension: system remains flexible enough for direct interventions."
+  check:
+    - "High concentration_control + high recursive_depth with low autonomy is the canonical lock signature."
+
+iteration:
+  note: "Use memory kernel to probe intervention absorption and compare attribution shifts under dynamic vs base interaction mode."

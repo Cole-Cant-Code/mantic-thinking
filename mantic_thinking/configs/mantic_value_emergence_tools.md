@@ -27,3 +27,7 @@ Identifies decisive action opportunities when Intelligence-Meso (enemy ambiguity
 ## **Social/Cultural: Catalytic Alignment Detector**
 
 Spots transformative potential when Individual-Micro (readiness), Network-Meso (bridge nodes activated), Institutional-Macro (policy window open), and Cultural-Meta (paradigm shift momentum) converge, signaling maximum impact for movement-building or cultural intervention.
+
+## **System Lock: Dissolution Window Detector**
+
+Identifies transition windows when Autonomy Momentum-Micro, Alternative Readiness-Meso, and Control Vulnerability-Macro converge while Pattern Flexibility-Meta supports sustained change, signaling when lock structures can be displaced instead of merely resisted.

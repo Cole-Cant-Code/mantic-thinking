@@ -77,14 +77,14 @@ result = detect(..., f_time=f_time)
 
 ## Tool Suites
 
-The Mantic Framework provides **14 tools** across 7 domains, with two complementary detection modes:
+The Mantic Framework provides **17 tools** across 8 domains, with two complementary detection modes plus a generic endpoint:
 
-### Friction Suite (7 tools)
+### Friction Suite (8 tools)
 **Logic:** Detects divergences and risks (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 **Use:** Risk assessment, anomaly detection, bottleneck identification  
 **Output:** Alerts, warnings, risk ratings
 
-### Emergence Suite (7 tools)
+### Emergence Suite (8 tools)
 **Logic:** Detects alignments and opportunities (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
 **Use:** Optimal timing, high-leverage interventions, window detection  
 **Output:** Window detected, recommendations, timing guidance
@@ -514,7 +514,7 @@ def detect(
     """
 ```
 
-### Universal Optional Inputs (All 14 Tools)
+### Universal Optional Inputs (All 17 Tools)
 
 All tools accept these optional tuning inputs in addition to their four domain-specific layer inputs:
 
@@ -551,7 +551,7 @@ Each tool has a companion YAML config next to its module with structured guidanc
 # Import via mantic_thinking/adapters/claude_adapter.py
 from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool
 
-tools = get_claude_tools()  # Returns 14 tools in Computer Use format
+tools = get_claude_tools()  # Returns 17 tools in Computer Use format
 
 # Friction tool (risk detection)
 result = execute_tool("healthcare_phenotype_genotype", {
@@ -570,7 +570,7 @@ result = execute_tool("healthcare_precision_therapeutic", {
 # Import via mantic_thinking/adapters/kimi_adapter.py
 from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
-tools = get_kimi_tools()  # Returns 14 tools in Kimi native format
+tools = get_kimi_tools()  # Returns 17 tools in Kimi native format
 
 # Compare friction vs emergence for same domain
 comparison = compare_friction_emergence(
@@ -606,12 +606,12 @@ result = execute_tool("climate_resilience_multiplier", {
 # Import via mantic_thinking/adapters/openai_adapter.py
 from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
-# Get all 14 tools
+# Get all 17 tools
 all_tools = get_openai_tools()
 
 # Or filter by type
-friction_tools = get_tools_by_type("friction")  # 7 tools
-emergence_tools = get_tools_by_type("emergence")  # 7 tools
+friction_tools = get_tools_by_type("friction")  # 8 tools
+emergence_tools = get_tools_by_type("emergence")  # 8 tools
 
 result = execute_tool("cyber_attribution_resolver", {...})  # Friction
 result = execute_tool("cyber_adversary_overreach", {...})   # Emergence
@@ -776,7 +776,7 @@ cd mantic-thinking
 python -m pytest tests/test_cross_model.py -v
 ```
 
-Expected: All 14 tools pass with 3 test cases each.
+Expected: All 17 tools pass with 3 test cases each.
 
 Quick sanity check:
 ```bash

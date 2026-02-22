@@ -82,10 +82,10 @@ class TestFullPipeline:
 # =============================================================================
 
 class TestKimiBatchExecution:
-    """Test Kimi adapter's batch_execute for all 14 tools."""
+    """Test Kimi adapter's batch_execute for all built-in domain tools."""
 
     def test_batch_execute_all_tools(self):
-        """Execute all 14 tools in a batch."""
+        """Execute all 16 built-in (non-generic) tools in a batch."""
         tools_with_params = [
             {"tool": "healthcare_phenotype_genotype", "params": {"phenotypic": 0.3, "genomic": 0.9, "environmental": 0.4, "psychosocial": 0.8}},
             {"tool": "finance_regime_conflict", "params": {"technical": 0.7, "macro": 0.5, "flow": -0.3, "risk": 0.6}},
@@ -101,10 +101,12 @@ class TestKimiBatchExecution:
             {"tool": "legal_precedent_seeding", "params": {"socio_political_climate": 0.7, "institutional_capacity": 0.8, "statutory_ambiguity": 0.75, "circuit_split": 0.85}},
             {"tool": "military_strategic_initiative", "params": {"enemy_ambiguity": 0.9, "positional_advantage": 0.9, "logistic_readiness": 0.9, "authorization_clarity": 0.9}},
             {"tool": "social_catalytic_alignment", "params": {"individual_readiness": 0.75, "network_bridges": 0.8, "policy_window": 0.7, "paradigm_momentum": 0.85}},
+            {"tool": "system_lock_recursive_control", "params": {"agent_autonomy": 0.25, "collective_capacity": 0.35, "concentration_control": 0.80, "recursive_depth": 0.75}},
+            {"tool": "system_lock_dissolution_window", "params": {"autonomy_momentum": 0.72, "alternative_readiness": 0.78, "control_vulnerability": 0.74, "pattern_flexibility": 0.66}},
         ]
 
         results = batch_execute(tools_with_params)
-        assert len(results) == 14
+        assert len(results) == 16
         for r in results:
             assert r["success"] is True, f"Tool {r['tool']} failed: {r.get('error')}"
             assert "m_score" in r["result"]

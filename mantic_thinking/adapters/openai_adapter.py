@@ -4,7 +4,7 @@ OpenAI/Codex Adapter for Mantic Tools
 Converts Mantic tools to OpenAI function calling format.
 Compatible with GPT-4, GPT-4o, and Codex.
 
-Includes Friction tools (7), Emergence tools (7), and Generic (1) = 15 total.
+Includes Friction tools (8), Emergence tools (8), and Generic (1) = 17 total.
 """
 
 import sys
@@ -32,6 +32,7 @@ from mantic_thinking.tools import (
     legal_precedent_drift,
     military_friction_forecast,
     social_narrative_rupture,
+    system_lock_recursive_control,
 )
 
 # Emergence tools (confluence detection)
@@ -43,6 +44,7 @@ from mantic_thinking.tools import (
     legal_precedent_seeding,
     military_strategic_initiative,
     social_catalytic_alignment,
+    system_lock_dissolution_window,
 )
 
 # Generic tool (caller-defined domains)
@@ -91,9 +93,9 @@ OVERRIDE_PROPERTIES = {
 }
 
 
-# Map tool IDs to detection functions (15 tools total)
+# Map tool IDs to detection functions (17 tools total)
 TOOL_MAP = {
-    # Friction tools (7)
+    # Friction tools (8)
     "healthcare_phenotype_genotype": healthcare_phenotype_genotype.detect,
     "finance_regime_conflict": finance_regime_conflict.detect,
     "cyber_attribution_resolver": cyber_attribution_resolver.detect,
@@ -101,7 +103,8 @@ TOOL_MAP = {
     "legal_precedent_drift": legal_precedent_drift.detect,
     "military_friction_forecast": military_friction_forecast.detect,
     "social_narrative_rupture": social_narrative_rupture.detect,
-    # Emergence tools (7)
+    "system_lock_recursive_control": system_lock_recursive_control.detect,
+    # Emergence tools (8)
     "healthcare_precision_therapeutic": healthcare_precision_therapeutic.detect,
     "finance_confluence_alpha": finance_confluence_alpha.detect,
     "cyber_adversary_overreach": cyber_adversary_overreach.detect,
@@ -109,6 +112,7 @@ TOOL_MAP = {
     "legal_precedent_seeding": legal_precedent_seeding.detect,
     "military_strategic_initiative": military_strategic_initiative.detect,
     "social_catalytic_alignment": social_catalytic_alignment.detect,
+    "system_lock_dissolution_window": system_lock_dissolution_window.detect,
     # Generic (caller-defined domains)
     "generic_detect": generic_detect.detect,
 }
@@ -119,7 +123,7 @@ def get_openai_tools():
     Return OpenAI function calling schema for all Mantic tools.
 
     Returns:
-        list: OpenAI function definitions (15 tools)
+        list: OpenAI function definitions (17 tools)
     """
     friction_tools = [
         {
@@ -245,6 +249,24 @@ def get_openai_tools():
                         "f_time": {"type": "number", "default": 1.0}
                     },
                     "required": ["individual", "network", "institutional", "cultural"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "system_lock_recursive_control",
+                "description": "FRICTION: Detects recursive control patterns where concentration and recursion outpace individual and collective agency.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "agent_autonomy": {"type": "number", "description": "Individual agency and choice diversity (0-1)"},
+                        "collective_capacity": {"type": "number", "description": "Alternative system viability (0-1)"},
+                        "concentration_control": {"type": "number", "description": "Concentration and platform control pressure (0-1)"},
+                        "recursive_depth": {"type": "number", "description": "Intervention absorption / recursion depth (0-1)"},
+                        "f_time": {"type": "number", "default": 1.0}
+                    },
+                    "required": ["agent_autonomy", "collective_capacity", "concentration_control", "recursive_depth"]
                 }
             }
         }
@@ -374,6 +396,24 @@ def get_openai_tools():
                         "f_time": {"type": "number", "default": 1.0}
                     },
                     "required": ["individual_readiness", "network_bridges", "policy_window", "paradigm_momentum"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "system_lock_dissolution_window",
+                "description": "CONFLUENCE: Detects dissolution windows where autonomy momentum, alternative readiness, and control vulnerability converge.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "autonomy_momentum": {"type": "number", "description": "Individual agency growth momentum (0-1)"},
+                        "alternative_readiness": {"type": "number", "description": "Decentralized alternative readiness (0-1)"},
+                        "control_vulnerability": {"type": "number", "description": "Incumbent control vulnerability (0-1)"},
+                        "pattern_flexibility": {"type": "number", "description": "Structural flexibility against re-locking (0-1)"},
+                        "f_time": {"type": "number", "default": 1.0}
+                    },
+                    "required": ["autonomy_momentum", "alternative_readiness", "control_vulnerability", "pattern_flexibility"]
                 }
             }
         }
@@ -649,6 +689,7 @@ _DOMAIN_TOOLS = {
     "legal": ["legal_precedent_drift", "legal_precedent_seeding"],
     "military": ["military_friction_forecast", "military_strategic_initiative"],
     "social": ["social_narrative_rupture", "social_catalytic_alignment"],
+    "system_lock": ["system_lock_recursive_control", "system_lock_dissolution_window"],
 }
 
 # Aliases for domain names → canonical _DOMAIN_TOOLS key
@@ -686,7 +727,7 @@ def get_domain_config(domain):
 
     Args:
         domain: Domain name (healthcare, finance, cyber, climate,
-                legal, military, social, plan, current).
+                legal, military, social, system_lock, plan, current).
 
     Returns:
         str: Domain config content, or empty string if not found.
@@ -746,7 +787,7 @@ def get_full_context(domain=None):
 
 if __name__ == "__main__":
     # Test the adapter
-    print("=== OpenAI Adapter Test (14 Tools) ===\n")
+    print("=== OpenAI Adapter Test (17 Tools) ===\n")
     
     tools = get_openai_tools()
     print(f"Total available tools: {len(tools)}")

@@ -2,8 +2,8 @@
 Mantic Early Warning System - Domain Tools
 
 Two complementary suites plus a generic endpoint:
-- Friction Tools (7): Detect cross-layer conflicts and mismatches
-- Emergence Tools (7): Detect alignment windows and opportunities
+- Friction Tools (8): Detect cross-layer conflicts and mismatches
+- Emergence Tools (8): Detect alignment windows and opportunities
 - Generic Tool (1): Caller-defined domains with full governance
 
 Friction Tools:
@@ -14,6 +14,7 @@ Friction Tools:
 - legal_precedent_drift: Precedent Drift Alert
 - military_friction_forecast: Friction Forecast Engine
 - social_narrative_rupture: Narrative Rupture Detector
+- system_lock_recursive_control: Recursive Control Detector
 
 Emergence (Confluence) Tools:
 - healthcare_precision_therapeutic: Precision Therapeutic Window
@@ -23,6 +24,7 @@ Emergence (Confluence) Tools:
 - legal_precedent_seeding: Precedent Seeding Optimizer
 - military_strategic_initiative: Strategic Initiative Window
 - social_catalytic_alignment: Catalytic Alignment Detector
+- system_lock_dissolution_window: Dissolution Window Detector
 """
 
 import importlib
@@ -36,6 +38,7 @@ _TOOL_MODULES = {
     "legal_precedent_drift": "mantic_thinking.tools.friction.legal_precedent_drift",
     "military_friction_forecast": "mantic_thinking.tools.friction.military_friction_forecast",
     "social_narrative_rupture": "mantic_thinking.tools.friction.social_narrative_rupture",
+    "system_lock_recursive_control": "mantic_thinking.tools.friction.system_lock_recursive_control",
     # Emergence
     "healthcare_precision_therapeutic": "mantic_thinking.tools.emergence.healthcare_precision_therapeutic",
     "finance_confluence_alpha": "mantic_thinking.tools.emergence.finance_confluence_alpha",
@@ -44,6 +47,7 @@ _TOOL_MODULES = {
     "legal_precedent_seeding": "mantic_thinking.tools.emergence.legal_precedent_seeding",
     "military_strategic_initiative": "mantic_thinking.tools.emergence.military_strategic_initiative",
     "social_catalytic_alignment": "mantic_thinking.tools.emergence.social_catalytic_alignment",
+    "system_lock_dissolution_window": "mantic_thinking.tools.emergence.system_lock_dissolution_window",
     # Generic (caller-defined domains)
     "generic_detect": "mantic_thinking.tools.generic_detect",
 }
@@ -77,6 +81,7 @@ __all__ = [
     "legal_precedent_drift",
     "military_friction_forecast",
     "social_narrative_rupture",
+    "system_lock_recursive_control",
     # Emergence
     "healthcare_precision_therapeutic",
     "finance_confluence_alpha",
@@ -85,6 +90,7 @@ __all__ = [
     "legal_precedent_seeding",
     "military_strategic_initiative",
     "social_catalytic_alignment",
+    "system_lock_dissolution_window",
     # Generic
     "generic_detect",
 ]

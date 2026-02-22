@@ -138,6 +138,20 @@ _TOOL_LAYER_MAP: Dict[str, Dict[str, LayerType]] = {
         "network_bridges": "Meso",
         "policy_window": "Macro",
         "paradigm_momentum": "Meta"
+    },
+    # System Lock Friction
+    "system_lock_recursive_control": {
+        "agent_autonomy": "Micro",
+        "collective_capacity": "Meso",
+        "concentration_control": "Macro",
+        "recursive_depth": "Meta"
+    },
+    # System Lock Emergence
+    "system_lock_dissolution_window": {
+        "autonomy_momentum": "Micro",
+        "alternative_readiness": "Meso",
+        "control_vulnerability": "Macro",
+        "pattern_flexibility": "Meta"
     }
 }
 
@@ -218,6 +232,18 @@ _DOMINANT_RATIONALE: Dict[str, Dict[str, str]] = {
         "Meso": "Network bridges enabling alignment",
         "Macro": "Policy window open",
         "Meta": "Cultural paradigm momentum"
+    },
+    "system_lock_recursive_control": {
+        "Micro": "Agent autonomy deficit driving lock-in",
+        "Meso": "Collective capacity insufficient for viable alternatives",
+        "Macro": "Concentration control is dominating system behavior",
+        "Meta": "Recursive reinforcement is absorbing interventions"
+    },
+    "system_lock_dissolution_window": {
+        "Micro": "Autonomy momentum is building at the individual layer",
+        "Meso": "Alternative readiness is driving transition potential",
+        "Macro": "Control vulnerability is creating an opening",
+        "Meta": "Pattern flexibility is enabling sustainable dissolution"
     }
 }
 

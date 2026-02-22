@@ -576,9 +576,9 @@ class TestOpenAIAdapter:
     """Test OpenAI/Codex adapter."""
     
     def test_tools_count(self):
-        """Test that all 14 tools are available."""
+        """Test that all 17 tools are available."""
         tools = get_openai_tools()
-        assert len(tools) == 15
+        assert len(tools) == 17
     
     def test_tool_schema(self):
         """Test tool schema format."""
@@ -666,6 +666,18 @@ class TestOpenAIAdapter:
                 "network_bridges": 0.85,
                 "policy_window": 0.80,
                 "paradigm_momentum": 0.88
+            },
+            "system_lock_recursive_control": {
+                "agent_autonomy": 0.30,
+                "collective_capacity": 0.35,
+                "concentration_control": 0.80,
+                "recursive_depth": 0.75
+            },
+            "system_lock_dissolution_window": {
+                "autonomy_momentum": 0.72,
+                "alternative_readiness": 0.76,
+                "control_vulnerability": 0.74,
+                "pattern_flexibility": 0.68
             }
         }
 
@@ -679,9 +691,9 @@ class TestKimiAdapter:
     """Test Kimi native adapter."""
     
     def test_tools_count(self):
-        """Test that all 14 tools are available."""
+        """Test that all 17 tools are available."""
         tools = get_kimi_tools()
-        assert len(tools) == 15
+        assert len(tools) == 17
     
     def test_kimi_meta(self):
         """Test Kimi-specific metadata."""
@@ -712,9 +724,9 @@ class TestClaudeAdapter:
     """Test Claude Computer Use adapter."""
     
     def test_tools_count(self):
-        """Test that all 14 tools are available."""
+        """Test that all 17 tools are available."""
         tools = get_claude_tools()
-        assert len(tools) == 15
+        assert len(tools) == 17
     
     def test_claude_meta(self):
         """Test Claude-specific metadata."""
@@ -921,7 +933,7 @@ if __name__ == "__main__":
     assert verify_kernel_integrity()
     print("   ✓ Kernel integrity verified")
     
-    print("\n2. Testing all 14 tools...")
+    print("\n2. Testing all 17 tools...")
     tools = [
         ("healthcare", healthcare_phenotype_genotype.detect, 
          {"phenotypic": 0.5, "genomic": 0.6, "environmental": 0.4, "psychosocial": 0.5}),

@@ -27,3 +27,7 @@ Course-of-action analyzer scoring Maneuver-Meso (plan) against Intelligence-Meso
 ## **Social/Cultural: Narrative Rupture Detector**
 
 Viral moment tracker mapping Individual-Micro (sentiment signals) against Network-Meso (propagation topology), Institutional-Macro (response capacity), and Cultural-Meta (meaning-paradigm fit), flagging when Network-Meso amplification outpaces Institutional-Macro sense-making (e.g., "Meme spreading via Network bridges, but Cultural-Meta shows sincerity shift incoming = irony backlash risk").
+
+## **System Lock: Recursive Control Detector**
+
+Detects lock-in regimes where Agent Autonomy-Micro and Collective Capacity-Meso are suppressed while Concentration Control-Macro and Recursive Depth-Meta rise, signaling value asymmetry and intervention absorption (e.g., "Users can technically exit but defaults and recommendation loops keep behavior captive = active lock dynamics").

@@ -1,3 +1,41 @@
+# Release Notes — 2026-02-22 (v1.6.0)
+
+## Summary
+
+This minor release adds a new `system_lock` domain with paired friction/emergence tools, updates adapters/schemas to a 17-tool public surface, and aligns docs/tests across the repository.
+
+## Highlights
+
+- New friction tool:
+  - `mantic_thinking/tools/friction/system_lock_recursive_control.py`
+  - `mantic_thinking/tools/friction/system_lock_recursive_control.yaml`
+- New emergence tool:
+  - `mantic_thinking/tools/emergence/system_lock_dissolution_window.py`
+  - `mantic_thinking/tools/emergence/system_lock_dissolution_window.yaml`
+- New domain config:
+  - `mantic_thinking/configs/mantic_system_lock.md`
+- Registration and governance updates:
+  - Added `system_lock` temporal allowlist (`linear`, `memory`, `s_curve`)
+  - Added hierarchy visibility mappings/rationales
+  - Reserved `system_lock` in `generic_detect` to prevent domain collision
+- Adapter/schema updates:
+  - OpenAI/Kimi/Claude/Gemini now expose 17 tools total (8 friction + 8 emergence + 1 generic)
+  - Updated `mantic_thinking/schemas/openapi.json` and `mantic_thinking/schemas/kimi-tools.json`
+- Tests:
+  - Added `tests/test_system_lock.py`
+  - Updated count/surface tests for 17-tool parity
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- Existing tools remain backward-compatible; new domain is additive.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-22 (v1.5.5)
 
 ## Summary

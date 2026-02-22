@@ -8,7 +8,7 @@ Cross-domain anomaly and opportunity detection using deterministic 4-layer hiera
 
 Compatible with Claude, Kimi, Gemini, OpenAI, and Ollama.
 
-**15 tools total:** 7 Friction (divergence detection) + 7 Emergence (confluence detection) + 1 Generic (caller-defined domains)
+**17 tools total:** 8 Friction (divergence detection) + 8 Emergence (confluence detection) + 1 Generic (caller-defined domains)
 
 ## Why Mantic
 
@@ -154,9 +154,9 @@ example_scenarios:
 
 The framework's accuracy is bounded by input quality. The mapping from messy reality to [0-1] values is fundamentally interpretive—the LLM uses YAML guidance as calibration points and interpolates. Mantic doesn't eliminate judgment; it makes judgment consistent, constrained, and auditable.
 
-### Beyond the 14 Built-in Tools
+### Beyond the 16 Built-in Tools
 
-The shipped tools — healthcare, finance, cyber, climate, legal, military, social — are reference points. Traditional starting spots. They formalize common domains with pre-set weights and thresholds so you can get results immediately.
+The shipped tools — healthcare, finance, cyber, climate, legal, military, social, and system_lock — are reference points. Traditional starting spots. They formalize common domains with pre-set weights and thresholds so you can get results immediately.
 
 But the framework is the four layers and the formula. That's it. An LLM can apply the same structure to anything that has signals at different scales: childbirth, household dynamics, MMA fight analysis, concert tour economics, virtual game economies, college admissions, supply chain disruption — whatever shows up.
 
@@ -249,6 +249,7 @@ Detects when layers diverge (per-tool thresholds; see each tool's DEFAULT_THRESH
 | `legal_precedent_drift` | Legal | Precedent drift alert |
 | `military_friction_forecast` | Military | Operational friction |
 | `social_narrative_rupture` | Social | Narrative rupture detection |
+| `system_lock_recursive_control` | System Lock | Recursive control and lock-in detection |
 
 ### Emergence Tools (Confluence Detection)
 Detects when layers align (per-tool thresholds; see each tool's DEFAULT_THRESHOLDS)
@@ -262,6 +263,7 @@ Detects when layers align (per-tool thresholds; see each tool's DEFAULT_THRESHOL
 | `legal_precedent_seeding` | Legal | Precedent-setting windows |
 | `military_strategic_initiative` | Military | Decisive action windows |
 | `social_catalytic_alignment` | Social | Movement-building windows |
+| `system_lock_dissolution_window` | System Lock | Lock-dissolution opportunity windows |
 
 ### Generic Tool (Caller-Defined Domains)
 Run Mantic detection on any domain — you define the layers, weights, and mode.
@@ -315,7 +317,7 @@ print(f"M-Score: {result['m_score']:.3f}")
 ```python
 from mantic_thinking.adapters.kimi_adapter import get_kimi_tools, execute, compare_friction_emergence
 
-# Get all 15 tools
+# Get all 17 tools
 tools = get_kimi_tools()
 
 # Compare friction vs emergence for same domain
@@ -333,7 +335,7 @@ comparison = compare_friction_emergence(
 ```python
 from mantic_thinking.adapters.claude_adapter import get_claude_tools, execute_tool, format_for_claude
 
-# Get 15 tools in Computer Use format
+# Get 17 tools in Computer Use format
 tools = get_claude_tools()
 
 # Execute and format for Claude
@@ -384,12 +386,12 @@ tools = get_openai_tools()
 ```python
 from mantic_thinking.adapters.openai_adapter import get_openai_tools, execute_tool, get_tools_by_type
 
-# Get all 15 tools
+# Get all 17 tools
 tools = get_openai_tools()
 
 # Or filter by type
-friction = get_tools_by_type("friction")   # 7 tools
-emergence = get_tools_by_type("emergence") # 7 tools
+friction = get_tools_by_type("friction")   # 8 tools
+emergence = get_tools_by_type("emergence") # 8 tools
 
 result = execute_tool("cyber_adversary_overreach", {
     "threat_intel_stretch": 0.90, "geopolitical_pressure": 0.85,
@@ -698,8 +700,8 @@ mantic-thinking/
 │   │   ├── safe_kernel.py         # Guarded wrapper (k_n validation)
 │   │   └── validators.py          # Input validation and normalization
 │   ├── tools/
-│   │   ├── friction/              # 7 divergence detection tools + YAML guidance per tool
-│   │   ├── emergence/             # 7 confluence detection tools + YAML guidance per tool
+│   │   ├── friction/              # 8 divergence detection tools + YAML guidance per tool
+│   │   ├── emergence/             # 8 confluence detection tools + YAML guidance per tool
 │   │   └── generic_detect.py      # Caller-defined domains (3-6 layers)
 │   ├── adapters/                  # Model-specific adapters (Claude/Kimi/Gemini/OpenAI)
 │   ├── mantic/

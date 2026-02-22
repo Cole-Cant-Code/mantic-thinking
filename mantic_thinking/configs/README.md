@@ -10,8 +10,8 @@ This directory contains domain-specific configurations and framework documentati
 | `mantic_explicit_framework.md` | Explicit framework mode - technical operating protocol with columnar architecture |
 | `mantic_reasoning_guidelines.md` | Reasoning assistant guidelines - internal thinking scaffold |
 | `mantic_boundary_weaver.md` | Cross-silo navigation pattern - translating complexity between boundaries |
-| `mantic_early_warning_tools.md` | Friction tools descriptions (7 divergence detection tools) |
-| `mantic_value_emergence_tools.md` | Emergence tools descriptions (7 confluence detection tools) |
+| `mantic_early_warning_tools.md` | Friction tools descriptions (8 divergence detection tools) |
+| `mantic_value_emergence_tools.md` | Emergence tools descriptions (8 confluence detection tools) |
 
 ## Ollama Compatibility
 
@@ -33,6 +33,7 @@ Tested with: MiniMax M2.1, GPT-OSS, GLM-4, Llama 3.1/3.2, Qwen 2.5, and other to
 | `mantic_legal.md` | Legal | Legal reasoning & case strategy |
 | `mantic_social.md` | Social/Cultural | Social movement analysis & cultural narrative tracking |
 | `mantic_command.md` | Military/Command | Strategic decision-making & operational planning |
+| `mantic_system_lock.md` | System Lock | Lock-in detection and dissolution window analysis |
 | `mantic_plan.md` | Planning | Universal planning reasoning for structured plan development & readiness assessment |
 | `mantic_current.md` | Current Affairs | Real-time event analysis & trend monitoring |
 

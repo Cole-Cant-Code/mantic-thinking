@@ -2,7 +2,7 @@
 Cross-Model Deep Tests
 
 Tests the Gemini adapter (zero existing coverage), Claude adapter
-argument filtering gap, and all-adapter parity across 14 tools.
+argument filtering gap, and all-adapter parity across 17 tools.
 
 Run with: python -m pytest tests/test_cross_model_deep.py -v
 """
@@ -36,6 +36,8 @@ TOOL_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.7, "institutional_capacity": 0.8, "statutory_ambiguity": 0.75, "circuit_split": 0.85},
     "military_strategic_initiative": {"enemy_ambiguity": 0.7, "positional_advantage": 0.8, "logistic_readiness": 0.85, "authorization_clarity": 0.9},
     "social_catalytic_alignment": {"individual_readiness": 0.75, "network_bridges": 0.8, "policy_window": 0.7, "paradigm_momentum": 0.85},
+    "system_lock_recursive_control": {"agent_autonomy": 0.25, "collective_capacity": 0.35, "concentration_control": 0.8, "recursive_depth": 0.75},
+    "system_lock_dissolution_window": {"autonomy_momentum": 0.72, "alternative_readiness": 0.78, "control_vulnerability": 0.74, "pattern_flexibility": 0.66},
     "generic_detect": {"domain_name": "test_cross", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.7, 0.6, 0.8, 0.5], "mode": "friction"},
 }
 
@@ -48,15 +50,15 @@ class TestGeminiAdapter:
     """Gemini adapter has zero existing test coverage."""
 
     def test_gemini_tool_count(self):
-        """Gemini adapter should expose exactly 14 tools."""
+        """Gemini adapter should expose exactly 17 tools."""
         tools = get_gemini_tools()
         declarations = tools[0]["function_declarations"]
-        assert len(declarations) == 15
+        assert len(declarations) == 17
 
     def test_gemini_flat_tool_count(self):
-        """Flat format should also have 14 tools."""
+        """Flat format should also have 17 tools."""
         tools = get_gemini_tools_flat()
-        assert len(tools) == 15
+        assert len(tools) == 17
 
     @pytest.mark.parametrize("tool_name", list(TOOL_MAP.keys()))
     def test_gemini_execute_all_tools(self, tool_name):
@@ -112,19 +114,19 @@ class TestCrossAdapterParity:
 # =============================================================================
 
 class TestAdapterToolCounts:
-    """All adapters should expose exactly 14 tools."""
+    """All adapters should expose exactly 17 tools."""
 
-    def test_openai_14_tools(self):
-        assert len(get_openai_tools()) == 15
+    def test_openai_17_tools(self):
+        assert len(get_openai_tools()) == 17
 
-    def test_kimi_14_tools(self):
-        assert len(get_kimi_tools()) == 15
+    def test_kimi_17_tools(self):
+        assert len(get_kimi_tools()) == 17
 
-    def test_claude_14_tools(self):
-        assert len(get_claude_tools()) == 15
+    def test_claude_17_tools(self):
+        assert len(get_claude_tools()) == 17
 
-    def test_gemini_14_tools(self):
-        assert len(get_gemini_tools_flat()) == 15
+    def test_gemini_17_tools(self):
+        assert len(get_gemini_tools_flat()) == 17
 
 
 # =============================================================================

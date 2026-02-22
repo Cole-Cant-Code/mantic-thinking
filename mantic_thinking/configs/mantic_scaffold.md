@@ -61,7 +61,7 @@ You are reasoning about the weights. That IS the valuable work — deciding what
 
 ## Tools Are Paths, Not Gates
 
-15 tools exist: 7 friction, 7 emergence, 1 generic (any domain, 3–6 layers).
+17 tools exist: 8 friction, 8 emergence, 1 generic (any domain, 3–6 layers).
 
 Tools are optional. The framework works without them — the formula and layer hierarchy are all you need to structure your reasoning. Tools formalize it with deterministic math, audit trails, and calibrated thresholds. Use them when precision matters. Skip them when the hierarchy alone gives you enough structure.
 

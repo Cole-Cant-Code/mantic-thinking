@@ -12,7 +12,7 @@ class TestToolGuidanceLoading:
     """Core guidance loading from openai_adapter."""
 
     def test_load_all_tool_guidance(self):
-        """All 14 built-in tools load without error."""
+        """All 16 built-in tools load without error."""
         from mantic_thinking.adapters.openai_adapter import get_tool_guidance
 
         result = get_tool_guidance()
@@ -59,8 +59,8 @@ class TestToolGuidanceLoading:
         assert isinstance(result, str)
         assert "generic_detect" not in result
 
-    def test_all_14_tools_present(self):
-        """All 14 built-in tool names appear in full guidance output."""
+    def test_all_16_tools_present(self):
+        """All 16 built-in tool names appear in full guidance output."""
         from mantic_thinking.adapters.openai_adapter import get_tool_guidance
 
         result = get_tool_guidance()
@@ -73,6 +73,7 @@ class TestToolGuidanceLoading:
             "legal_precedent_drift",
             "military_friction_forecast",
             "social_narrative_rupture",
+            "system_lock_recursive_control",
             "healthcare_precision_therapeutic",
             "finance_confluence_alpha",
             "cyber_adversary_overreach",
@@ -80,6 +81,7 @@ class TestToolGuidanceLoading:
             "legal_precedent_seeding",
             "military_strategic_initiative",
             "social_catalytic_alignment",
+            "system_lock_dissolution_window",
         ]
 
         for tool_name in expected_tools:
@@ -322,7 +324,7 @@ class TestFullContext:
         result = get_full_context()
         assert "Mantic Reasoning Scaffold" in result
         assert "## Tool Calibration Guidance" in result
-        # Should include all 14 tools
+        # Should include all built-in domain tools
         assert "healthcare_phenotype_genotype" in result
         assert "finance_confluence_alpha" in result
 

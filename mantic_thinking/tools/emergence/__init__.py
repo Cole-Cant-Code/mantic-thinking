@@ -15,4 +15,5 @@ __all__ = [
     "legal_precedent_seeding",
     "military_strategic_initiative",
     "social_catalytic_alignment",
+    "system_lock_dissolution_window",
 ]

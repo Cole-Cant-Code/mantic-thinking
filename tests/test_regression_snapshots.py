@@ -43,7 +43,7 @@ class TestImmutabilityMarkers:
 # =============================================================================
 
 class TestPublicAPISurface:
-    """tools.__all__ must contain exactly 14 public tool modules."""
+    """tools.__all__ must contain exactly 17 public tool modules."""
 
     EXPECTED_TOOLS = sorted([
         "healthcare_phenotype_genotype",
@@ -53,6 +53,7 @@ class TestPublicAPISurface:
         "legal_precedent_drift",
         "military_friction_forecast",
         "social_narrative_rupture",
+        "system_lock_recursive_control",
         "healthcare_precision_therapeutic",
         "finance_confluence_alpha",
         "cyber_adversary_overreach",
@@ -60,15 +61,16 @@ class TestPublicAPISurface:
         "legal_precedent_seeding",
         "military_strategic_initiative",
         "social_catalytic_alignment",
+        "system_lock_dissolution_window",
         "generic_detect",
     ])
 
-    def test_all_has_15_tools(self):
-        """tools.__all__ has exactly 15 entries."""
-        assert len(tools.__all__) == 15
+    def test_all_has_17_tools(self):
+        """tools.__all__ has exactly 17 entries."""
+        assert len(tools.__all__) == 17
 
     def test_all_matches_expected(self):
-        """tools.__all__ contains exactly the expected 15 names."""
+        """tools.__all__ contains exactly the expected 17 names."""
         assert sorted(tools.__all__) == self.EXPECTED_TOOLS
 
     def test_no_internal_tools_exported(self):

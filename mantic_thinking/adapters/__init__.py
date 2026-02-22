@@ -7,9 +7,10 @@ Provides model-specific interfaces for:
 - Gemini (FunctionDeclaration format)
 - OpenAI/Codex (Function calling format)
 
-All adapters support 14 tools:
-- 7 Friction tools (divergence detection)
-- 7 Emergence tools (confluence detection)
+All adapters support 17 tools:
+- 8 Friction tools (divergence detection)
+- 8 Emergence tools (confluence detection)
+- 1 Generic tool (caller-defined domains)
 """
 
 from .openai_adapter import (

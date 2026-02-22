@@ -4,11 +4,11 @@ Generic Mantic Detector
 Exposes the Mantic kernel for arbitrary caller-defined domains.
 The caller specifies layer names, weights, and values — the kernel,
 governance (bounded overrides, interaction clamping, f_time limits),
-and audit trail remain identical to the 14 hardcoded domain tools.
+and audit trail remain identical to the 16 hardcoded domain tools.
 
 Domain Registration (Option D):
     The caller "registers" a novel domain by declaring:
-    - domain_name: A unique identifier (cannot collide with existing 7 domains)
+    - domain_name: A unique identifier (cannot collide with existing built-in domains)
     - layer_names: 3-6 layer labels
     - weights: Must sum to 1.0
     - layer_values: One value per layer (0-1)
@@ -50,7 +50,7 @@ from mantic_thinking.core.validators import (
 
 # Existing hardcoded domains — generic tool cannot shadow these
 _RESERVED_DOMAINS = frozenset([
-    "healthcare", "finance", "cyber", "climate", "legal", "military", "social"
+    "healthcare", "finance", "cyber", "climate", "legal", "military", "social", "system_lock"
 ])
 
 # Layer count bounds
@@ -131,7 +131,7 @@ def detect(domain_name, layer_names, weights, layer_values, mode="friction",
     Run Mantic detection on a caller-defined domain.
 
     Args:
-        domain_name: Unique domain label (cannot shadow built-in 7 domains)
+        domain_name: Unique domain label (cannot shadow built-in domains)
         layer_names: List of 3-6 layer name strings
         weights: List of floats summing to 1.0 (one per layer)
         layer_values: List of floats 0-1 (one per layer)

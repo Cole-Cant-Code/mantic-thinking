@@ -160,7 +160,7 @@ class TestToolResponses:
         assert "layer_visibility" in result
 
     def test_all_tools_include_layer_visibility(self):
-        """Test all 14 tools include layer_visibility."""
+        """Test all 17 tools include layer_visibility."""
         from mantic_thinking.adapters.openai_adapter import TOOL_MAP
         
         test_params = {
@@ -212,6 +212,14 @@ class TestToolResponses:
             "social_catalytic_alignment": {
                 "individual_readiness": 0.82, "network_bridges": 0.85,
                 "policy_window": 0.80, "paradigm_momentum": 0.88
+            },
+            "system_lock_recursive_control": {
+                "agent_autonomy": 0.30, "collective_capacity": 0.35,
+                "concentration_control": 0.80, "recursive_depth": 0.75
+            },
+            "system_lock_dissolution_window": {
+                "autonomy_momentum": 0.72, "alternative_readiness": 0.76,
+                "control_vulnerability": 0.74, "pattern_flexibility": 0.68
             },
             "generic_detect": {
                 "domain_name": "vis_test", "layer_names": ["a", "b", "c", "d"],

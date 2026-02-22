@@ -15,4 +15,5 @@ __all__ = [
     "legal_precedent_drift",
     "military_friction_forecast",
     "social_narrative_rupture",
+    "system_lock_recursive_control",
 ]

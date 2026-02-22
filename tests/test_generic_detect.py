@@ -392,13 +392,13 @@ class TestAdapterIntegration:
 
     def test_tool_count(self):
         from mantic_thinking.adapters.openai_adapter import TOOL_MAP, get_openai_tools
-        assert len(TOOL_MAP) == 15
-        assert len(get_openai_tools()) == 15
+        assert len(TOOL_MAP) == 17
+        assert len(get_openai_tools()) == 17
 
     def test_claude_adapter_includes_generic(self):
         from mantic_thinking.adapters.claude_adapter import get_claude_tools
         tools = get_claude_tools()
-        assert len(tools) == 15
+        assert len(tools) == 17
         names = [t["name"] for t in tools]
         assert "generic_detect" in names
 

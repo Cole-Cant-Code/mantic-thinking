@@ -1,7 +1,7 @@
 """
 Output Schema Consistency Tests
 
-Verifies that all 14 public tools return consistent output schemas
+Verifies that all 17 public tools return consistent output schemas
 with required keys present in all code paths.
 
 Run with: python -m pytest tests/test_output_schemas.py -v
@@ -37,6 +37,8 @@ HIGH_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.85, "institutional_capacity": 0.80, "statutory_ambiguity": 0.85, "circuit_split": 0.90},
     "military_strategic_initiative": {"enemy_ambiguity": 0.90, "positional_advantage": 0.90, "logistic_readiness": 0.90, "authorization_clarity": 0.90},
     "social_catalytic_alignment": {"individual_readiness": 0.85, "network_bridges": 0.80, "policy_window": 0.85, "paradigm_momentum": 0.90},
+    "system_lock_recursive_control": {"agent_autonomy": 0.25, "collective_capacity": 0.35, "concentration_control": 0.80, "recursive_depth": 0.75},
+    "system_lock_dissolution_window": {"autonomy_momentum": 0.72, "alternative_readiness": 0.78, "control_vulnerability": 0.74, "pattern_flexibility": 0.66},
     "generic_detect": {"domain_name": "test_high", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.9, 0.3, 0.6, 0.7], "mode": "friction"},
 }
 
@@ -56,6 +58,8 @@ LOW_INPUTS = {
     "legal_precedent_seeding": {"socio_political_climate": 0.3, "institutional_capacity": 0.3, "statutory_ambiguity": 0.3, "circuit_split": 0.3},
     "military_strategic_initiative": {"enemy_ambiguity": 0.3, "positional_advantage": 0.3, "logistic_readiness": 0.3, "authorization_clarity": 0.3},
     "social_catalytic_alignment": {"individual_readiness": 0.3, "network_bridges": 0.3, "policy_window": 0.3, "paradigm_momentum": 0.3},
+    "system_lock_recursive_control": {"agent_autonomy": 0.70, "collective_capacity": 0.65, "concentration_control": 0.35, "recursive_depth": 0.30},
+    "system_lock_dissolution_window": {"autonomy_momentum": 0.30, "alternative_readiness": 0.30, "control_vulnerability": 0.30, "pattern_flexibility": 0.30},
     "generic_detect": {"domain_name": "test_low", "layer_names": ["a", "b", "c", "d"], "weights": [0.25, 0.25, 0.25, 0.25], "layer_values": [0.5, 0.5, 0.5, 0.5], "mode": "friction"},
 }
 
@@ -64,6 +68,7 @@ FRICTION_TOOLS = [
     "cyber_attribution_resolver", "climate_maladaptation",
     "legal_precedent_drift", "military_friction_forecast",
     "social_narrative_rupture",
+    "system_lock_recursive_control",
 ]
 
 EMERGENCE_TOOLS = [
@@ -71,6 +76,7 @@ EMERGENCE_TOOLS = [
     "cyber_adversary_overreach", "climate_resilience_multiplier",
     "legal_precedent_seeding", "military_strategic_initiative",
     "social_catalytic_alignment",
+    "system_lock_dissolution_window",
 ]
 
 

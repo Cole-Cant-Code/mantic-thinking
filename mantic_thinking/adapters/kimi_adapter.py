@@ -3,7 +3,7 @@ Kimi Native Adapter for Mantic Tools
 
 Provides native Kimi tool format for seamless integration with Kimi Code CLI.
 
-Includes both Friction tools (7) and Emergence tools (7) = 14 total.
+Includes Friction tools (8), Emergence tools (8), and Generic (1) = 17 total.
 """
 
 import sys
@@ -24,7 +24,7 @@ from mantic_thinking.adapters.openai_adapter import (
 
 def get_kimi_tools():
     """
-    Return Kimi native tool format for all 14 Mantic tools.
+    Return Kimi native tool format for all 17 Mantic tools.
     
     Returns:
         list: Kimi tool definitions
@@ -35,7 +35,12 @@ def get_kimi_tools():
     kimi_tools = []
     for tool in openai_tools:
         func = tool["function"]
-        tool_type = "friction" if func["description"].startswith("FRICTION:") else "emergence"
+        if func["description"].startswith("FRICTION:"):
+            tool_type = "friction"
+        elif func["description"].startswith("CONFLUENCE:"):
+            tool_type = "emergence"
+        else:
+            tool_type = "generic"
         
         kimi_tool = {
             "name": func["name"],
@@ -189,7 +194,7 @@ def compare_friction_emergence(domain, friction_params, emergence_params):
     Compare friction and emergence results for the same domain.
     
     Args:
-        domain: Domain name (healthcare, finance, cyber, climate, legal, military, social)
+        domain: Domain name (healthcare, finance, cyber, climate, legal, military, social, system_lock)
         friction_params: Params for friction tool
         emergence_params: Params for emergence tool
     
@@ -203,7 +208,8 @@ def compare_friction_emergence(domain, friction_params, emergence_params):
         "climate": "climate_maladaptation",
         "legal": "legal_precedent_drift",
         "military": "military_friction_forecast",
-        "social": "social_narrative_rupture"
+        "social": "social_narrative_rupture",
+        "system_lock": "system_lock_recursive_control",
     }
     
     emergence_map = {
@@ -213,7 +219,8 @@ def compare_friction_emergence(domain, friction_params, emergence_params):
         "climate": "climate_resilience_multiplier",
         "legal": "legal_precedent_seeding",
         "military": "military_strategic_initiative",
-        "social": "social_catalytic_alignment"
+        "social": "social_catalytic_alignment",
+        "system_lock": "system_lock_dissolution_window",
     }
     
     if domain not in friction_map:
@@ -325,7 +332,7 @@ def get_kimi_context(domain=None):
 
 if __name__ == "__main__":
     # Test the adapter
-    print("=== Kimi Adapter Test (14 Tools) ===\n")
+    print("=== Kimi Adapter Test (17 Tools) ===\n")
 
     print(get_tool_summary("all"))
     

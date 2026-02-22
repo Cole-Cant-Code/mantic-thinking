@@ -1,0 +1,50 @@
+tool: system_lock_dissolution_window
+type: emergence
+domain: system_lock
+
+selection:
+  use_when:
+    - "You suspect a lock-dissolution window may be forming."
+    - "Alternative ecosystems are maturing while incumbent control weakens."
+    - "You need timing guidance for structural vs competitive transition moves."
+  not_for:
+    - "Narrative-only commentary without measurable transition signals."
+    - "Forecasting long-term collapse with no current convergence evidence."
+
+parameters:
+  autonomy_momentum:
+    layer: Micro
+    low: "Agency growth is stalled"
+    mid: "Agency growth is visible but uneven"
+    high: "Agency growth is strong and accelerating"
+  alternative_readiness:
+    layer: Meso
+    low: "Alternatives are immature or fragmented"
+    mid: "Alternatives are functional but not dominant"
+    high: "Alternatives are viable and displacement-ready"
+  control_vulnerability:
+    layer: Macro
+    low: "Incumbent control is stable"
+    mid: "Incumbent control has visible stress points"
+    high: "Control is fragile and exposed to displacement"
+  pattern_flexibility:
+    layer: Meta
+    low: "System re-hardens quickly"
+    mid: "Some adaptability; gains can hold with reinforcement"
+    high: "Pattern rigidity is weakening; sustained change is plausible"
+
+interaction_guidance:
+  modes:
+    base: "Use fixed I for comparability across phases."
+    dynamic: "Default; alternative_readiness is boosted as control_vulnerability rises."
+    override: "Use to encode confidence in readiness/vulnerability estimates."
+  key_dynamic: "Vulnerability-driven readiness acceleration models competitive opening dynamics."
+
+interpretation:
+  high_m: "Opportunity: a dissolution window is forming or open; transition execution matters."
+  low_m: "No dissolution window yet; continue capacity building and pressure alignment."
+  check:
+    - "Sustained windows require autonomy momentum, alternative readiness, and control vulnerability to converge."
+
+iteration:
+  note: "Use s_curve to test adoption onset and linear to test decay assumptions when comparing intervention timing." 

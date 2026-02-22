@@ -170,27 +170,30 @@ def get_gemini_prompt_addon():
         str: Prompt addon
     """
     return """
-## Using Mantic Early Warning Tools (14 Total)
+## Using Mantic Early Warning Tools (17 Total)
 
-You have access to 14 cross-domain detection tools using the Mantic Framework.
+You have access to 17 cross-domain detection tools using the Mantic Framework.
 
 **Core Formula:** M = (sum(W * L * I)) * f(t) / k_n
 
 ### Tool Types
 
-**FRICTION Tools (7):** Detect cross-layer conflicts (risks)
+**FRICTION Tools (8):** Detect cross-layer conflicts (risks)
 - Use when: Assessing risks, finding bottlenecks
 - High M = danger
 - Output: alerts, warnings
 
-**CONFLUENCE Tools (7):** Detect alignment windows (opportunities)  
+**CONFLUENCE Tools (8):** Detect alignment windows (opportunities)  
 - Use when: Seeking optimal timing
 - High M = opportunity
 - Output: window_detected, recommendations
 
 ### Available Tools
 
-Healthcare, Finance, Cybersecurity, Climate, Legal, Military, Social/Cultural
+Healthcare, Finance, Cybersecurity, Climate, Legal, Military, Social/Cultural, System Lock
+
+Generic:
+- `generic_detect` for caller-defined domains (3-6 layers).
 
 Each domain has both a Friction tool (divergence detection) and Emergence tool (confluence detection).
 
@@ -292,7 +295,7 @@ def get_gemini_context(domain=None):
 
 if __name__ == "__main__":
     # Test the adapter
-    print("=== Gemini Adapter Test (14 Tools) ===\n")
+    print("=== Gemini Adapter Test (17 Tools) ===\n")
 
     tools = get_gemini_tools()
     declarations = tools[0]["function_declarations"]

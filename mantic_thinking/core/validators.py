@@ -208,6 +208,7 @@ DOMAIN_KERNEL_ALLOWLIST = {
     "legal": ["logistic", "s_curve", "linear", "memory"],
     "military": ["memory", "exponential", "linear"],
     "social": ["exponential", "oscillatory", "s_curve", "linear"],
+    "system_lock": ["linear", "memory", "s_curve"],
     "planning": ["logistic", "s_curve", "linear", "memory"],
     "generic": ["exponential", "s_curve", "linear", "memory", "oscillatory", "power_law", "logistic"],
 }

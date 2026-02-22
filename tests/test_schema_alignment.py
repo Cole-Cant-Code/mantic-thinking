@@ -55,7 +55,7 @@ def _kimi_tool_schemas():
 
 
 def test_public_tool_sets_match():
-    """OpenAPI, Kimi, and adapters must expose the same public 14 tools."""
+    """OpenAPI, Kimi, and adapters must expose the same public 17 tools."""
     public = set(tools.__all__)
 
     openapi_doc = _load_json(OPENAPI_PATH)
