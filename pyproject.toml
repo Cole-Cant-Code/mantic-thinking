@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mantic-thinking"
-version = "1.6.0"
+version = "2.0.0"
 description = "Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis"
 readme = "README.md"
 license = {text = "Elastic License 2.0"}
@@ -12,7 +12,7 @@ authors = [
     {name = "Mantic Framework", email = "licensing@manticthink.com"},
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",

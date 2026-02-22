@@ -1,3 +1,27 @@
+# Release Notes — 2026-02-22 (v2.0.0)
+
+## Summary
+
+Mantic 2.0 marks the stable release milestone. The 17-tool surface (8 friction + 8 emergence + 1 generic) across 8 domains is production-ready. This release overhauls the README for clarity and accessibility, bumps the project status to Production/Stable, and establishes v2 as the baseline for all future development.
+
+## Highlights
+
+- **README overhaul**: Restructured for scannability and value clarity. Collapsible test-drive prompts. Clean section hierarchy: problem, solution, quick start, tools, formula, governance, temporal dynamics, audit trail, architecture.
+- **Version milestone**: 2.0.0 signals production stability. 626 tests passing. 17 tools across 8 domains. Full adapter coverage (Claude, Kimi, Gemini, OpenAI, Ollama).
+- **Project status**: `Development Status :: 5 - Production/Stable` in PyPI classifiers.
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- All tools, adapters, and schemas unchanged from v1.6.0.
+- No breaking API changes from v1.6.0.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-22 (v1.6.0)
 
 ## Summary
