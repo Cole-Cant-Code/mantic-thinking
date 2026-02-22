@@ -62,7 +62,8 @@ memory         1 + memory_strength * exp(-t)                         Decaying pe
 
 Each kernel uses a subset of the parameter space:
 
-All kernels    kernel_type (required), t (required), alpha (0.01-0.5), n (-2.0 to 2.0)
+All kernels    kernel_type (required), t (required)
+               alpha (0.01-0.5, optional, default varies), n (-2.0 to 2.0, optional, default varies)
 s_curve        + t0 (inflection point, where onset begins)
 power_law      + exponent (tail heaviness)
 oscillatory    + frequency (cycle rate)
@@ -72,7 +73,7 @@ Do NOT use midpoint, steepness, or decay. These are not recognized and will be s
 
 Temporal config overrides raw f_time. Requires both kernel_type AND t.
 
-Not all kernels are valid for every profile. Each profile declares a temporal allowlist. Using an unlisted kernel is not an error -- it is a modeling choice you should justify.
+Not all kernels are valid for every profile. Each profile declares a temporal allowlist. Using an unlisted kernel will be rejected -- the kernel_type moves to the rejected block in overrides_applied, and f(t) falls back to the raw f_time value. Check the allowlist via list_domain_profiles before choosing a kernel.
 
 
 --- MCP TOOLS ---
@@ -89,21 +90,19 @@ mantic_detect_emergence  Shortcut for emergence (alignment) detection
 
 Call list_domain_profiles to see what is loaded. Each profile defines its own layer names, weights, thresholds, and temporal allowlist. The LLM decides what Micro/Meso/Macro/Meta mean for the situation at hand. The profile encodes the domain theory; you bring the situational judgment.
 
-Example profile (customer_signal_core):
+Example profile (signal_core):
 
-Layer                     Hierarchy   Weight   What It Measures
-behavioral_velocity       Micro       0.30     Engagement speed, usage patterns, activity signals
-institutional_readiness   Meso        0.25     Org alignment, integration depth, process adoption
-economic_capacity         Macro       0.25     Budget health, spending trajectory, contract signals
-trust_resilience          Meta        0.20     Relationship durability, loyalty under stress
+Layer       Hierarchy   What It Measures
+micro       Micro       Individual actions, engagement speed, usage patterns
+meso        Meso        Group dynamics, integration depth, process adoption
+macro       Macro       System-wide effects, spending trajectory, structural signals
+meta        Meta        Evolutionary change, relationship durability, loyalty under stress
 
 Temporal allowlist: linear, memory, s_curve.
 
-This is a deliberately general profile. Every profile follows the same structure: 4 layers at Micro/Meso/Macro/Meta, weights summing to 1.0, thresholds, and a temporal allowlist. The formula does not change between profiles. Only the layer semantics and weight distribution change.
+This is a domain-agnostic base profile. The layer names are generic by design -- you decide what Micro/Meso/Macro/Meta mean for the situation at hand. Every profile follows the same structure: 4 layers, weights summing to 1.0, thresholds, and a temporal allowlist. The formula does not change between profiles. Only the layer semantics and weight distribution change.
 
-If no existing profile fits your domain, you have two options:
-1. Reinterpret the closest profile. Map its layers to your domain's signals. The math does not care what the layers are called -- only that you are consistent.
-2. Author a custom profile YAML and validate it with validate_domain_profile before use.
+If no existing profile fits your domain, reinterpret the closest one. Map its layers to your domain's signals. The math does not care what the layers are called -- only that you are consistent. You can also author a custom profile YAML and validate its schema with validate_domain_profile, but note that the MCP toolset provides validation only -- loading a custom profile into the runtime requires server-side registration.
 
 
 --- PARAMETERS ---
