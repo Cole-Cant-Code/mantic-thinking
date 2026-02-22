@@ -24,7 +24,7 @@ LLMs are powerful reasoners but they drift. Give an LLM complete freedom with a 
 
 | Constraint | What the LLM Can Do | What's Prevented |
 |------------|---------------------|------------------|
-| **Weights (W)** | Hidden, immutable | Domain theory cannot be altered or ignored |
+| **Weights (W)** | Visible, immutable | Domain theory cannot be altered or ignored |
 | **Thresholds** | Tune ±20% of default | Cannot disable detection or trigger on noise |
 | **Temporal Kernels** | Choose from domain-allowlisted set | Nonsensical dynamics (e.g., oscillatory for cancer progression) |
 | **Interaction Coefficients (I)** | Scale per-layer confidence [0.1, 2.0] | Cannot zero out signals or let one dominate entirely |
