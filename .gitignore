@@ -22,3 +22,8 @@ build/
 # Local development utilities (not part of release)
 demo.py
 visualization/__init__.py
+
+# Local planning/scratch artifacts
+PLAN_doc_update.md
+staging/
+CLAUDE.md
