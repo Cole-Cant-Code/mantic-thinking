@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mantic-thinking"
-version = "1.5.3"
+version = "1.5.4"
 description = "Cross-domain anomaly and opportunity detection using 4-layer hierarchical analysis"
 readme = "README.md"
 license = {text = "Elastic License 2.0"}
