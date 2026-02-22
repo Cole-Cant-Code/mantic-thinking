@@ -93,10 +93,10 @@ Call list_domain_profiles to see what is loaded. Each profile defines its own la
 Example profile (signal_core):
 
 Layer       Hierarchy   What It Measures
-micro       Micro       Individual actions, engagement speed, usage patterns
-meso        Meso        Group dynamics, integration depth, process adoption
-macro       Macro       System-wide effects, spending trajectory, structural signals
-meta        Meta        Evolutionary change, relationship durability, loyalty under stress
+micro       Micro       Individual actions
+meso        Meso        Group dynamics
+macro       Macro       System-wide effects
+meta        Meta        Evolutionary change
 
 Temporal allowlist: linear, memory, s_curve.
 
@@ -150,7 +150,7 @@ Layer coupling / coherence (0-1): Do the layers agree? Computed from L values on
 tension_with: Names the specific disagreeing layer pairs (agreement < 0.5). Only appears when tension exists.
 
 Friction mode adds: alert, severity, mismatch_score.
-Emergence mode adds: window_detected, window_type, confidence, limiting_factor, recommended_action.
+Emergence mode adds: window_detected, window_type, confidence, alignment_floor, limiting_factor, recommended_action.
 
 Key patterns:
   High coherence + high M in emergence = real window, all signals confirm.
