@@ -161,7 +161,7 @@ def health_check() -> dict[str, Any]:
     return {
         "status": "ok",
         "server": "Mantic Thinking",
-        "version": "2.1.0",
+        "version": "2.2.0",
         "presets": len(_PRESETS),
     }
 

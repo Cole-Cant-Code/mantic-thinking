@@ -401,7 +401,7 @@ mantic-thinking/
 │   ├── configs/                   # Domain configs, system prompt, framework docs
 │   ├── schemas/                   # OpenAPI & Kimi-native schemas
 │   └── visualization/             # ASCII charts & gauges
-└── tests/                         # 654 tests
+└── tests/                         # 626 tests
 ```
 
 ---
@@ -424,7 +424,7 @@ The `mantic_thinking/configs/` directory provides LLM reasoning context:
 # Quick check
 python3 -c "from mantic_thinking.tools.generic_detect import detect; print('detect ready')"
 
-# Full suite (654 tests)
+# Full suite (626 tests)
 python3 -m pytest -q
 ```
 
@@ -480,7 +480,7 @@ See [RELEASE_NOTES.md](RELEASE_NOTES.md) for full changelog.
 
 | Version | Highlights |
 |---------|-----------|
-| **3.0.0** | Single-detect architecture. LLM controls layers, weights, values. 16 built-in tools become presets. |
+| **2.2.0** | Single-detect architecture. LLM controls layers, weights, values. 16 built-in tools become presets. |
 | 2.0.1 | PyPI README sync |
 | 2.0.0 | README overhaul, v2 milestone |
 | 1.6.0 | System lock domain |

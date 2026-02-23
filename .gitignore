@@ -23,6 +23,9 @@ build/
 demo.py
 visualization/__init__.py
 
+# Lock files (project uses hatchling, not uv/pip-tools)
+uv.lock
+
 # Local planning/scratch artifacts
 PLAN_doc_update.md
 staging/

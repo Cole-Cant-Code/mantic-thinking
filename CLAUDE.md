@@ -15,7 +15,7 @@ Mantic Thinking is a cross-domain anomaly and opportunity detection framework us
 ## Commands
 
 ```bash
-# Run all tests (654 tests, ~1s)
+# Run all tests (626 tests, ~1s)
 python3 -m pytest -q
 
 # Run a single test file

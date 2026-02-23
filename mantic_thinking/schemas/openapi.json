@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Mantic Detection API",
-    "version": "3.0.0",
+    "version": "2.2.0",
     "description": "Deterministic cross-domain detection engine. One detect tool -- the LLM defines layers, weights, and values. The kernel handles the math."
   },
   "paths": {

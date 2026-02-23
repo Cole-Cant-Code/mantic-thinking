@@ -38,7 +38,7 @@ def get_kimi_tools():
             "description": func["description"],
             "parameters": func["parameters"],
             "_mantic_meta": {
-                "version": "3.0.0",
+                "version": "2.2.0",
                 "tool_type": "detect",
                 "requires_clamping": True,
                 "deterministic": True

@@ -1,3 +1,29 @@
+# Release Notes — 2026-02-23 (v2.2.0)
+
+## Summary
+
+Single-detect architecture. The 16 built-in domain tools are now reference presets behind one `detect` endpoint — the LLM defines layer names, weights, and values. All 4 adapters rewritten for the single-tool surface. MCP server added. Version references unified across the project.
+
+## Highlights
+
+- **Single-detect architecture**: Collapsed 16 individual domain tools into reference presets. One `detect` tool is the product; presets are calibration data.
+- **MCP server** (`server.py`, `__main__.py`): 7 tools, 9 resources, 3 prompts via FastMCP.
+- **Adapter rewrite**: OpenAI, Claude, Kimi, and Gemini adapters now expose one detect tool instead of 17 schemas.
+- **Version alignment**: Unified version across pyproject.toml, server, adapters, schemas, SKILL.md, and docs.
+- **Test count correction**: 626 tests (was incorrectly listed as 654 in some docs).
+
+## Compatibility
+
+- Core formula unchanged (`mantic_thinking/core/mantic_kernel.py`).
+- Built-in tools still importable via `TOOL_MAP` for backward compatibility.
+- No changes to governance bounds or temporal kernel modes.
+
+## Tests
+
+- `python3 -m pytest -q`
+
+---
+
 # Release Notes — 2026-02-22 (v2.0.1)
 
 ## Summary
