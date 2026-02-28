@@ -2,6 +2,9 @@
 
 **Cross-domain anomaly and opportunity detection for LLMs.**
 
+[![License: Elastic 2.0](https://img.shields.io/badge/license-Elastic--2.0-blue.svg)](LICENSE)
+[![Free for Startups & Internal Use](https://img.shields.io/badge/free-startups%20%26%20internal%20use-success.svg)](COMMERCIAL_LICENSE)
+
 Detects hidden risks before they cascade. Spots optimal windows before they close. Works across healthcare, finance, cybersecurity, climate, legal, military, social dynamics, system lock-in, or any domain you define.
 
 ```bash
@@ -9,6 +12,8 @@ pip install mantic-thinking
 ```
 
 Compatible with **Claude, Kimi, Gemini, OpenAI, and Ollama.**
+
+> **Single source of truth for multi-signal scoring math.** CIP and other downstream protocols consume mantic via optional adapters — mantic owns the kernel, they own the domain semantics.
 
 ---
 
@@ -454,8 +459,11 @@ Elastic License 2.0 -- See [LICENSE](LICENSE).
 
 - Free to use, modify, distribute for internal applications
 - Can use in production for your own organization
-- **Cannot** offer as a hosted/managed service (SaaS)
-- **Cannot** embed in commercial products without commercial license
+- Free startup commercial embedding is available under Tier 1 (eligibility +
+  registration required; see [COMMERCIAL_LICENSE](COMMERCIAL_LICENSE))
+- **Cannot** offer as a hosted/managed service (SaaS) to third parties without
+  an active commercial tier
+- **Cannot** redistribute/white-label without Tier 4 OEM rights
 
 ### Commercial License
 
@@ -465,10 +473,16 @@ See [COMMERCIAL_LICENSE](COMMERCIAL_LICENSE) for pricing and terms.
 
 | Tier | Best For | From |
 |------|----------|------|
-| Startup | <$1M revenue | $500/year |
+| Startup Builder | <$1M ARR and <$3M funding | $0/year |
 | Growth | <$50M revenue | $5,000/year |
 | Enterprise | Unlimited, large orgs | $25,000/year |
 | OEM/SaaS | Embed, resell, hosted service | Custom (from $50k) |
+
+Startup tier mechanics:
+
+- Registration is required by email to `licensing@manticthink.com`.
+- If you cross the startup threshold, you have a 60-day grace period to notify
+  Mantic and upgrade to the Growth tier.
 
 **Contact:** licensing@manticthink.com
 

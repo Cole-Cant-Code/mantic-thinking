@@ -8,31 +8,34 @@ License 2.0).
 LICENSE TIERS
 ------------------------------------------------------------------------------
 
-TIER 1: STARTUP / SMALL BUSINESS
-- Annual revenue < $1M USD
-- Up to 10 employees
-- Internal use only (no redistribution)
+TIER 1: STARTUP BUILDER (COMMERCIAL) -- FREE
+- Annual Recurring Revenue (ARR) < $1M USD
+- Total funding raised < $3M USD
+- One legal entity
+- Commercial embedding in one product or SaaS deployment is permitted
+- Registration is required (see "STARTUP REGISTRATION & VERIFICATION")
 
-  Price: $500/year or $1,500 one-time
+  Price: $0/year
 
-TIER 2: GROWTH / ENTERPRISE INTERNAL
+TIER 2: GROWTH (COMMERCIAL)
 - Annual revenue < $50M USD
-- Unlimited internal users
-- Internal use only (no redistribution)
+- Internal and external commercial use
+- Commercial embedding in product or SaaS for one legal entity
 
   Price: $5,000/year or $15,000 one-time
 
 TIER 3: ENTERPRISE UNLIMITED
-- Annual revenue ≥ $50M USD
+- Annual revenue >= $50M USD
 - Unlimited internal users
+- Commercial embedding in product or SaaS for one legal entity
 - Includes 20 hours consulting/support
 
   Price: $25,000/year or $75,000 one-time
 
-TIER 4: OEM / REDISTRIBUTION / SAAS
-- Embed in commercial product
-- Offer as managed service (SaaS)
+TIER 4: OEM / REDISTRIBUTION / PLATFORM
 - White-label rights
+- Redistribution/sublicensing rights
+- Multi-tenant platform and managed-service rights
 - Includes source code modification rights
 - Priority support
 
@@ -40,58 +43,87 @@ TIER 4: OEM / REDISTRIBUTION / SAAS
   Contact: licensing@manticthink.com
 
 ------------------------------------------------------------------------------
+STARTUP GRADUATION MECHANIC
+------------------------------------------------------------------------------
+
+If a Tier 1 licensee exceeds either Tier 1 threshold (ARR >= $1M or total
+funding >= $3M), the licensee has 60 calendar days to:
+
+1. Notify Mantic Framework at licensing@manticthink.com, and
+2. Upgrade to Tier 2 (or another applicable tier).
+
+Commercial use remains authorized during this 60-day transition period if the
+licensee is acting in good faith and provides timely notice.
+
+------------------------------------------------------------------------------
 WHAT EACH TIER INCLUDES
 ------------------------------------------------------------------------------
 
-All tiers include:
-- Right to use all 14 tools (Friction + Emergence)
-- All 7 domain configurations (Healthcare, Finance, Cyber, Climate, Legal,
-  Military, Social)
-- All adapters (OpenAI, Claude, Kimi, Gemini, Ollama)
-- Updates for license duration
+All active commercial tiers include:
+- Right to use all Mantic tools (Friction + Emergence)
+- Domain configurations and presets shipped with the project
+- Adapters (OpenAI, Claude, Kimi, Gemini, Ollama)
+- Updates for the license duration
 
-OEM/SaaS tier additionally includes:
-- Right to modify and redistribute
-- Right to remove attribution
-- Right to offer as hosted service
+Tier 4 additionally includes:
+- Redistribution/sublicensing rights
+- Right to offer Mantic as a standalone hosted/managed service
 - Dedicated support channel
-- Custom domain configurations
+- Custom commercial terms
+
+------------------------------------------------------------------------------
+STARTUP REGISTRATION & VERIFICATION
+------------------------------------------------------------------------------
+
+Tier 1 (free startup commercial rights) is not an honor-system-only grant.
+To activate Tier 1 rights, email licensing@manticthink.com and include:
+
+- Legal entity name and country of incorporation
+- Product name and deployment model (embedded SDK, SaaS, API, etc.)
+- Current ARR and total funding (self-attested)
+- Contact person for annual eligibility confirmation
+
+Mantic Framework will issue a written Tier 1 confirmation. Tier 1 eligibility
+must be re-attested at least once every 12 months.
 
 ------------------------------------------------------------------------------
 RESTRICTIONS
 ------------------------------------------------------------------------------
 
-Unless you have purchased an OEM/SaaS license:
+1. Without an active Tier 1, Tier 2, Tier 3, or Tier 4 commercial license, you
+   may NOT embed Mantic in a product sold to end users.
 
-1. You may NOT offer Mantic tools as a hosted or managed service where users
-   access the functionality via API, web interface, or cloud platform.
+2. Without an active Tier 1, Tier 2, Tier 3, or Tier 4 commercial license, you
+   may NOT provide Mantic functionality to third parties as a hosted/managed
+   service where users access substantial Mantic functionality.
 
-2. You may NOT embed Mantic tools in a product sold to end users without
-   additional OEM licensing.
+3. Without Tier 4 rights, you may NOT sublicense, resell, or redistribute
+   Mantic as a standalone platform or white-labeled offering.
 
-3. You may NOT remove or alter copyright notices, license references, or
+4. You may NOT remove or alter copyright notices, license references, or
    attribution in the source code.
 
-4. You may NOT sublicense, sell, or transfer your license to third parties
-   without written permission.
+5. You may NOT transfer your commercial license to another legal entity without
+   written permission.
 
 ------------------------------------------------------------------------------
-HOW TO PURCHASE
+HOW TO PURCHASE OR ACTIVATE
 ------------------------------------------------------------------------------
 
 Contact: licensing@manticthink.com
 
 Include in your inquiry:
 - Company name and size
-- Intended use case (internal, product embedding, SaaS)
+- Intended use case (internal, product embedding, SaaS, OEM)
 - Estimated number of users/deployments
 - Any customization requirements
 
-Standard licenses are issued within 48 hours of payment.
-Custom/OEM licenses require 1-2 weeks for terms negotiation.
+Tier 1 startup confirmations are typically issued within 5 business days.
+Paid standard licenses are typically issued within 48 hours of payment.
+Custom/OEM licenses generally require 1-2 weeks for terms negotiation.
 
 ------------------------------------------------------------------------------
-REFUND POLICY
+REFUND POLICY (PAID TIERS)
 ------------------------------------------------------------------------------
 
 Full refund within 14 days if:
@@ -112,7 +144,7 @@ All paid licenses include:
 - Email support (48-hour response)
 - Bug fix priority
 
-OEM/SaaS licenses additionally include:
+Tier 4 licenses additionally include:
 - Phone/Slack support (business hours)
 - Quarterly roadmap reviews
 - Custom feature development (additional cost)
@@ -122,13 +154,13 @@ QUESTIONS?
 ------------------------------------------------------------------------------
 
 For licensing inquiries: licensing@manticthink.com
-
 For technical questions: licensing@manticthink.com
-
-For legal questions: Include "Legal Inquiry" in subject line
+For legal questions: include "Legal Inquiry" in subject line.
 
 ------------------------------------------------------------------------------
 VERSION HISTORY
 ------------------------------------------------------------------------------
 
+v1.1 (2026-02-28): Added free startup commercial tier, registration requirement,
+60-day graduation mechanic, and clarified embedding/hosted-service rights.
 v1.0 (2025-02-05): Initial commercial terms
