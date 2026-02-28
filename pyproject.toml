@@ -72,7 +72,6 @@ include = [
     "/mantic_thinking/mantic",
     "/mantic_thinking/configs",
     "/mantic_thinking/schemas",
-    "/tests",
     "/mantic_thinking/visualization",
     "README.md",
     "SKILL.md",

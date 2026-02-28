@@ -1,12 +1,15 @@
 """Tests for the MCP server surface.
 
 Tests tool, resource, and prompt functions directly (not via MCP protocol).
+Requires the [mcp] extra (fastmcp).
 """
 from __future__ import annotations
 
 import json
 
 import pytest
+
+fastmcp = pytest.importorskip("fastmcp", reason="requires fastmcp (install with pip install mantic-thinking[mcp])")
 
 from mantic_thinking.server import (
     # Tools
